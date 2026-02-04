@@ -3,8 +3,8 @@ import { db } from "@/lib/db";
 import { getLearningPaths } from "@/actions/learning-path";
 
 export default async function TestPage() {
-    let directData = [];
-    let actionData = [];
+    let directData: any[] = [];
+    let actionData: any[] = [];
     let error = null;
 
     try {
