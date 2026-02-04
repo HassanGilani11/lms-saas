@@ -1,0 +1,9 @@
+D:\NextJSProjects\lms-saas\src\app\(dashboard)\instructor\analytics
+D:\NextJSProjects\lms-saas\src\app\(dashboard)\instructor\courses
+D:\NextJSProjects\lms-saas\src\app\(dashboard)\instructor\layout.tsx
+D:\NextJSProjects\lms-saas\src\app\(dashboard)\instructor\page.tsx
+D:\NextJSProjects\lms-saas\src\app\(dashboard)\instructor\quizzes
+D:\NextJSProjects\lms-saas\src\app\(dashboard)\instructor\analytics\page.tsx
+D:\NextJSProjects\lms-saas\src\app\(dashboard)\instructor\courses\page.tsx
+D:\NextJSProjects\lms-saas\src\app\(dashboard)\instructor\quizzes\[quizId]
+D:\NextJSProjects\lms-saas\src\app\(dashboard)\instructor\quizzes\[quizId]\page.tsx
