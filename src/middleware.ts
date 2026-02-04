@@ -27,9 +27,6 @@ export default auth((req) => {
     if (isApiAuthRoute) return NextResponse.next();
 
     if (isAuthRoute) {
-        if (isLoggedIn) {
-            return NextResponse.redirect(new URL("/dashboard", nextUrl));
-        }
         return NextResponse.next();
     }
 

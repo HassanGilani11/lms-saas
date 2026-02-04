@@ -22,8 +22,8 @@ const DashboardPage = async () => {
         return redirect("/student");
     }
 
-    // Prevents redirect loop if role is missing or invalid
-    return redirect("/");
+    // Prevents redirect loop if role is missing or invalid by sending to login
+    return redirect("/auth/login?error=InvalidRole");
 };
 
 export default DashboardPage;
