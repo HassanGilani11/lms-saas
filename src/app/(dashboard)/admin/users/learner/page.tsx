@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getUsers, deleteUser, updateUser, createUser } from "@/actions/user";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@/lib/prisma";
 import {
     Table,
     TableBody,

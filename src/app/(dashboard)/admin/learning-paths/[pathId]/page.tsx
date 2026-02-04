@@ -60,7 +60,7 @@ import { getAdminCourses } from "@/actions/admin";
 import { getUsers } from "@/actions/user";
 import { toast } from "react-hot-toast";
 import { format } from "date-fns";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@/lib/prisma";
 
 const LearningPathDetailPage = () => {
     const params = useParams();

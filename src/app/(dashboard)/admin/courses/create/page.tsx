@@ -32,7 +32,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { createCourse, updateCourse } from "@/actions/course";
 import { getCategories } from "@/actions/admin";
 import { getUsers } from "@/actions/user";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@/lib/prisma";
 import { getCourseTags } from "@/actions/course-tags";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -61,8 +61,7 @@ const CreateCoursePage = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     const form = useForm<FormValues>({
-        // @ts-ignore
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(formSchema) as any,
         defaultValues: {
             title: "",
             courseCode: "",
@@ -76,8 +75,8 @@ const CreateCoursePage = () => {
             isActive: true,
             hideFromCatalog: false,
             tagIds: [],
-        },
-    });
+        } as any,
+    }) as any;
 
     useEffect(() => {
         const fetchData = async () => {
@@ -95,7 +94,7 @@ const CreateCoursePage = () => {
         fetchData();
     }, []);
 
-    const onSubmit = async (values: any) => {
+    const onSubmit = async (values: FormValues) => {
         try {
             const course = await createCourse(values.title, {
                 price: values.price,
@@ -108,12 +107,7 @@ const CreateCoursePage = () => {
             if (course) {
                 // Now update with the remaining fields since createCourse is basic
                 await updateCourse(course.id, {
-                    description: values.description,
-                    introVideoUrl: values.introVideoUrl,
-                    capacity: values.capacity,
-                    level: values.level,
-                    isActive: values.isActive,
-                    hideFromCatalog: values.hideFromCatalog,
+                    ...values,
                     tagIds: values.tagIds,
                 });
 
@@ -155,7 +149,7 @@ const CreateCoursePage = () => {
                 </div>
             </div>
 
-            <Form {...form}>
+            <Form {...(form as any)}>
                 <form className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
                     <Card className="border-none shadow-sm md:col-span-2">
                         <CardContent className="p-6 space-y-6">
@@ -269,40 +263,29 @@ const CreateCoursePage = () => {
                                         <FormItem className="space-y-0">
                                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                                 {availableTags.map((tag) => (
-                                                    <FormField
+                                                    <FormItem
                                                         key={tag.id}
-                                                        control={form.control}
-                                                        name="tagIds"
-                                                        render={({ field }) => {
-                                                            return (
-                                                                <FormItem
-                                                                    key={tag.id}
-                                                                    className="flex flex-row items-center space-x-3 space-y-0 p-3 rounded-xl bg-slate-50/50 border border-slate-100/50 hover:bg-slate-50 hover:border-slate-200 transition-all cursor-pointer"
-                                                                >
-                                                                    <FormControl>
-                                                                        <Checkbox
-                                                                            checked={field.value?.includes(tag.id)}
-                                                                            onCheckedChange={(checked) => {
-                                                                                return checked
-                                                                                    ? field.onChange([...field.value, tag.id])
-                                                                                    : field.onChange(
-                                                                                        field.value?.filter(
-                                                                                            (value: any) => value !== tag.id
-                                                                                        )
-                                                                                    )
-                                                                            }}
-                                                                        />
-                                                                    </FormControl>
-                                                                    <div className="flex items-center gap-x-1.5">
-                                                                        <Hash className="h-3 w-3 text-slate-400" />
-                                                                        <FormLabel className="text-[13px] font-medium text-slate-600 cursor-pointer">
-                                                                            {tag.name}
-                                                                        </FormLabel>
-                                                                    </div>
-                                                                </FormItem>
-                                                            )
-                                                        }}
-                                                    />
+                                                        className="flex flex-row items-center space-x-3 space-y-0 p-3 rounded-xl bg-slate-50/50 border border-slate-100/50 hover:bg-slate-50 hover:border-slate-200 transition-all cursor-pointer"
+                                                    >
+                                                        <FormControl>
+                                                            <Checkbox
+                                                                checked={field.value?.includes(tag.id)}
+                                                                onCheckedChange={(checked) => {
+                                                                    const current = field.value || [];
+                                                                    const updated = checked
+                                                                        ? [...current, tag.id]
+                                                                        : current.filter((value: string) => value !== tag.id);
+                                                                    field.onChange(updated);
+                                                                }}
+                                                            />
+                                                        </FormControl>
+                                                        <div className="flex items-center gap-x-1.5">
+                                                            <Hash className="h-3 w-3 text-slate-400" />
+                                                            <FormLabel className="text-[13px] font-medium text-slate-600 cursor-pointer">
+                                                                {tag.name}
+                                                            </FormLabel>
+                                                        </div>
+                                                    </FormItem>
                                                 ))}
                                             </div>
                                             {availableTags.length === 0 && (

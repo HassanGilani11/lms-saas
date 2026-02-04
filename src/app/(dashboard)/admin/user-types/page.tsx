@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@/lib/prisma";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 

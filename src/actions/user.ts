@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
 /**
