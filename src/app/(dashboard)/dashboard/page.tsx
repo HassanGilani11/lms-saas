@@ -11,14 +11,19 @@ const DashboardPage = async () => {
     const role = session.user.role;
 
     if (role === "ADMIN") {
-        redirect("/admin");
+        return redirect("/admin");
     }
 
     if (role === "INSTRUCTOR") {
-        redirect("/instructor");
+        return redirect("/instructor");
     }
 
-    redirect("/student");
+    if (role === "STUDENT") {
+        return redirect("/student");
+    }
+
+    // Prevents redirect loop if role is missing or invalid
+    return redirect("/");
 };
 
 export default DashboardPage;

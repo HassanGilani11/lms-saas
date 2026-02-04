@@ -139,7 +139,7 @@ export const AdminSidebar = () => {
                         {session?.user?.name || "User Name"}
                     </span>
                     <span className="text-[10px] text-slate-400 font-medium tracking-wide uppercase">
-                        Admin Account
+                        {session?.user?.role?.toLowerCase() || "User"} Account
                     </span>
                 </div>
             </Link>

@@ -19,12 +19,14 @@ export const {
     session: { strategy: "jwt" },
     callbacks: {
         async session({ token, session }: any) {
-            if (token.sub && session.user) {
-                session.user.id = token.sub;
-            }
+            if (session.user) {
+                if (token.sub) {
+                    session.user.id = token.sub;
+                }
 
-            if (token.role && session.user) {
-                session.user.role = token.role as UserRole;
+                if (token.role) {
+                    session.user.role = token.role as UserRole;
+                }
             }
 
             return session;
@@ -35,18 +37,18 @@ export const {
                 return token;
             }
 
-            if (!token.sub) return token;
+            if (!token.role && token.sub) {
+                try {
+                    const existingUser = await db.user.findUnique({
+                        where: { id: token.sub },
+                    });
 
-            try {
-                const existingUser = await db.user.findUnique({
-                    where: { id: token.sub },
-                });
-
-                if (!existingUser) return token;
-
-                token.role = existingUser.role;
-            } catch (error) {
-                console.error("JWT CALLBACK ERROR", error);
+                    if (existingUser) {
+                        token.role = existingUser.role;
+                    }
+                } catch (error) {
+                    console.error("JWT CALLBACK ERROR", error);
+                }
             }
 
             return token;
