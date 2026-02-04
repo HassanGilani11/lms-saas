@@ -131,12 +131,12 @@ export const AdminSidebar = () => {
                 <Avatar className="h-10 w-10 border transition-transform group-hover:scale-105">
                     <AvatarImage src={session?.user?.image || ""} />
                     <AvatarFallback className="bg-slate-100 text-slate-600 font-semibold italic text-lg">
-                        {session?.user?.name?.[0] || "U"}
+                        {(session?.user as any)?.username?.[0] || session?.user?.name?.[0] || session?.user?.email?.[0] || "U"}
                     </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
                     <span className="text-sm font-semibold text-slate-700 leading-tight group-hover:text-slate-900 transition-colors">
-                        {session?.user?.name || "User Name"}
+                        {(session?.user as any)?.username || session?.user?.name || session?.user?.email || "User Name"}
                     </span>
                     <span className="text-[10px] text-slate-400 font-medium tracking-wide uppercase">
                         {session?.user?.role?.toLowerCase() || "User"} Account

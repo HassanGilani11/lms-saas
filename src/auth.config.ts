@@ -8,6 +8,8 @@ export default {
             if (user) {
                 token.role = (user as any).role;
                 token.id = user.id;
+                token.username = (user as any).username;
+                token.name = user.name;
             }
             return token;
         },
@@ -19,6 +21,14 @@ export default {
 
                 if (token.role) {
                     session.user.role = token.role;
+                }
+
+                if (token.username) {
+                    session.user.username = token.username;
+                }
+
+                if (token.name) {
+                    session.user.name = token.name;
                 }
             }
             return session;

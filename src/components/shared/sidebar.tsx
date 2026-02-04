@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { LogoutButton } from "./logout-button";
 import { BookOpen, Layout, List, BarChart } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useSession } from "next-auth/react";
 
 const routes = [
     {
@@ -21,13 +23,34 @@ const routes = [
 ];
 
 export const Sidebar = () => {
+    const { data: session } = useSession();
+
     return (
-        <div className="h-full border-r flex flex-col overflow-y-auto bg-white shadow-sm">
-            <div className="p-6 flex items-center gap-x-2">
-                <div className="h-8 w-8 bg-black rounded-lg flex items-center justify-center">
-                    <BookOpen className="text-white h-5 w-5" />
+        <div className="h-full border-r flex flex-col overflow-y-auto bg-white shadow-sm font-sans">
+            <Link
+                href="/instructor"
+                className="p-4 flex items-center gap-x-3 mb-2 hover:bg-slate-50 transition-colors group cursor-pointer"
+            >
+                <Avatar className="h-10 w-10 border transition-transform group-hover:scale-105">
+                    <AvatarImage src={session?.user?.image || ""} />
+                    <AvatarFallback className="bg-slate-100 text-slate-600 font-semibold italic text-lg">
+                        {(session?.user as any)?.username?.[0] || session?.user?.name?.[0] || session?.user?.email?.[0] || "U"}
+                    </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col">
+                    <span className="text-sm font-semibold text-slate-700 leading-tight group-hover:text-slate-900 transition-colors">
+                        {(session?.user as any)?.username || session?.user?.name || session?.user?.email || "User Name"}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium tracking-wide uppercase">
+                        Instructor Account
+                    </span>
                 </div>
-                <span className="font-bold text-xl tracking-tight">LuminaLearn</span>
+            </Link>
+
+            <div className="px-6 mb-2">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Dashboards
+                </span>
             </div>
             <div className="flex flex-col w-full">
                 {routes.map((route) => (

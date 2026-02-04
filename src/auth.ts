@@ -17,6 +17,58 @@ export const {
     secret: process.env.AUTH_SECRET,
     trustHost: true,
     session: { strategy: "jwt" },
+    callbacks: {
+        async jwt({ token, user }: any) {
+            // Initial sign in
+            if (user) {
+                token.role = (user as any).role;
+                token.id = user.id;
+                token.username = (user as any).username;
+                token.name = user.name;
+                return token;
+            }
+
+            // Subsequent checks - fetch from DB if fields are missing or if we want to sync
+            if (!token.name || !token.role) {
+                try {
+                    const dbUser = await db.user.findUnique({
+                        where: { id: token.sub }
+                    });
+
+                    if (dbUser) {
+                        token.role = dbUser.role;
+                        token.username = dbUser.username;
+                        token.name = dbUser.name;
+                    }
+                } catch {
+                    return token;
+                }
+            }
+
+            return token;
+        },
+        async session({ session, token }: any) {
+            if (session.user) {
+                if (token.sub) {
+                    session.user.id = token.sub;
+                }
+
+                if (token.role) {
+                    session.user.role = token.role as UserRole;
+                }
+
+                if (token.username) {
+                    session.user.username = token.username as string;
+                }
+
+                if (token.name) {
+                    session.user.name = token.name as string;
+                }
+            }
+
+            return session;
+        },
+    },
     providers: [
         ...authConfig.providers,
         Credentials({
