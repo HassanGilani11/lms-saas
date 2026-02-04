@@ -12,12 +12,13 @@ export const {
     signIn,
     signOut,
 } = NextAuth({
+    ...authConfig,
     adapter: PrismaAdapter(db as any),
     secret: process.env.AUTH_SECRET,
     trustHost: true,
     session: { strategy: "jwt" },
     callbacks: {
-        async session({ token, session }) {
+        async session({ token, session }: any) {
             if (token.sub && session.user) {
                 session.user.id = token.sub;
             }
@@ -28,7 +29,12 @@ export const {
 
             return session;
         },
-        async jwt({ token }) {
+        async jwt({ token, user }: any) {
+            if (user) {
+                token.role = (user as any).role;
+                return token;
+            }
+
             if (!token.sub) return token;
 
             try {
@@ -46,7 +52,6 @@ export const {
             return token;
         },
     },
-    ...authConfig,
     providers: [
         ...authConfig.providers,
         Credentials({

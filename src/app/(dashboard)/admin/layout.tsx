@@ -1,35 +1,24 @@
-"use client";
-
-import { AdminSidebar } from "@/components/shared/admin-sidebar";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import { AdminHeader } from "@/components/shared/admin-header";
 import { AdminRightSidebar } from "@/components/shared/admin-right-sidebar";
-import { SidebarProvider, useSidebar } from "@/hooks/use-sidebar";
-import { cn } from "@/lib/utils";
+import { SidebarProvider } from "@/hooks/use-sidebar";
+import { AdminLayoutWrapper } from "./_components/admin-layout-wrapper";
 
-const AdminLayoutContent = ({ children }: { children: React.ReactNode }) => {
-    const { isCollapsed } = useSidebar();
+const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
+    const session = await auth();
+
+    if (!session?.user) {
+        return redirect("/auth/login");
+    }
+
+    if (session.user.role !== "ADMIN") {
+        return redirect("/dashboard");
+    }
 
     return (
-        <div className="h-full bg-slate-50/30">
-            {/* Main Sidebar */}
-            <div
-                className={cn(
-                    "hidden md:flex h-full flex-col fixed inset-y-0 z-50 transition-all duration-300 ease-in-out overflow-hidden",
-                    isCollapsed ? "w-0 -translate-x-full" : "w-64 translate-x-0"
-                )}
-            >
-                <div className="h-full w-64">
-                    <AdminSidebar />
-                </div>
-            </div>
-
-            {/* Content Hub */}
-            <div
-                className={cn(
-                    "h-full flex flex-col transition-all duration-300 ease-in-out",
-                    isCollapsed ? "md:pl-0" : "md:pl-64"
-                )}
-            >
+        <SidebarProvider>
+            <AdminLayoutWrapper>
                 <AdminHeader />
                 <div className="flex h-full overflow-hidden">
                     {/* Main Scrollable Content */}
@@ -42,17 +31,7 @@ const AdminLayoutContent = ({ children }: { children: React.ReactNode }) => {
                         <AdminRightSidebar />
                     </div>
                 </div>
-            </div>
-        </div>
-    );
-};
-
-const AdminLayout = ({ children }: { children: React.ReactNode }) => {
-    return (
-        <SidebarProvider>
-            <AdminLayoutContent>
-                {children}
-            </AdminLayoutContent>
+            </AdminLayoutWrapper>
         </SidebarProvider>
     );
 };

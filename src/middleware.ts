@@ -7,30 +7,57 @@ const { auth } = NextAuth({
     trustHost: true,
 });
 
+import { NextResponse } from "next/server";
+
 export default auth((req) => {
     const { nextUrl } = req;
     const isLoggedIn = !!req.auth;
+    const userRole = (req.auth?.user as any)?.role;
 
     const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth");
     const isPublicRoute = ["/", "/auth/login", "/auth/register"].includes(
         nextUrl.pathname
     );
     const isAuthRoute = nextUrl.pathname.startsWith("/auth");
+    const isAdminRoute = nextUrl.pathname.startsWith("/admin");
+    const isInstructorRoute = nextUrl.pathname.startsWith("/instructor");
+    const isStudentRoute = nextUrl.pathname.startsWith("/student");
+    const isDashboardRoute = nextUrl.pathname === "/dashboard";
 
-    if (isApiAuthRoute) return;
+    if (isApiAuthRoute) return NextResponse.next();
 
     if (isAuthRoute) {
         if (isLoggedIn) {
-            return Response.redirect(new URL("/dashboard", nextUrl));
+            const redirectPath = userRole === "ADMIN" ? "/admin" : userRole === "INSTRUCTOR" ? "/instructor" : "/student";
+            return NextResponse.redirect(new URL(redirectPath, nextUrl));
         }
-        return;
+        return NextResponse.next();
     }
 
     if (!isLoggedIn && !isPublicRoute) {
-        return Response.redirect(new URL("/auth/login", nextUrl));
+        return NextResponse.redirect(new URL("/auth/login", nextUrl));
     }
 
-    return;
+    if (isLoggedIn) {
+        if (isDashboardRoute) {
+            const redirectPath = userRole === "ADMIN" ? "/admin" : userRole === "INSTRUCTOR" ? "/instructor" : "/student";
+            return NextResponse.redirect(new URL(redirectPath, nextUrl));
+        }
+
+        if (isAdminRoute && userRole !== "ADMIN") {
+            return NextResponse.redirect(new URL("/dashboard", nextUrl));
+        }
+
+        if (isInstructorRoute && userRole !== "INSTRUCTOR" && userRole !== "ADMIN") {
+            return NextResponse.redirect(new URL("/dashboard", nextUrl));
+        }
+
+        if (isStudentRoute && userRole !== "STUDENT" && userRole !== "ADMIN") {
+            return NextResponse.redirect(new URL("/dashboard", nextUrl));
+        }
+    }
+
+    return NextResponse.next();
 });
 
 export const config = {
