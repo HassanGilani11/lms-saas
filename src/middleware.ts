@@ -39,20 +39,23 @@ export default auth((req) => {
     }
 
     if (isLoggedIn) {
+        // Safe default for role if missing
+        const role = userRole || "STUDENT";
+
         if (isDashboardRoute) {
-            const redirectPath = userRole === "ADMIN" ? "/admin" : userRole === "INSTRUCTOR" ? "/instructor" : "/student";
+            const redirectPath = role === "ADMIN" ? "/admin" : role === "INSTRUCTOR" ? "/instructor" : "/student";
             return NextResponse.redirect(new URL(redirectPath, nextUrl));
         }
 
-        if (isAdminRoute && userRole !== "ADMIN") {
+        if (isAdminRoute && role !== "ADMIN") {
             return NextResponse.redirect(new URL("/dashboard", nextUrl));
         }
 
-        if (isInstructorRoute && userRole !== "INSTRUCTOR" && userRole !== "ADMIN") {
+        if (isInstructorRoute && role !== "INSTRUCTOR" && role !== "ADMIN") {
             return NextResponse.redirect(new URL("/dashboard", nextUrl));
         }
 
-        if (isStudentRoute && userRole !== "STUDENT" && userRole !== "ADMIN") {
+        if (isStudentRoute && role !== "STUDENT" && role !== "ADMIN") {
             return NextResponse.redirect(new URL("/dashboard", nextUrl));
         }
     }
