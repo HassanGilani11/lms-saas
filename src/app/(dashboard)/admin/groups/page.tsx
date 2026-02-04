@@ -60,8 +60,8 @@ import * as z from "zod";
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
-    description: z.string().optional().default(""),
-    categoryId: z.string().optional().default(""),
+    description: z.string().default("").or(z.literal("")),
+    categoryId: z.string().default("").or(z.literal("")),
     tagIds: z.array(z.string()).default([]),
 });
 

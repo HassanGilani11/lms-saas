@@ -13,13 +13,6 @@ export const getGlobalStats = async () => {
             throw new Error("Unauthorized");
         }
 
-        const totalRevenue = await db.purchase.aggregate({
-            _sum: {
-                // Since we don't store the exact price in Purchase yet (redundant with Course), 
-                // we'd normally join or sum course prices. For MVP, we'll sum course prices of all purchases.
-            }
-        });
-
         const totalUsers = await db.user.count();
         const totalCourses = await db.course.count();
         const totalPurchases = await db.purchase.count();
