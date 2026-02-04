@@ -17,44 +17,6 @@ export const {
     secret: process.env.AUTH_SECRET,
     trustHost: true,
     session: { strategy: "jwt" },
-    callbacks: {
-        async session({ token, session }: any) {
-            if (session.user) {
-                if (token.sub) {
-                    session.user.id = token.sub;
-                }
-
-                if (token.role) {
-                    session.user.role = token.role as UserRole;
-                }
-            }
-
-            return session;
-        },
-        async jwt({ token, user }: any) {
-            if (user) {
-                token.role = (user as any).role;
-                token.id = user.id;
-                return token;
-            }
-
-            if (!token.role && token.sub) {
-                try {
-                    const existingUser = await db.user.findUnique({
-                        where: { id: token.sub },
-                    });
-
-                    if (existingUser) {
-                        token.role = existingUser.role;
-                    }
-                } catch (error) {
-                    console.error("JWT CALLBACK ERROR", error);
-                }
-            }
-
-            return token;
-        },
-    },
     providers: [
         ...authConfig.providers,
         Credentials({

@@ -24,8 +24,5 @@ export default {
             return session;
         },
     },
-    providers: [
-        Github,
-        Google,
-    ],
+    providers: [], // Add OAuth providers here when credentials are ready
 } satisfies NextAuthConfig;
