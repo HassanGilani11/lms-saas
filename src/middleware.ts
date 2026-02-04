@@ -28,8 +28,7 @@ export default auth((req) => {
 
     if (isAuthRoute) {
         if (isLoggedIn) {
-            const redirectPath = userRole === "ADMIN" ? "/admin" : userRole === "INSTRUCTOR" ? "/instructor" : "/student";
-            return NextResponse.redirect(new URL(redirectPath, nextUrl));
+            return NextResponse.redirect(new URL("/dashboard", nextUrl));
         }
         return NextResponse.next();
     }
@@ -40,20 +39,21 @@ export default auth((req) => {
 
     if (isLoggedIn) {
         if (isDashboardRoute) {
-            if (!userRole) return NextResponse.next(); // Let the page handle missing role
-            const redirectPath = userRole === "ADMIN" ? "/admin" : userRole === "INSTRUCTOR" ? "/instructor" : "/student";
-            return NextResponse.redirect(new URL(redirectPath, nextUrl));
+            if (userRole === "ADMIN") return NextResponse.redirect(new URL("/admin", nextUrl));
+            if (userRole === "INSTRUCTOR") return NextResponse.redirect(new URL("/instructor", nextUrl));
+            if (userRole === "STUDENT") return NextResponse.redirect(new URL("/student", nextUrl));
+            return NextResponse.next();
         }
 
-        if (isAdminRoute && userRole !== "ADMIN") {
+        if (isAdminRoute && userRole && userRole !== "ADMIN") {
             return NextResponse.redirect(new URL("/dashboard", nextUrl));
         }
 
-        if (isInstructorRoute && userRole !== "INSTRUCTOR" && userRole !== "ADMIN") {
+        if (isInstructorRoute && userRole && userRole !== "INSTRUCTOR" && userRole !== "ADMIN") {
             return NextResponse.redirect(new URL("/dashboard", nextUrl));
         }
 
-        if (isStudentRoute && userRole !== "STUDENT" && userRole !== "ADMIN") {
+        if (isStudentRoute && userRole && userRole !== "STUDENT" && userRole !== "ADMIN") {
             return NextResponse.redirect(new URL("/dashboard", nextUrl));
         }
     }

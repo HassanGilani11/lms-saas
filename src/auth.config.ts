@@ -13,13 +13,12 @@ export default {
         },
         async session({ session, token }: any) {
             if (session.user) {
+                if (token.sub) {
+                    session.user.id = token.sub;
+                }
+
                 if (token.role) {
                     session.user.role = token.role;
-                }
-                if (token.id) {
-                    session.user.id = token.id;
-                } else if (token.sub) {
-                    session.user.id = token.sub;
                 }
             }
             return session;
