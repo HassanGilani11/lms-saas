@@ -35,6 +35,7 @@ import { getUsers } from "@/actions/user";
 import { UserRole } from "@/lib/prisma";
 import { getCourseTags } from "@/actions/course-tags";
 import { Checkbox } from "@/components/ui/checkbox";
+import { LessonsForm } from "../_components/lessons-form";
 
 const formSchema = z.object({
     title: z.string().min(1, "Title is required"),
@@ -61,6 +62,7 @@ const EditCoursePage = () => {
     const [categories, setCategories] = useState<any[]>([]);
     const [instructors, setInstructors] = useState<any[]>([]);
     const [availableTags, setAvailableTags] = useState<any[]>([]);
+    const [course, setCourse] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const form = useForm<FormValues>({
@@ -81,41 +83,43 @@ const EditCoursePage = () => {
         } as any,
     }) as any;
 
+    const fetchData = async () => {
+        setIsLoading(true);
+        const [courseData, catData, instData, tagData] = await Promise.all([
+            getCourseById(courseId),
+            getCategories(),
+            getUsers(UserRole.INSTRUCTOR),
+            getCourseTags(),
+        ]);
+
+        if (courseData) {
+            setCourse(courseData);
+            form.reset({
+                title: courseData.title || "",
+                courseCode: (courseData as any).courseCode || "",
+                categoryId: courseData.categoryId || "",
+                description: (courseData as any).description || "",
+                price: (courseData as any).price || 0,
+                introVideoUrl: (courseData as any).introVideoUrl || "",
+                capacity: (courseData as any).capacity || 0,
+                level: (courseData as any).level || "Beginner",
+                userId: courseData.userId || "",
+                isActive: (courseData as any).isActive ?? true,
+                hideFromCatalog: (courseData as any).hideFromCatalog ?? false,
+                tagIds: (courseData as any).tags?.map((tag: any) => tag.id) || [],
+            });
+        } else {
+            toast.error("Course not found");
+            router.push("/admin/courses");
+        }
+
+        setCategories(catData);
+        setInstructors(instData);
+        setAvailableTags(tagData);
+        setIsLoading(false);
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
-            const [courseData, catData, instData, tagData] = await Promise.all([
-                getCourseById(courseId),
-                getCategories(),
-                getUsers(UserRole.INSTRUCTOR),
-                getCourseTags(),
-            ]);
-
-            if (courseData) {
-                form.reset({
-                    title: courseData.title || "",
-                    courseCode: (courseData as any).courseCode || "",
-                    categoryId: courseData.categoryId || "",
-                    description: (courseData as any).description || "",
-                    price: (courseData as any).price || 0,
-                    introVideoUrl: (courseData as any).introVideoUrl || "",
-                    capacity: (courseData as any).capacity || 0,
-                    level: (courseData as any).level || "Beginner",
-                    userId: courseData.userId || "",
-                    isActive: (courseData as any).isActive ?? true,
-                    hideFromCatalog: (courseData as any).hideFromCatalog ?? false,
-                    tagIds: (courseData as any).tags?.map((tag: any) => tag.id) || [],
-                });
-            } else {
-                toast.error("Course not found");
-                router.push("/admin/courses");
-            }
-
-            setCategories(catData);
-            setInstructors(instData);
-            setAvailableTags(tagData);
-            setIsLoading(false);
-        };
         fetchData();
     }, [courseId, form, router]);
 
@@ -415,6 +419,12 @@ const EditCoursePage = () => {
                             </FormItem>
                         </CardContent>
                     </Card>
+
+                    <LessonsForm
+                        initialData={course}
+                        courseId={courseId}
+                        onRefresh={fetchData}
+                    />
                 </form>
             </Form>
         </div>

@@ -141,8 +141,8 @@ const CourseDetailPage = () => {
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[11px] font-bold text-slate-400 uppercase">Total Modules</p>
-                                    <p className="text-[14px] font-bold text-slate-700">{course._count?.modules || 0} Modules</p>
+                                    <p className="text-[11px] font-bold text-slate-400 uppercase">Total Lessons</p>
+                                    <p className="text-[14px] font-bold text-slate-700">{course._count?.lessons || 0} Lessons</p>
                                 </div>
                             </div>
                         </div>

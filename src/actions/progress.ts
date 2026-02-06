@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { checkAndIssueCertificate } from "@/actions/certificate";
 
 /**
  * Enroll a user in a course by creating a Purchase record.
@@ -43,10 +44,10 @@ export const enrollInCourse = async (courseId: string) => {
 };
 
 /**
- * Toggle lesson completion status.
+ * Toggle topic completion status.
  */
-export const toggleLessonCompletion = async (
-    lessonId: string,
+export const toggleTopicCompletion = async (
+    topicId: string,
     isCompleted: boolean
 ) => {
     try {
@@ -59,9 +60,9 @@ export const toggleLessonCompletion = async (
 
         const userProgress = await db.userProgress.upsert({
             where: {
-                userId_lessonId: {
+                userId_topicId: {
                     userId,
-                    lessonId,
+                    topicId,
                 },
             },
             update: {
@@ -69,10 +70,22 @@ export const toggleLessonCompletion = async (
             },
             create: {
                 userId,
-                lessonId,
+                topicId,
                 isCompleted,
             },
         });
+
+        // Trigger certificate check if completed
+        if (isCompleted) {
+            const topic = await db.topic.findUnique({
+                where: { id: topicId },
+                include: { lesson: true }
+            });
+
+            if (topic?.lesson?.courseId) {
+                await checkAndIssueCertificate(topic.lesson.courseId);
+            }
+        }
 
         return userProgress;
     } catch (error) {

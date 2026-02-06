@@ -3,10 +3,25 @@
 import Link from "next/link";
 import { LogoutButton } from "./logout-button";
 import {
-    Users, BookOpen, CreditCard, Settings, Layout, BarChart,
-    List, AlertCircle, Award, Shield, Contact, Map,
-    Users as UsersCloud, GitBranch, Bell, Share2, MessagesSquare,
-    ChevronDown, ChevronRight
+    Layout,
+    Users,
+    BookOpen,
+    CreditCard,
+    Settings,
+    BarChart,
+    List,
+    AlertCircle,
+    Award,
+    Shield,
+    Contact,
+    Map,
+    Users as UsersCloud,
+    GitBranch,
+    Bell,
+    Share2,
+    MessagesSquare,
+    ChevronDown,
+    ChevronRight
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -49,6 +64,10 @@ const routes = [
             { label: "All Courses", href: "/admin/courses" },
             { label: "Course Category", href: "/admin/categories" },
             { label: "Course Tags", href: "/admin/courses/tags" },
+            { label: "Lessons", href: "/admin/lessons" },
+            { label: "Topics", href: "/admin/topics" },
+            { label: "Quizzes", href: "/admin/quizzes" },
+            { label: "Certificates", href: "/admin/certificates" },
         ]
     },
     {
@@ -109,7 +128,13 @@ export const AdminSidebar = () => {
     const [openMenus, setOpenMenus] = useState<string[]>(() => {
         const initial: string[] = [];
         if (pathname.startsWith("/admin/users")) initial.push("Users");
-        if (pathname.startsWith("/admin/courses") || pathname.startsWith("/admin/categories")) initial.push("Courses");
+        if (
+            pathname.startsWith("/admin/courses") ||
+            pathname.startsWith("/admin/categories") ||
+            pathname.startsWith("/admin/lessons") ||
+            pathname.startsWith("/admin/topics") ||
+            pathname.startsWith("/admin/quizzes")
+        ) initial.push("Courses");
         if (pathname.startsWith("/admin/groups")) initial.push("Groups");
         return initial;
     });

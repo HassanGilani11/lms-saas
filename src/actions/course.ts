@@ -100,12 +100,20 @@ export const getCourseById = async (courseId: string) => {
                         email: true,
                     }
                 },
-                modules: {
+                lessons: {
                     orderBy: { position: "asc" },
+                    include: {
+                        topics: {
+                            orderBy: { position: "asc" },
+                            include: {
+                                attachments: true,
+                            }
+                        }
+                    }
                 },
                 _count: {
                     select: {
-                        modules: true,
+                        lessons: true,
                     }
                 }
             }
@@ -126,15 +134,17 @@ export const publishCourse = async (courseId: string) => {
             throw new Error("Unauthorized");
         }
 
+        const isAdmin = session?.user?.role === "ADMIN";
+
         const course = await db.course.findUnique({
             where: {
                 id: courseId,
-                userId,
+                ...(isAdmin ? {} : { userId }),
             },
             include: {
-                modules: {
+                lessons: {
                     include: {
-                        lessons: true,
+                        topics: true,
                     },
                 },
             },
@@ -144,18 +154,18 @@ export const publishCourse = async (courseId: string) => {
             throw new Error("Not found");
         }
 
-        const hasPublishedLesson = course.modules.some((module) =>
-            module.lessons.some((lesson) => lesson.isPublished)
+        const hasPublishedTopic = course.lessons.some((lesson) =>
+            lesson.topics.some((topic) => topic.isPublished)
         );
 
-        if (!course.title || !course.description || !hasPublishedLesson) {
+        if (!course.title || !course.description || !hasPublishedTopic) {
             throw new Error("Missing required fields");
         }
 
         const publishedCourse = await db.course.update({
             where: {
                 id: courseId,
-                userId,
+                ...(isAdmin ? {} : { userId }),
             },
             data: {
                 isPublished: true,
@@ -178,10 +188,12 @@ export const deleteCourse = async (courseId: string) => {
             throw new Error("Unauthorized");
         }
 
+        const isAdmin = session?.user?.role === "ADMIN";
+
         const course = await db.course.findUnique({
             where: {
                 id: courseId,
-                userId,
+                ...(isAdmin ? {} : { userId }),
             },
         });
 
@@ -203,19 +215,14 @@ export const deleteCourse = async (courseId: string) => {
     }
 };
 
-export const reorderModules = async (courseId: string, list: { id: string; position: number }[]) => {
+export const reorderLessons = async (courseId: string, list: { id: string; position: number }[]) => {
     try {
-        const session = await auth();
-        const userId = session?.user?.id;
-
-        if (!userId) {
-            throw new Error("Unauthorized");
-        }
+        const isAdmin = session?.user?.role === "ADMIN";
 
         const courseOwner = await db.course.findUnique({
             where: {
                 id: courseId,
-                userId,
+                ...(isAdmin ? {} : { userId }),
             },
         });
 
@@ -224,7 +231,7 @@ export const reorderModules = async (courseId: string, list: { id: string; posit
         }
 
         for (let item of list) {
-            await db.module.update({
+            await db.lesson.update({
                 where: { id: item.id },
                 data: { position: item.position },
             });
@@ -233,7 +240,7 @@ export const reorderModules = async (courseId: string, list: { id: string; posit
         revalidatePath(`/instructor/courses/${courseId}`);
         return { success: true };
     } catch (error) {
-        console.log("[REORDER_MODULES]", error);
+        console.log("[REORDER_LESSONS]", error);
         return null;
     }
 };

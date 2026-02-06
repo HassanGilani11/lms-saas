@@ -52,10 +52,11 @@ const AdminCoursesPage = () => {
         }
     };
 
-    const filteredCourses = courses.filter(course =>
-        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        course.category?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredCourses = courses.filter(course => {
+        const titleMatch = (course.title || "").toLowerCase().includes(searchQuery.toLowerCase());
+        const categoryMatch = (course.category?.name || "").toLowerCase().includes(searchQuery.toLowerCase());
+        return titleMatch || categoryMatch;
+    });
 
     return (
         <div className="p-6 text-black font-sans space-y-6">

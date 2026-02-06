@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { nanoid } from "nanoid";
+import { checkAchievements } from "./achievement";
 
 /**
  * Check if a course is completed by a user and issue a certificate if so.
@@ -16,10 +17,10 @@ export const checkAndIssueCertificate = async (courseId: string) => {
             throw new Error("Unauthorized");
         }
 
-        // 1. Fetch all published lessons in the course
-        const publishedLessons = await db.lesson.findMany({
+        // 1. Fetch all published topics in the course
+        const publishedTopics = await db.topic.findMany({
             where: {
-                module: {
+                lesson: {
                     courseId: courseId,
                 },
                 isPublished: true,
@@ -29,22 +30,22 @@ export const checkAndIssueCertificate = async (courseId: string) => {
             },
         });
 
-        const lessonIds = publishedLessons.map((lesson: { id: string }) => lesson.id);
+        const topicIds = publishedTopics.map((topic) => topic.id);
 
-        if (lessonIds.length === 0) return null;
+        if (topicIds.length === 0) return null;
 
-        // 2. Count completed lessons for the user
-        const completedLessonsCount = await db.userProgress.count({
+        // 2. Count completed topics for the user
+        const completedTopicsCount = await db.userProgress.count({
             where: {
                 userId: userId,
-                lessonId: {
-                    in: lessonIds,
+                topicId: {
+                    in: topicIds,
                 },
                 isCompleted: true,
             },
         });
 
-        const isCompleted = completedLessonsCount === lessonIds.length;
+        const isCompleted = completedTopicsCount === topicIds.length;
 
         if (!isCompleted) return null;
 
@@ -68,8 +69,16 @@ export const checkAndIssueCertificate = async (courseId: string) => {
                 userId,
                 courseId,
                 certificateCode: code,
+                metadata: {
+                    courseTitle: (await db.course.findUnique({ where: { id: courseId }, select: { title: true } }))?.title,
+                    userName: session.user.name,
+                    issuedAt: new Date().toISOString(),
+                }
             },
         });
+
+        // Check for achievements
+        await checkAchievements(userId, { type: 'course_completion', courseId });
 
         return certificate;
     } catch (error) {

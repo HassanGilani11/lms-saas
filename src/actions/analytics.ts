@@ -96,13 +96,9 @@ export const getCourseEngagement = async (courseId: string) => {
         const course = await db.course.findUnique({
             where: { id: courseId, userId },
             include: {
-                modules: {
+                lessons: {
                     include: {
-                        lessons: {
-                            include: {
-                                userProgress: true,
-                            }
-                        }
+                        userProgress: true,
                     }
                 }
             }
@@ -116,11 +112,9 @@ export const getCourseEngagement = async (courseId: string) => {
         let totalLessons = 0;
         let totalCompletions = 0;
 
-        course.modules.forEach((module: any) => {
-            module.lessons.forEach((lesson: any) => {
-                totalLessons++;
-                totalCompletions += lesson.userProgress.filter((p: any) => p.isCompleted).length;
-            });
+        course.lessons.forEach((lesson: any) => {
+            totalLessons++;
+            totalCompletions += lesson.userProgress.filter((p: any) => p.isCompleted).length;
         });
 
         const avgCompletionRate = totalLessons > 0 ? (totalCompletions / (totalLessons * (course as any).purchases?.length || 1)) : 0;
@@ -133,5 +127,75 @@ export const getCourseEngagement = async (courseId: string) => {
     } catch (error) {
         console.log("[GET_COURSE_ENGAGEMENT]", error);
         return null;
+    }
+};
+
+/**
+ * Get recent system activities for the Admin dashboard.
+ * Aggregates data from User creation, Course updates, and Purchases.
+ */
+export const getRecentActivities = async () => {
+    try {
+        const session = await auth();
+        if (!session?.user || session.user.role !== "ADMIN") {
+            throw new Error("Unauthorized");
+        }
+
+        const [users, courses, purchases] = await Promise.all([
+            // New Users
+            db.user.findMany({
+                take: 3,
+                orderBy: { createdAt: "desc" },
+                select: { id: true, name: true, image: true, createdAt: true }
+            }),
+            // Course Updates (published/created)
+            db.course.findMany({
+                take: 3,
+                orderBy: { updatedAt: "desc" },
+                select: { id: true, title: true, updatedAt: true, user: { select: { name: true, image: true } } }
+            }),
+            // New Purchases
+            db.purchase.findMany({
+                take: 3,
+                orderBy: { createdAt: "desc" },
+                include: {
+                    user: { select: { name: true, image: true } },
+                    course: { select: { title: true } }
+                }
+            })
+        ]);
+
+        const activities = [
+            ...users.map(u => ({
+                id: `user-${u.id}`,
+                user: u.name || "Unknown User",
+                avatar: u.image,
+                action: "New user registered",
+                time: u.createdAt,
+            })),
+            ...courses.map(c => ({
+                id: `course-${c.id}`,
+                user: c.user?.name || "Instructor",
+                avatar: c.user?.image,
+                action: `Updated course: ${c.title}`,
+                time: c.updatedAt,
+            })),
+            ...purchases.map(p => ({
+                id: `purchase-${p.id}`,
+                user: p.user?.name || "Student",
+                avatar: p.user?.image,
+                action: `Purchased ${p.course.title}`,
+                time: p.createdAt,
+            }))
+        ];
+
+        // Sort by most recent
+        return activities
+            .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
+            .slice(0, 10);
+
+    } catch (error) {
+        console.log("[GET_RECENT_ACTIVITIES]", error);
+        return [];
     }
 };

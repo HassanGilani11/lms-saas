@@ -40,6 +40,7 @@ model User {
   stripeSubscription      StripeSubscription?
   learningPathEnrollments LearningPathUser[]
   groups                  Group[]             @relation("UserGroups")
+  userAchievements        UserAchievement[]
 }
 
 model UserType {
@@ -233,7 +234,7 @@ model Course {
   certificates    Certificate[]
   category        Category?            @relation(fields: [categoryId], references: [id])
   user            User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  modules         Module[]
+  lessons         Lesson[]
   purchases       Purchase[]
   quizzes         Quiz[]
   learningPaths   LearningPathCourse[]
@@ -251,22 +252,23 @@ model CourseTag {
   courses   Course[]
 }
 
-model Module {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  position    Int
-  isPublished Boolean  @default(false)
-  courseId    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  lessons     Lesson[]
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+model Lesson {
+  id               String   @id @default(cuid())
+  title            String
+  description      String?
+  position         Int
+  isPublished      Boolean  @default(false)
+  courseId         String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  topics           Topic[]
+  course           Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progressionRules Json?    @default("[]")
 
   @@index([courseId])
 }
 
-model Lesson {
+model Topic {
   id           String         @id @default(cuid())
   title        String
   description  String?
@@ -276,91 +278,108 @@ model Lesson {
   position     Int
   isPublished  Boolean        @default(false)
   isFree       Boolean        @default(false)
-  type         LessonType     @default(VIDEO)
-  moduleId     String
+  type         TopicType      @default(VIDEO)
+  lessonId     String
   quizId       String?        @unique
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   discussions  Discussion[]
-  module       Module         @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  lesson       Lesson         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   quiz         Quiz?          @relation(fields: [quizId], references: [id])
   userProgress UserProgress[]
+  attachments  Attachment[]
 
-  @@index([moduleId])
+  @@index([lessonId])
 }
 
 model Quiz {
-  id           String        @id @default(cuid())
-  title        String
-  description  String?
-  passingScore Int           @default(70)
-  maxAttempts  Int?
-  courseId     String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  lessons      Lesson?
-  questions    Question[]
-  course       Course?       @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  attempts     QuizAttempt[]
+  id                     String   @id @default(cuid())
+  title                  String
+  description            String?
+  timeLimit              Int? // in minutes
+  passingScore           Int      @default(70)
+  maxAttempts            Int?
+  shuffleQuestions       Boolean  @default(false)
+  showResultsImmediately Boolean  @default(true)
+  courseId               String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  topics  Topic?
+  topicId String? @unique // Optional link back if needed
+
+  questions Question[]
+  course    Course?       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  attempts  QuizAttempt[]
 
   @@index([courseId])
 }
 
 model Question {
-  id          String       @id @default(cuid())
-  text        String
-  type        QuestionType @default(MULTIPLE_CHOICE)
-  position    Int
-  quizId      String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  options     Option[]
-  quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  userAnswers UserAnswer[]
+  id        String       @id @default(cuid())
+  text      String // The question content (rich text)
+  type      QuestionType @default(MULTIPLE_CHOICE)
+  points    Int          @default(1)
+  position  Int
+  quizId    String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  options       Option[] // For MCQ/Single Choice
+  correctAnswer String? // For simple validation or essay criteria
+
+  quiz      Quiz           @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  responses QuizResponse[]
 
   @@index([quizId])
 }
 
 model Option {
-  id          String       @id @default(cuid())
-  text        String
-  isCorrect   Boolean      @default(false)
-  position    Int
-  questionId  String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  question    Question     @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  userAnswers UserAnswer[]
+  id         String   @id @default(cuid())
+  text       String
+  isCorrect  Boolean  @default(false)
+  position   Int
+  questionId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@index([questionId])
 }
 
 model QuizAttempt {
-  id          String       @id @default(cuid())
+  id          String        @id @default(cuid())
   userId      String
   quizId      String
-  score       Int          @default(0)
-  isPassed    Boolean      @default(false)
-  completed   Boolean      @default(false)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userAnswers UserAnswer[]
+  score       Int           @default(0)
+  status      AttemptStatus @default(IN_PROGRESS)
+  startedAt   DateTime      @default(now())
+  completedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  quiz      Quiz           @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  responses QuizResponse[]
 
   @@index([userId])
   @@index([quizId])
 }
 
-model UserAnswer {
-  id         String      @id @default(cuid())
-  attemptId  String
-  questionId String
-  optionId   String
-  createdAt  DateTime    @default(now())
-  attempt    QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  option     Option      @relation(fields: [optionId], references: [id], onDelete: Cascade)
-  question   Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+model QuizResponse {
+  id            String   @id @default(cuid())
+  attemptId     String
+  questionId    String
+  answer        String? // Text answer or JSON of selected option IDs
+  isCorrect     Boolean  @default(false)
+  pointsAwarded Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  attempt  QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([attemptId])
+  @@index([questionId])
 }
 
 model StripeCustomer {
@@ -387,12 +406,15 @@ model Attachment {
   id        String   @id @default(cuid())
   name      String
   url       String
-  courseId  String
+  courseId  String?
+  topicId   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course    Course?  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  topic     Topic?   @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@index([courseId])
+  @@index([topicId])
 }
 
 model Purchase {
@@ -411,14 +433,14 @@ model Purchase {
 model UserProgress {
   id          String   @id @default(cuid())
   userId      String
-  lessonId    String
+  topicId     String
   isCompleted Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  topic       Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, lessonId])
-  @@index([lessonId])
+  @@unique([userId, topicId])
+  @@index([topicId])
 }
 
 model Certificate {
@@ -427,6 +449,7 @@ model Certificate {
   courseId        String
   certificateCode String   @unique
   issuedAt        DateTime @default(now())
+  metadata        Json?    @default("{}") // Store course title, user name, etc. at time of issue
   course          Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -434,9 +457,35 @@ model Certificate {
   @@index([courseId])
 }
 
+model Achievement {
+  id               String            @id @default(cuid())
+  slug             String            @unique // e.g., "course_completer", "quiz_master"
+  title            String
+  description      String
+  icon             String? // URL or icon name
+  xp               Int               @default(0)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  userAchievements UserAchievement[]
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@index([achievementId])
+}
+
 model Discussion {
   id        String    @id @default(cuid())
-  lessonId  String
+  topicId   String
   userId    String
   title     String
   content   String
@@ -444,11 +493,11 @@ model Discussion {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   comments  Comment[]
-  lesson    Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  topic     Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   reports   Report[]
 
-  @@index([lessonId])
+  @@index([topicId])
   @@index([userId])
 }
 
@@ -500,15 +549,24 @@ enum UserRole {
   STUDENT
 }
 
-enum LessonType {
+enum TopicType {
   VIDEO
   TEXT
   PDF
+  QUIZ
 }
 
 enum QuestionType {
   MULTIPLE_CHOICE
+  SINGLE_CHOICE
   TRUE_FALSE
+  ESSAY
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+  GRADED
 }
 
 enum ReportStatus {

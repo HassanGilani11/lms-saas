@@ -6,11 +6,12 @@ import { db } from "@/lib/db";
 export const getAdminCourses = async () => {
     try {
         const session = await auth();
+
         if (!session?.user || session.user.role !== "ADMIN") {
             throw new Error("Unauthorized");
         }
 
-        return await db.course.findMany({
+        const courses = await db.course.findMany({
             orderBy: {
                 createdAt: "desc",
             },
@@ -23,12 +24,14 @@ export const getAdminCourses = async () => {
                 category: true,
                 _count: {
                     select: {
-                        modules: true,
+                        lessons: true,
                     },
                 },
             },
         });
-    } catch (error) {
+
+        return courses;
+    } catch (error: any) {
         console.log("[GET_ADMIN_COURSES]", error);
         return [];
     }
@@ -132,6 +135,7 @@ export const getAdminReports = async () => {
         return [];
     }
 };
+
 export const getCategories = async () => {
     try {
         return await db.category.findMany({

@@ -290,7 +290,7 @@ exports.Prisma.CourseTagScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.ModuleScalarFieldEnum = {
+exports.Prisma.LessonScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
@@ -298,10 +298,11 @@ exports.Prisma.ModuleScalarFieldEnum = {
   isPublished: 'isPublished',
   courseId: 'courseId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  progressionRules: 'progressionRules'
 };
 
-exports.Prisma.LessonScalarFieldEnum = {
+exports.Prisma.TopicScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
@@ -312,7 +313,7 @@ exports.Prisma.LessonScalarFieldEnum = {
   isPublished: 'isPublished',
   isFree: 'isFree',
   type: 'type',
-  moduleId: 'moduleId',
+  lessonId: 'lessonId',
   quizId: 'quizId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -322,21 +323,27 @@ exports.Prisma.QuizScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
+  timeLimit: 'timeLimit',
   passingScore: 'passingScore',
   maxAttempts: 'maxAttempts',
+  shuffleQuestions: 'shuffleQuestions',
+  showResultsImmediately: 'showResultsImmediately',
   courseId: 'courseId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  topicId: 'topicId'
 };
 
 exports.Prisma.QuestionScalarFieldEnum = {
   id: 'id',
   text: 'text',
   type: 'type',
+  points: 'points',
   position: 'position',
   quizId: 'quizId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  correctAnswer: 'correctAnswer'
 };
 
 exports.Prisma.OptionScalarFieldEnum = {
@@ -354,17 +361,20 @@ exports.Prisma.QuizAttemptScalarFieldEnum = {
   userId: 'userId',
   quizId: 'quizId',
   score: 'score',
-  isPassed: 'isPassed',
-  completed: 'completed',
+  status: 'status',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.UserAnswerScalarFieldEnum = {
+exports.Prisma.QuizResponseScalarFieldEnum = {
   id: 'id',
   attemptId: 'attemptId',
   questionId: 'questionId',
-  optionId: 'optionId',
+  answer: 'answer',
+  isCorrect: 'isCorrect',
+  pointsAwarded: 'pointsAwarded',
   createdAt: 'createdAt'
 };
 
@@ -391,6 +401,7 @@ exports.Prisma.AttachmentScalarFieldEnum = {
   name: 'name',
   url: 'url',
   courseId: 'courseId',
+  topicId: 'topicId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -406,7 +417,7 @@ exports.Prisma.PurchaseScalarFieldEnum = {
 exports.Prisma.UserProgressScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  lessonId: 'lessonId',
+  topicId: 'topicId',
   isCompleted: 'isCompleted',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -417,12 +428,31 @@ exports.Prisma.CertificateScalarFieldEnum = {
   userId: 'userId',
   courseId: 'courseId',
   certificateCode: 'certificateCode',
-  issuedAt: 'issuedAt'
+  issuedAt: 'issuedAt',
+  metadata: 'metadata'
+};
+
+exports.Prisma.AchievementScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  title: 'title',
+  description: 'description',
+  icon: 'icon',
+  xp: 'xp',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.UserAchievementScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  achievementId: 'achievementId',
+  unlockedAt: 'unlockedAt'
 };
 
 exports.Prisma.DiscussionScalarFieldEnum = {
   id: 'id',
-  lessonId: 'lessonId',
+  topicId: 'topicId',
   userId: 'userId',
   title: 'title',
   content: 'content',
@@ -496,15 +526,24 @@ exports.UserRole = exports.$Enums.UserRole = {
   STUDENT: 'STUDENT'
 };
 
-exports.LessonType = exports.$Enums.LessonType = {
+exports.TopicType = exports.$Enums.TopicType = {
   VIDEO: 'VIDEO',
   TEXT: 'TEXT',
-  PDF: 'PDF'
+  PDF: 'PDF',
+  QUIZ: 'QUIZ'
 };
 
 exports.QuestionType = exports.$Enums.QuestionType = {
   MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',
-  TRUE_FALSE: 'TRUE_FALSE'
+  SINGLE_CHOICE: 'SINGLE_CHOICE',
+  TRUE_FALSE: 'TRUE_FALSE',
+  ESSAY: 'ESSAY'
+};
+
+exports.AttemptStatus = exports.$Enums.AttemptStatus = {
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  GRADED: 'GRADED'
 };
 
 exports.ReportStatus = exports.$Enums.ReportStatus = {
@@ -531,19 +570,21 @@ exports.Prisma.ModelName = {
   LearningPathLevel: 'LearningPathLevel',
   Course: 'Course',
   CourseTag: 'CourseTag',
-  Module: 'Module',
   Lesson: 'Lesson',
+  Topic: 'Topic',
   Quiz: 'Quiz',
   Question: 'Question',
   Option: 'Option',
   QuizAttempt: 'QuizAttempt',
-  UserAnswer: 'UserAnswer',
+  QuizResponse: 'QuizResponse',
   StripeCustomer: 'StripeCustomer',
   StripeSubscription: 'StripeSubscription',
   Attachment: 'Attachment',
   Purchase: 'Purchase',
   UserProgress: 'UserProgress',
   Certificate: 'Certificate',
+  Achievement: 'Achievement',
+  UserAchievement: 'UserAchievement',
   Discussion: 'Discussion',
   Comment: 'Comment',
   Notification: 'Notification',
