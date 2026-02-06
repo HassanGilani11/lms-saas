@@ -137,7 +137,6 @@ export const finishAttempt = async (attemptId: string) => {
                 status: requiresManualGrading ? AttemptStatus.COMPLETED : AttemptStatus.GRADED,
                 completedAt: new Date(),
                 score: totalScore,
-                isPassed: totalScore >= (attempt.quiz.passingScore || 0)
             }
         });
 
@@ -193,7 +192,6 @@ export const gradeEssayQuestion = async (
                 where: { id: attemptId },
                 data: {
                     score: totalScore,
-                    isPassed: totalScore >= attempt.quiz.passingScore,
                     status: "GRADED" // Mark as fully graded now
                 }
             });

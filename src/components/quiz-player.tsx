@@ -179,6 +179,8 @@ export const QuizPlayer = ({ quizId, userId }: QuizPlayerProps) => {
 
     // Results Screen
     if (isFinished || attempt.status === "COMPLETED" || attempt.status === "GRADED") {
+        const isPassed = attempt.score >= (quiz?.passingScore || 70);
+
         return (
             <Card className="max-w-3xl mx-auto my-10 border-t-4 border-t-indigo-500">
                 <CardHeader className="text-center">
@@ -187,9 +189,9 @@ export const QuizPlayer = ({ quizId, userId }: QuizPlayerProps) => {
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="flex justify-center py-6">
-                        <div className={`p-6 rounded-full border-4 ${attempt.isPassed ? "border-green-500 bg-green-50 text-green-700" : "border-red-500 bg-red-50 text-red-700"} w-40 h-40 flex flex-col items-center justify-center`}>
+                        <div className={`p-6 rounded-full border-4 ${isPassed ? "border-green-500 bg-green-50 text-green-700" : "border-red-500 bg-red-50 text-red-700"} w-40 h-40 flex flex-col items-center justify-center`}>
                             <span className="text-4xl font-bold">{attempt.score}</span>
-                            <span className="text-sm font-semibold uppercase">{attempt.isPassed ? "Passed" : "Failed"}</span>
+                            <span className="text-sm font-semibold uppercase">{isPassed ? "Passed" : "Failed"}</span>
                         </div>
                     </div>
 
