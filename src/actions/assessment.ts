@@ -79,16 +79,16 @@ export const submitQuizAttempt = async (
             },
         });
 
-        if (!attempt || attempt.completed) {
+        if (!attempt || attempt.status === "COMPLETED") {
             throw new Error("Invalid or completed attempt");
         }
 
-        // Save user answers
-        await db.userAnswer.createMany({
+        // Save user answers as quiz responses
+        await db.quizResponse.createMany({
             data: answers.map((answer) => ({
                 attemptId,
                 questionId: answer.questionId,
-                optionId: answer.optionId,
+                answer: answer.optionId, // Store optionId as the answer
             })),
         });
 
@@ -112,8 +112,8 @@ export const submitQuizAttempt = async (
             where: { id: attemptId },
             data: {
                 score,
-                isPassed,
-                completed: true,
+                status: "COMPLETED",
+                completedAt: new Date(),
             },
         });
 
@@ -137,11 +137,12 @@ export const getQuizAnalytics = async (quizId: string) => {
         }
 
         const attempts = await db.quizAttempt.findMany({
-            where: { quizId, completed: true },
+            where: { quizId, status: "COMPLETED" },
         });
 
         const totalAttempts = attempts.length;
-        const passCount = attempts.filter((a: any) => a.isPassed).length;
+        const passingScore = 70; // Fallback or fetch from quiz
+        const passCount = attempts.filter((a: any) => a.score >= passingScore).length;
         const averageScore = totalAttempts > 0
             ? attempts.reduce((acc: number, curr: any) => acc + curr.score, 0) / totalAttempts
             : 0;
