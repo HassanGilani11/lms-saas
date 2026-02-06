@@ -96,9 +96,14 @@ export const getCourseEngagement = async (courseId: string) => {
         const course = await db.course.findUnique({
             where: { id: courseId, userId },
             include: {
+                purchases: true,
                 lessons: {
                     include: {
-                        userProgress: true,
+                        topics: {
+                            include: {
+                                userProgress: true,
+                            }
+                        }
                     }
                 }
             }
@@ -108,17 +113,22 @@ export const getCourseEngagement = async (courseId: string) => {
             throw new Error("Course not found or unauthorized");
         }
 
-        // Calculate engagement: total lessons vs total completions
-        let totalLessons = 0;
+        // Calculate engagement: total topics vs total completions
+        let totalTopics = 0;
         let totalCompletions = 0;
 
-        course.lessons.forEach((lesson: any) => {
-            totalLessons++;
-            totalCompletions += lesson.userProgress.filter((p: any) => p.isCompleted).length;
+        course.lessons.forEach((lesson) => {
+            lesson.topics.forEach((topic) => {
+                totalTopics++;
+                // Sum completions across all users for this topic
+                totalCompletions += topic.userProgress.filter((p) => p.isCompleted).length;
+            });
         });
 
-        const avgCompletionRate = totalLessons > 0 ? (totalCompletions / (totalLessons * (course as any).purchases?.length || 1)) : 0;
-        // This is a naive calculation. Better: total potential completions (lessons * users) vs actual.
+        const totalLessons = course.lessons.length;
+        const studentCount = course.purchases.length || 1;
+        const potentialCompletions = totalTopics * studentCount;
+        const avgCompletionRate = potentialCompletions > 0 ? (totalCompletions / potentialCompletions) : 0;
 
         return {
             totalLessons,

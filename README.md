@@ -1,93 +1,126 @@
-# Premium LMS SaaS Platform
+# 🎓 Premium LMS SaaS Platform
 
-A modern, scalable, and feature-rich Learning Management System developed with the latest web technologies. This platform is designed to provide a premium experience for Administrators, Instructors, and Learners.
+A state-of-the-art, scalable, and feature-rich Learning Management System built with the modern Next.js 15+ stack. This platform delivers a premium, high-performance experience for Administrators, Instructors, and Students alike.
 
-## 🚀 Key Features
+---
 
-### 🛠️ Admin Dashboard
-- **Comprehensive Analytics**: Monitor platform performance at a glance.
-- **Advanced Management**: Dedicated modules for Users, Roles, and Contacts.
-- **Premium UI**: Smooth transitions, glassmorphism aesthetics, and a fully responsive layout.
+## ✨ Key Features
 
-### 📚 Course & Content Management
-- **Full CRUD Support**: Effortlessly create, edit, and manage courses.
-- **Dynamic Tagging & Categorization**: Organize content with a robust tags and categories system.
-- **Interactive Forms**: Premium form designs for content creation and editing.
+### 🛡️ Admin Powerhouse
+- **Dynamic Dashboard**: Real-time analytics on platform growth, revenue, and engagement.
+- **Granular User Management**: Full control over users, roles, and permissions.
+- **System Activity Logs**: Audit-ready tracking of all major platform events.
+- **Custom Branding**: Tools to manage categories, tags, and platform aesthetics.
 
-### 👥 Group Collaboration
-- **Group Management**: Create and manage user groups with ease.
-- **Hierarchical Structure**: Organize groups into categories and apply specific tags.
-- **Member Tracking**: Real-time tracking of users and learning paths within groups.
+### 👨‍🏫 Instructor Excellence
+- **Intuitive Course Builder**: Drag-and-drop hierarchy for sections (Lessons) and content (Topics).
+- **Rich Media Support**: Integrate Videos, PDFs, and interactive Text lessons.
+- **Advanced Quizzing**: Comprehensive quiz engine with multiple question types and automated grading.
+- **Student Progress Tracking**: Monitor individual and group learning paths in real-time.
 
-### 🍱 User Experience Enhancements
-- **Collapsible Sidebar**: Maximize your workspace with a smooth, context-aware toggle.
-- **Intelligent Navigation**: Quick access to profiles and global settings.
-- **"Coming Soon" Modules**: Professional placeholders for upcoming features like Payment Gateway, Branches, and Reports.
+### 📝 Student Experience
+- **Sleek Learning Interface**: Distraction-free content delivery with progress persistence.
+- **Gamification**: Earn achievements and track learning milestones.
+- **Interactive Discussions**: Peer-to-peer and instructor engagement within lessons.
+- **Certificate Generation**: Automated, premium certificates upon course completion.
 
-## 💻 Tech Stack
+---
 
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Turbopack)
-- **Library**: [React 19](https://react.dev/)
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
-- **ORM**: [Prisma](https://www.prisma.io/)
-- **Authentication**: [NextAuth.js](https://next-auth.js.org/)
+## 🚀 Tech Stack
+
+- **Core Framework**: [Next.js 15.1.x](https://nextjs.org/) (App Router, Turbopack)
+- **UI Library**: [React 19](https://react.dev/)
+- **Styling Engine**: [Tailwind CSS 4.0+](https://tailwindcss.com/)
+- **Database ORM**: [Prisma 7.x](https://www.prisma.io/)
+- **Database**: PostgreSQL (Supabase / Local)
+- **Authentication**: [NextAuth.js v5 Beta](https://authjs.dev/)
+- **Payment Processing**: [Stripe](https://stripe.com/)
 - **Icons**: [Lucide React](https://lucide.dev/)
-- **Database**: PostgreSQL / Supabase
-- **Payments**: Stripe (Integration in progress)
+- **State & Forms**: [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
+
+---
 
 ## 🛠️ Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
-- npm / yarn / pnpm
+- **Node.js**: 20.x or higher
+- **PackageManager**: `npm`, `yarn`, or `pnpm`
+- **Database**: A running PostgreSQL instance
 
-### Installation
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/your-repo/lms-saas.git
-   cd lms-saas
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Environment Setup**:
-   Create a `.env` file in the root directory and add your credentials:
-   ```env
-   DATABASE_URL="your-postgresql-url"
-   NEXTAUTH_SECRET="your-secret"
-   STRIPE_API_KEY="your-stripe-key"
-   ```
-
-4. **Database Sync**:
-   ```bash
-   npx prisma db push
-   npx prisma generate
-   ```
-
-5. **Run the development server**:
-   ```bash
-   npm run dev
-   ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-## 🏗️ Project Structure
-```text
-src/
-├── actions/      # Server Actions (CRUD, Logic)
-├── app/          # Next.js App Router (Routes & Layouts)
-├── components/   # Reusable UI Components
-├── hooks/        # Custom React Hooks (Context, State)
-├── lib/          # Utilities & Config (Prisma, Auth)
-└── prisma/       # Database Schema
+### 1. Installation
+```bash
+git clone https://github.com/HassanGilani11/lms-saas.git
+cd lms-saas
+npm install
 ```
 
-## 📄 License
-This project is proprietary and for demonstration purposes.
+### 2. Environment Configuration
+Create a `.env` file in the root and add the following:
+```env
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/lms_db"
+
+# Auth (NextAuth)
+AUTH_SECRET="your-auth-secret" # Generate with `npx auth secret`
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+# Stripe
+STRIPE_API_KEY="sk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+
+# Optional: Supabase
+NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
+```
+
+### 3. Database Initialization
+```bash
+npx prisma db push
+npx prisma generate
+```
+
+### 4. Seed Initial Data (Optional)
+```bash
+npm run seed
+```
+
+### 5. Launch
+```bash
+npm run dev
+```
 
 ---
-*Built with ❤️ for High-Performance Learning.*
+
+## 🏗️ Project Architecture
+
+```text
+src/
+├── actions/      # Reusable Server Actions (DB Logic, Auth)
+├── app/          # Next.js App Router (Layouts & Page Views)
+│   ├── (dashboard) # Role-based private routes (Admin, Instructor, Student)
+│   ├── (public)    # Landing pages and catalog
+│   └── auth/       # Custom authentication flows
+├── components/   # Atomic UI Components & Layout Fragments
+├── hooks/        # Custom React Hooks for UI state
+├── lib/          # Core utilities (Prisma client, Stripe, Shared utils)
+└── prisma/       # Database Schema & Migrations
+```
+
+---
+
+## 🗺️ Roadmap
+- [x] Core LMS Architecture
+- [x] Multi-role Authentication
+- [x] Course & Lesson Management
+- [/] Stripe Payment Integration (In Progress)
+- [ ] Mobile-First Progressive Web App (PWA)
+- [ ] AI-Powered Course Recommendations
+- [ ] Live Video Streaming Sessions
+
+---
+
+## 📄 License
+This project is proprietary. All rights reserved.
+
+---
+*Developed with focus on Performance, Scalability, and User Experience.*
