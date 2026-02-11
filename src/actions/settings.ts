@@ -49,7 +49,7 @@ export const updateSettings = async (data: any) => {
 
         revalidatePath("/admin/settings");
         revalidatePath("/", "layout"); // Revalidate all pages to reflect branding changes
-        revalidateTag("settings"); // Invalidate the unstable_cache tag
+        revalidateTag("settings", "default"); // Invalidate the unstable_cache tag
         return { success: true, data: settings };
     } catch (error) {
         console.error("[UPDATE_SETTINGS]", error);
