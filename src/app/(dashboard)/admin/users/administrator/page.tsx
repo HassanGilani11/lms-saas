@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getUsers, deleteUser, updateUser, createUser } from "@/actions/user";
+import { getUsers, deleteUser, updateUser, createUser, resendVerificationAction } from "@/actions/user";
 import { UserRole } from "@/lib/prisma";
 import {
     Table,
@@ -31,7 +31,8 @@ import {
     Trash2, Pencil,
     Plus, MoreVertical, Filter,
     ArrowUpDown, Search, Calendar,
-    ChevronLeft, ChevronRight, Eye
+    ChevronLeft, ChevronRight, Eye, EyeOff,
+    CheckCircle, XCircle, Mail
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -47,13 +48,24 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "react-hot-toast";
+import { FileUpload } from "@/components/shared/file-upload";
 
 const formSchema = z.object({
-    name: z.string().min(1, "Name is required"),
-    email: z.string().email("Invalid email"),
-    phone: z.string().optional(),
-    address: z.string().optional(),
+    name: z.string().min(1, "Full name is required").max(50, "Name too long"),
+    email: z.string().email("Please enter a valid email address"),
+    phone: z.string().min(5, "Phone number is too short").max(20, "Phone number is too long").optional().or(z.literal("")),
+    address: z.string().min(5, "Address must be more descriptive").optional().or(z.literal("")),
     role: z.nativeEnum(UserRole),
+    password: z.string().optional(),
+    emailVerified: z.boolean().default(false),
+    image: z.string().optional().or(z.literal("")),
+}).refine((data) => {
+    // If we're creating (password would be expected), it should be checked elsewhere or here
+    // But since this schema is shared, we'll handle the 'required' part in the component logic or refine
+    return true;
+}, {
+    message: "Password is required for new accounts",
+    path: ["password"],
 });
 
 const AdministratorPage = () => {
@@ -64,6 +76,7 @@ const AdministratorPage = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -73,6 +86,9 @@ const AdministratorPage = () => {
             phone: "",
             address: "",
             role: UserRole.ADMIN,
+            password: "",
+            emailVerified: false,
+            image: "",
         },
     });
 
@@ -89,6 +105,14 @@ const AdministratorPage = () => {
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
+            if (!editingUser && (!values.password || values.password.length < 6)) {
+                form.setError("password", {
+                    type: "manual",
+                    message: "Password is required for new accounts (min 6 characters)"
+                });
+                return;
+            }
+
             let response;
             if (editingUser) {
                 response = await updateUser(editingUser.id, values);
@@ -111,6 +135,15 @@ const AdministratorPage = () => {
         }
     };
 
+    const resendVerification = async (email: string) => {
+        const response = await resendVerificationAction(email);
+        if (response.success) {
+            toast.success("Verification email sent!");
+        } else {
+            toast.error(response.error || "Failed to send email");
+        }
+    };
+
     const onDelete = async (userId: string) => {
         if (confirm("Are you sure you want to delete this admin?")) {
             await deleteUser(userId);
@@ -127,6 +160,9 @@ const AdministratorPage = () => {
             phone: user.phone || "",
             address: user.address || "",
             role: user.role,
+            password: "",
+            emailVerified: !!user.emailVerified,
+            image: user.image || "",
         });
         setIsDialogOpen(true);
     };
@@ -144,6 +180,9 @@ const AdministratorPage = () => {
             phone: "",
             address: "",
             role: UserRole.ADMIN,
+            password: "",
+            emailVerified: false,
+            image: "",
         });
         setIsDialogOpen(true);
     };
@@ -221,7 +260,19 @@ const AdministratorPage = () => {
                                             {format(new Date(user.createdAt), "MMM dd, yyyy")}
                                         </div>
                                     </TableCell>
-                                    <TableCell><Switch checked={true} className="scale-75" /></TableCell>
+                                    <TableCell>
+                                        {user.emailVerified ? (
+                                            <div className="flex items-center gap-x-1.5 text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full w-fit">
+                                                <CheckCircle className="h-3 w-3" />
+                                                <span className="text-[10px] font-bold">Verified</span>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-x-1.5 text-amber-600 bg-amber-50 px-2 py-1 rounded-full w-fit">
+                                                <XCircle className="h-3 w-3" />
+                                                <span className="text-[10px] font-bold">Pending</span>
+                                            </div>
+                                        )}
+                                    </TableCell>
                                     <TableCell className="text-right pr-6 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
@@ -230,6 +281,11 @@ const AdministratorPage = () => {
                                             <DropdownMenuContent align="end" className="text-[13px]">
                                                 <DropdownMenuItem onClick={() => onView(user)}><Eye className="h-3.5 w-3.5 mr-2" />View</DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => onEdit(user)}><Pencil className="h-3.5 w-3.5 mr-2" />Edit</DropdownMenuItem>
+                                                {!user.emailVerified && (
+                                                    <DropdownMenuItem onClick={() => resendVerification(user.email)} className="text-emerald-600 focus:text-emerald-600 font-bold">
+                                                        <Mail className="h-3.5 w-3.5 mr-2" />Resend Verification
+                                                    </DropdownMenuItem>
+                                                )}
                                                 <DropdownMenuItem onClick={() => onDelete(user.id)} className="text-destructive focus:text-destructive"><Trash2 className="h-3.5 w-3.5 mr-2" />Delete</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -250,59 +306,138 @@ const AdministratorPage = () => {
             </div>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="font-sans">
-                    <DialogHeader><DialogTitle className="text-[16px] font-bold">{editingUser ? "Edit Admin" : "Create New Admin"}</DialogTitle></DialogHeader>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
-                            <FormField
-                                control={form.control}
-                                name="name"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-[13px] font-bold text-slate-700">Full Name</FormLabel>
-                                        <FormControl><Input placeholder="John Doe" className="h-10 text-[13px]" {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-[13px] font-bold text-slate-700">Email Address</FormLabel>
-                                        <FormControl><Input placeholder="john@example.com" className="h-10 text-[13px]" {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="phone"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-[13px] font-bold text-slate-700">Phone Number</FormLabel>
-                                        <FormControl><Input placeholder="+1 234 567 890" className="h-10 text-[13px]" {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="address"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-[13px] font-bold text-slate-700">Address</FormLabel>
-                                        <FormControl><Input placeholder="123 Street Name, City" className="h-10 text-[13px]" {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <Button type="submit" className="w-full h-10 bg-slate-900 text-[13px] font-bold mt-6" disabled={form.formState.isSubmitting}>
-                                {editingUser ? "Save Changes" : "Create Admin"}
-                            </Button>
-                        </form>
-                    </Form>
+                <DialogContent className="font-sans max-w-2xl max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0">
+                    <DialogHeader className="p-6 pb-2">
+                        <DialogTitle className="text-[16px] font-bold">
+                            {editingUser ? "Edit Admin" : "Create New Admin"}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="flex-1 overflow-y-auto p-6 pt-2">
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="name"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[13px] font-bold text-slate-700">Full Name</FormLabel>
+                                                <FormControl><Input placeholder="John Doe" className="h-10 text-[13px]" {...field} /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="email"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[13px] font-bold text-slate-700">Email Address</FormLabel>
+                                                <FormControl><Input placeholder="john@example.com" className="h-10 text-[13px]" {...field} /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="phone"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[13px] font-bold text-slate-700">Phone Number</FormLabel>
+                                                <FormControl><Input placeholder="+1 234 567 890" className="h-10 text-[13px]" {...field} /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="address"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[13px] font-bold text-slate-700">Address</FormLabel>
+                                                <FormControl><Input placeholder="123 Street Name, City" className="h-10 text-[13px]" {...field} /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <FormField
+                                    control={form.control}
+                                    name="image"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[13px] font-bold text-slate-700">Profile Image</FormLabel>
+                                            <FormControl>
+                                                <FileUpload
+                                                    endpoint="imageUploader"
+                                                    value={field.value}
+                                                    onChange={field.onChange}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="password"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[13px] font-bold text-slate-700">
+                                                {editingUser ? "New Password (leave blank to keep current)" : "Password"}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <div className="relative">
+                                                    <Input
+                                                        type={showPassword ? "text" : "password"}
+                                                        placeholder="******"
+                                                        className="h-10 text-[13px] pr-10"
+                                                        {...field}
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-slate-400 hover:text-slate-600"
+                                                        onClick={() => setShowPassword(!showPassword)}
+                                                    >
+                                                        {showPassword ? (
+                                                            <EyeOff className="h-4 w-4" />
+                                                        ) : (
+                                                            <Eye className="h-4 w-4" />
+                                                        )}
+                                                    </Button>
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="emailVerified"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                            <div className="space-y-0.5">
+                                                <FormLabel className="text-[13px] font-bold text-slate-700">Email Verified</FormLabel>
+                                            </div>
+                                            <FormControl>
+                                                <Switch
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                />
+                                            </FormControl>
+                                        </FormItem>
+                                    )}
+                                />
+                                <Button type="submit" className="w-full h-10 bg-slate-900 text-[13px] font-bold mt-2" disabled={form.formState.isSubmitting}>
+                                    {editingUser ? "Save Changes" : "Create Admin"}
+                                </Button>
+                            </form>
+                        </Form>
+                    </div>
                 </DialogContent>
             </Dialog>
 

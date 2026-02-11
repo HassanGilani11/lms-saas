@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { LogoutButton } from "./logout-button";
+import { getCurrentUser } from "@/actions/user";
 import {
     Layout,
     Users,
@@ -24,7 +25,7 @@ import {
     ChevronRight
 } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
@@ -147,6 +148,16 @@ export const AdminSidebar = () => {
         );
     };
 
+    const [dbUser, setDbUser] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const data = await getCurrentUser();
+            setDbUser(data);
+        };
+        fetchUser();
+    }, [pathname]); // Refresh on navigation to catch updates
+
     return (
         <div className="h-full border-r flex flex-col overflow-y-auto bg-white shadow-sm font-sans">
             <Link
@@ -154,17 +165,17 @@ export const AdminSidebar = () => {
                 className="p-4 flex items-center gap-x-3 mb-2 hover:bg-slate-50 transition-colors group cursor-pointer"
             >
                 <Avatar className="h-10 w-10 border transition-transform group-hover:scale-105">
-                    <AvatarImage src={session?.user?.image || ""} />
+                    <AvatarImage src={dbUser?.image || session?.user?.image || ""} />
                     <AvatarFallback className="bg-slate-100 text-slate-600 font-semibold italic text-lg">
-                        {(session?.user as any)?.username?.[0] || session?.user?.name?.[0] || session?.user?.email?.[0] || "U"}
+                        {dbUser?.name?.[0] || (session?.user as any)?.username?.[0] || session?.user?.name?.[0] || session?.user?.email?.[0] || "U"}
                     </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
                     <span className="text-sm font-semibold text-slate-700 leading-tight group-hover:text-slate-900 transition-colors">
-                        {(session?.user as any)?.username || session?.user?.name || session?.user?.email || "User Name"}
+                        {dbUser?.name || (session?.user as any)?.username || session?.user?.name || session?.user?.email || "User Name"}
                     </span>
                     <span className="text-[10px] text-slate-400 font-medium tracking-wide uppercase">
-                        {session?.user?.role?.toLowerCase() || "User"} Account
+                        {dbUser?.role?.toLowerCase() || session?.user?.role?.toLowerCase() || "User"} Account
                     </span>
                 </div>
             </Link>

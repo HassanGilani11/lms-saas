@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
+import { generateVerificationToken } from "@/lib/tokens";
+import { sendVerificationEmail } from "@/lib/mail";
 
 /**
  * Register a new user.
@@ -22,7 +24,7 @@ export const register = async (values: any) => {
             return { error: "Email already in use!" };
         }
 
-        await db.user.create({
+        const user = await db.user.create({
             data: {
                 name,
                 email,
@@ -30,8 +32,10 @@ export const register = async (values: any) => {
             },
         });
 
-        // After registration, sign the user in
-        return await login({ email, password });
+        const verificationToken = await generateVerificationToken(email);
+        await sendVerificationEmail(verificationToken.identifier, verificationToken.token);
+
+        return { success: "Confirmation email sent!" };
     } catch (error) {
         console.error("[REGISTER_ERROR]", error);
         return { error: "Something went wrong!" };

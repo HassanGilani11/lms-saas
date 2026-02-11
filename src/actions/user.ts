@@ -5,6 +5,8 @@ import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { UserRole } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { generateVerificationToken } from "@/lib/tokens";
+import { sendVerificationEmail } from "@/lib/mail";
 
 /**
  * Get users for admin dashboard with optional role filter.
@@ -125,19 +127,41 @@ export const deleteUser = async (userId: string) => {
 /**
  * Update user details (Admin only).
  */
-export const updateUser = async (userId: string, values: { name?: string; email?: string; role?: UserRole; phone?: string; address?: string }) => {
+export const updateUser = async (userId: string, values: {
+    name?: string;
+    email?: string;
+    role?: UserRole;
+    phone?: string;
+    address?: string;
+    password?: string;
+    emailVerified?: boolean | null;
+    image?: string;
+}) => {
     try {
         const session = await auth();
         if (!session?.user || session.user.role !== "ADMIN") {
             throw new Error("Unauthorized");
         }
 
+        const data: any = { ...values };
+
+        if (values.password) {
+            data.password = await bcrypt.hash(values.password, 10);
+        } else {
+            delete data.password;
+        }
+
+        if (values.emailVerified !== undefined) {
+            data.emailVerified = values.emailVerified ? new Date() : null;
+        }
+
         const updatedUser = await db.user.update({
             where: { id: userId },
-            data: { ...values },
+            data,
         });
 
         revalidatePath("/admin/users");
+        revalidatePath("/admin/users/administrator");
         revalidatePath("/admin/users/instructor");
         revalidatePath("/admin/users/learner");
         return { success: true, data: updatedUser };
@@ -150,25 +174,43 @@ export const updateUser = async (userId: string, values: { name?: string; email?
 /**
  * Create a new user (Admin only).
  */
-export const createUser = async (values: { name: string; email: string; role: UserRole; phone?: string; address?: string }) => {
+export const createUser = async (values: {
+    name: string;
+    email: string;
+    role: UserRole;
+    phone?: string;
+    address?: string;
+    password?: string;
+    emailVerified?: boolean;
+    image?: string;
+}) => {
     try {
         const session = await auth();
         if (!session?.user || session.user.role !== "ADMIN") {
             throw new Error("Unauthorized");
         }
 
-        const hashedPassword = await bcrypt.hash("password123", 10);
+        const hashedPassword = await bcrypt.hash(values.password || "password123", 10);
 
         const newUser = await db.user.create({
             data: {
                 ...values,
                 password: hashedPassword,
+                emailVerified: values.emailVerified ? new Date() : null,
             },
         });
 
         revalidatePath("/admin/users");
+        revalidatePath("/admin/users/administrator");
         revalidatePath("/admin/users/instructor");
         revalidatePath("/admin/users/learner");
+
+        // Send verification email if the user is not manually verified by admin
+        if (!values.emailVerified) {
+            const verificationToken = await generateVerificationToken(newUser.email!);
+            await sendVerificationEmail(verificationToken.identifier, verificationToken.token);
+        }
+
         return { success: true, data: newUser };
     } catch (error: any) {
         console.log("[CREATE_USER] Error detail:", error);
@@ -176,5 +218,37 @@ export const createUser = async (values: { name: string; email: string; role: Us
             return { success: false, error: "Email already exists" };
         }
         return { success: false, error: error.message || "Failed to create user" };
+    }
+};
+
+/**
+ * Resend verification email to a user.
+ */
+export const resendVerificationAction = async (email: string) => {
+    try {
+        const session = await auth();
+        if (!session?.user || session.user.role !== "ADMIN") {
+            throw new Error("Unauthorized");
+        }
+
+        const user = await db.user.findUnique({
+            where: { email }
+        });
+
+        if (!user) {
+            return { success: false, error: "User not found" };
+        }
+
+        if (user.emailVerified) {
+            return { success: false, error: "User is already verified" };
+        }
+
+        const verificationToken = await generateVerificationToken(email);
+        await sendVerificationEmail(verificationToken.identifier, verificationToken.token);
+
+        return { success: true };
+    } catch (error) {
+        console.log("[RESEND_VERIFICATION]", error);
+        return { success: false, error: "Failed to resend email" };
     }
 };

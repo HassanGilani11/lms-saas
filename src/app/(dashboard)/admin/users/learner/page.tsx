@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getUsers, deleteUser, updateUser, createUser } from "@/actions/user";
+import { getUsers, deleteUser, updateUser, createUser, resendVerificationAction } from "@/actions/user";
 import { UserRole } from "@/lib/prisma";
 import {
     Table,
@@ -30,7 +30,8 @@ import { format } from "date-fns";
 import {
     Trash2, Pencil, Plus,
     MoreVertical, Filter, ArrowUpDown,
-    Search, Calendar, ChevronLeft, ChevronRight, Eye
+    Search, Calendar, ChevronLeft, ChevronRight, Eye, EyeOff,
+    CheckCircle, XCircle, Mail
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -46,6 +47,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "react-hot-toast";
+import { FileUpload } from "@/components/shared/file-upload";
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -53,6 +55,9 @@ const formSchema = z.object({
     phone: z.string().optional(),
     address: z.string().optional(),
     role: z.nativeEnum(UserRole),
+    password: z.string().min(6, "Password must be at least 6 characters").optional().or(z.literal("")),
+    emailVerified: z.boolean().default(false),
+    image: z.string().optional().or(z.literal("")),
 });
 
 const LearnerPage = () => {
@@ -63,6 +68,7 @@ const LearnerPage = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -72,6 +78,9 @@ const LearnerPage = () => {
             phone: "",
             address: "",
             role: UserRole.STUDENT,
+            password: "",
+            emailVerified: false,
+            image: "",
         },
     });
 
@@ -110,6 +119,15 @@ const LearnerPage = () => {
         }
     };
 
+    const resendVerification = async (email: string) => {
+        const response = await resendVerificationAction(email);
+        if (response.success) {
+            toast.success("Verification email sent!");
+        } else {
+            toast.error(response.error || "Failed to send email");
+        }
+    };
+
     const onDelete = async (userId: string) => {
         if (confirm("Are you sure you want to delete this learner?")) {
             await deleteUser(userId);
@@ -126,6 +144,9 @@ const LearnerPage = () => {
             phone: user.phone || "",
             address: user.address || "",
             role: user.role,
+            password: "",
+            emailVerified: !!user.emailVerified,
+            image: user.image || "",
         });
         setIsDialogOpen(true);
     };
@@ -143,6 +164,9 @@ const LearnerPage = () => {
             phone: "",
             address: "",
             role: UserRole.STUDENT,
+            password: "",
+            emailVerified: false,
+            image: "",
         });
         setIsDialogOpen(true);
     };
@@ -220,7 +244,19 @@ const LearnerPage = () => {
                                             {format(new Date(user.createdAt), "MMM dd, yyyy")}
                                         </div>
                                     </TableCell>
-                                    <TableCell><Switch checked={true} className="scale-75" /></TableCell>
+                                    <TableCell>
+                                        {user.emailVerified ? (
+                                            <div className="flex items-center gap-x-1.5 text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full w-fit">
+                                                <CheckCircle className="h-3 w-3" />
+                                                <span className="text-[10px] font-bold">Verified</span>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-x-1.5 text-amber-600 bg-amber-50 px-2 py-1 rounded-full w-fit">
+                                                <XCircle className="h-3 w-3" />
+                                                <span className="text-[10px] font-bold">Pending</span>
+                                            </div>
+                                        )}
+                                    </TableCell>
                                     <TableCell className="text-right pr-6 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
@@ -229,6 +265,11 @@ const LearnerPage = () => {
                                             <DropdownMenuContent align="end" className="text-[13px]">
                                                 <DropdownMenuItem onClick={() => onView(user)}><Eye className="h-3.5 w-3.5 mr-2" />View</DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => onEdit(user)}><Pencil className="h-3.5 w-3.5 mr-2" />Edit</DropdownMenuItem>
+                                                {!user.emailVerified && (
+                                                    <DropdownMenuItem onClick={() => resendVerification(user.email)} className="text-emerald-600 focus:text-emerald-600 font-bold">
+                                                        <Mail className="h-3.5 w-3.5 mr-2" />Resend Verification
+                                                    </DropdownMenuItem>
+                                                )}
                                                 <DropdownMenuItem onClick={() => onDelete(user.id)} className="text-destructive focus:text-destructive"><Trash2 className="h-3.5 w-3.5 mr-2" />Delete</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -249,54 +290,127 @@ const LearnerPage = () => {
             </div>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="font-sans">
+                <DialogContent className="font-sans max-w-2xl max-h-[90vh] overflow-y-auto pr-6">
                     <DialogHeader><DialogTitle className="text-[16px] font-bold">{editingUser ? "Edit Learner" : "Create New Learner"}</DialogTitle></DialogHeader>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
-                            <FormField
-                                control={form.control}
-                                name="name"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-[13px] font-bold text-slate-700">Full Name</FormLabel>
-                                        <FormControl><Input placeholder="John Doe" className="h-10 text-[13px]" {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-[13px] font-bold text-slate-700">Email Address</FormLabel>
-                                        <FormControl><Input placeholder="john@example.com" className="h-10 text-[13px]" {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="phone"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-[13px] font-bold text-slate-700">Phone Number</FormLabel>
-                                        <FormControl><Input placeholder="+1 234 567 890" className="h-10 text-[13px]" {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="address"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-[13px] font-bold text-slate-700">Address</FormLabel>
-                                        <FormControl><Input placeholder="123 Street Name, City" className="h-10 text-[13px]" {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[13px] font-bold text-slate-700">Full Name</FormLabel>
+                                            <FormControl><Input placeholder="John Doe" className="h-10 text-[13px]" {...field} /></FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[13px] font-bold text-slate-700">Email Address</FormLabel>
+                                            <FormControl><Input placeholder="john@example.com" className="h-10 text-[13px]" {...field} /></FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="phone"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[13px] font-bold text-slate-700">Phone Number</FormLabel>
+                                            <FormControl><Input placeholder="+1 234 567 890" className="h-10 text-[13px]" {...field} /></FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="address"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[13px] font-bold text-slate-700">Address</FormLabel>
+                                            <FormControl><Input placeholder="123 Street Name, City" className="h-10 text-[13px]" {...field} /></FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="image"
+                                    render={({ field }) => (
+                                        <FormItem className="col-span-1 md:col-span-2">
+                                            <FormLabel className="text-[13px] font-bold text-slate-700">Profile Image</FormLabel>
+                                            <FormControl>
+                                                <div className="flex items-center justify-center p-4 border-2 border-dashed border-slate-200 rounded-xl">
+                                                    <FileUpload
+                                                        endpoint="imageUploader"
+                                                        value={field.value}
+                                                        onChange={field.onChange}
+                                                    />
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="password"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[13px] font-bold text-slate-700">
+                                                {editingUser ? "New Password (optional)" : "Password"}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <div className="relative">
+                                                    <Input
+                                                        type={showPassword ? "text" : "password"}
+                                                        placeholder="******"
+                                                        className="h-10 text-[13px] pr-10"
+                                                        {...field}
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-slate-400"
+                                                        onClick={() => setShowPassword(!showPassword)}
+                                                    >
+                                                        {showPassword ? (
+                                                            <EyeOff className="h-4 w-4" />
+                                                        ) : (
+                                                            <Eye className="h-4 w-4" />
+                                                        )}
+                                                    </Button>
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="emailVerified"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm h-10 mt-8">
+                                            <div className="space-y-0.5">
+                                                <FormLabel className="text-[13px] font-bold text-slate-700">Email Verified</FormLabel>
+                                            </div>
+                                            <FormControl>
+                                                <Switch
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                />
+                                            </FormControl>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
                             <Button type="submit" className="w-full h-10 bg-slate-900 text-[13px] font-bold mt-6" disabled={form.formState.isSubmitting}>
                                 {editingUser ? "Save Changes" : "Create Learner"}
                             </Button>

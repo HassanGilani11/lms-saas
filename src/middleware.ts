@@ -15,6 +15,7 @@ export default auth((req) => {
     const userRole = (req.auth?.user as any)?.role;
 
     const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth");
+    const isUploadThingRoute = nextUrl.pathname.startsWith("/api/uploadthing");
     const isPublicRoute = ["/", "/auth/login", "/auth/register"].includes(
         nextUrl.pathname
     );
@@ -24,7 +25,7 @@ export default auth((req) => {
     const isStudentRoute = nextUrl.pathname.startsWith("/student");
     const isDashboardRoute = nextUrl.pathname === "/dashboard";
 
-    if (isApiAuthRoute) return NextResponse.next();
+    if (isApiAuthRoute || isUploadThingRoute) return NextResponse.next();
 
     if (isAuthRoute) {
         return NextResponse.next();
