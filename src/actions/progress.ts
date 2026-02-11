@@ -4,6 +4,8 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { checkAndIssueCertificate } from "@/actions/certificate";
+import { createNotification } from "@/actions/notifications";
+import { NotificationType } from "@/lib/prisma";
 
 /**
  * Enroll a user in a course by creating a Purchase record.
@@ -33,6 +35,15 @@ export const enrollInCourse = async (courseId: string) => {
                 userId,
                 courseId,
             },
+        });
+
+        await createNotification({
+            userId,
+            title: "Welcome to the Course!",
+            message: `You have successfully enrolled in "${course.title}". Let's start learning!`,
+            type: NotificationType.ENROLLMENT,
+            href: `/student/courses/${courseId}`,
+            metadata: { courseId }
         });
 
         revalidatePath(`/courses/${courseId}`);

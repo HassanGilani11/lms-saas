@@ -231,7 +231,8 @@ exports.Prisma.GroupScalarFieldEnum = {
   description: 'description',
   categoryId: 'categoryId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  parentId: 'parentId'
 };
 
 exports.Prisma.GroupCategoryScalarFieldEnum = {
@@ -288,6 +289,11 @@ exports.Prisma.CourseTagScalarFieldEnum = {
   color: 'color',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CourseGroupScalarFieldEnum = {
+  courseId: 'courseId',
+  groupId: 'groupId'
 };
 
 exports.Prisma.LessonScalarFieldEnum = {
@@ -419,6 +425,7 @@ exports.Prisma.UserProgressScalarFieldEnum = {
   userId: 'userId',
   topicId: 'topicId',
   isCompleted: 'isCompleted',
+  totalTimeSpent: 'totalTimeSpent',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -477,8 +484,18 @@ exports.Prisma.NotificationScalarFieldEnum = {
   title: 'title',
   message: 'message',
   href: 'href',
+  type: 'type',
+  metadata: 'metadata',
   isRead: 'isRead',
   createdAt: 'createdAt'
+};
+
+exports.Prisma.NotificationPreferenceScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  enabled: 'enabled',
+  emailEnabled: 'emailEnabled'
 };
 
 exports.Prisma.ReportScalarFieldEnum = {
@@ -489,6 +506,35 @@ exports.Prisma.ReportScalarFieldEnum = {
   reason: 'reason',
   status: 'status',
   createdAt: 'createdAt'
+};
+
+exports.Prisma.TimeLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  courseId: 'courseId',
+  topicId: 'topicId',
+  duration: 'duration',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.AnalyticsAggregateScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  referenceId: 'referenceId',
+  value: 'value',
+  metadata: 'metadata',
+  date: 'date',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SystemSettingsScalarFieldEnum = {
+  id: 'id',
+  siteName: 'siteName',
+  siteLogo: 'siteLogo',
+  contactEmail: 'contactEmail',
+  emailTemplates: 'emailTemplates',
+  stripeCurrency: 'stripeCurrency',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -546,6 +592,14 @@ exports.AttemptStatus = exports.$Enums.AttemptStatus = {
   GRADED: 'GRADED'
 };
 
+exports.NotificationType = exports.$Enums.NotificationType = {
+  ENROLLMENT: 'ENROLLMENT',
+  COURSE_UPDATE: 'COURSE_UPDATE',
+  DISCUSSION: 'DISCUSSION',
+  QUIZ_GRADED: 'QUIZ_GRADED',
+  SYSTEM: 'SYSTEM'
+};
+
 exports.ReportStatus = exports.$Enums.ReportStatus = {
   PENDING: 'PENDING',
   RESOLVED: 'RESOLVED',
@@ -570,6 +624,7 @@ exports.Prisma.ModelName = {
   LearningPathLevel: 'LearningPathLevel',
   Course: 'Course',
   CourseTag: 'CourseTag',
+  CourseGroup: 'CourseGroup',
   Lesson: 'Lesson',
   Topic: 'Topic',
   Quiz: 'Quiz',
@@ -588,7 +643,11 @@ exports.Prisma.ModelName = {
   Discussion: 'Discussion',
   Comment: 'Comment',
   Notification: 'Notification',
-  Report: 'Report'
+  NotificationPreference: 'NotificationPreference',
+  Report: 'Report',
+  TimeLog: 'TimeLog',
+  AnalyticsAggregate: 'AnalyticsAggregate',
+  SystemSettings: 'SystemSettings'
 };
 
 /**

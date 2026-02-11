@@ -3,6 +3,8 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { createNotification } from "@/actions/notifications";
+import { NotificationType } from "@/lib/prisma";
 
 /**
  * Post a new discussion thread in a lesson.
@@ -31,8 +33,31 @@ export const postDiscussion = async (topicId: string, title: string, content: st
                 userId,
                 title,
                 content,
+            },
+            include: {
+                topic: {
+                    include: {
+                        lesson: {
+                            include: {
+                                course: true
+                            }
+                        }
+                    }
+                }
             }
         });
+
+        // Notify instructor
+        if (discussion.topic?.lesson?.course?.userId) {
+            await createNotification({
+                userId: discussion.topic.lesson.course.userId,
+                title: "New Discussion Posted",
+                message: `A student started a new discussion: "${title}" in "${discussion.topic.lesson.course.title}".`,
+                type: NotificationType.DISCUSSION,
+                href: `/instructor/courses/${discussion.topic.lesson.courseId}`,
+                metadata: { discussionId: discussion.id }
+            });
+        }
 
         revalidatePath(`/courses/[courseId]/lessons/[lessonId]`);
         return discussion;
@@ -163,14 +188,31 @@ export const createComment = async (discussionId: string, content: string, paren
         const userId = session?.user?.id;
         if (!userId) throw new Error("Unauthorized");
 
-        return await db.comment.create({
+        const comment = await db.comment.create({
             data: {
                 discussionId,
                 userId,
                 content,
                 parentId
+            },
+            include: {
+                discussion: true,
             }
         });
+
+        // Notify discussion owner if they are not the one commenting
+        if (comment.discussion?.userId && comment.discussion.userId !== userId) {
+            await createNotification({
+                userId: comment.discussion.userId,
+                title: "New Reply on Your Discussion",
+                message: `Someone replied to your discussion: "${comment.discussion.title}".`,
+                type: NotificationType.DISCUSSION,
+                href: `/courses/[courseId]/lessons/[lessonId]`, // Dynamic in FE
+                metadata: { discussionId, commentId: comment.id }
+            });
+        }
+
+        return comment;
     } catch (error) {
         console.log("[CREATE_COMMENT]", error);
         return null;

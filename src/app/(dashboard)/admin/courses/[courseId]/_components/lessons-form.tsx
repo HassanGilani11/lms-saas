@@ -61,7 +61,8 @@ export const LessonsForm = ({
     const [newTopicType, setNewTopicType] = useState<"VIDEO" | "TEXT" | "PDF" | "QUIZ">("VIDEO");
     const [creationMode, setCreationMode] = useState<"TOPIC" | "QUIZ">("TOPIC");
     const [editingProgression, setEditingProgression] = useState<string | null>(null);
-    const [progressionRules, setProgressionRules] = useState("");
+    const [progressionRules, setProgressionRules] = useState<string[]>([]);
+    const [customRule, setCustomRule] = useState("");
     const [isAddingAttachment, setIsAddingAttachment] = useState<string | null>(null);
     const [attachmentName, setAttachmentName] = useState("");
     const [attachmentUrl, setAttachmentUrl] = useState("");
@@ -107,14 +108,7 @@ export const LessonsForm = ({
 
     const onUpdateProgression = async (lessonId: string) => {
         try {
-            let rules = [];
-            try {
-                rules = JSON.parse(progressionRules);
-            } catch {
-                toast.error("Invalid JSON for rules");
-                return;
-            }
-            await updateLesson(lessonId, { progressionRules: rules });
+            await updateLesson(lessonId, { progressionRules });
             toast.success("Progression rules updated");
             setEditingProgression(null);
             router.refresh();
@@ -290,35 +284,138 @@ export const LessonsForm = ({
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         setEditingProgression(lesson.id);
-                                                        setProgressionRules(JSON.stringify(lesson.progressionRules || [], null, 2));
+                                                        setProgressionRules(lesson.progressionRules || []);
                                                     }}
                                                     variant="ghost"
                                                     size="sm"
                                                     className="h-7 text-[10px] font-bold text-slate-500"
                                                 >
-                                                    <Pencil className="h-3 w-3 mr-1" />
-                                                    Edit Rules
+                                                    {lesson.progressionRules && lesson.progressionRules.length > 0 ? (
+                                                        <>
+                                                            <Pencil className="h-3 w-3 mr-1" />
+                                                            Edit Rules
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <PlusCircle className="h-3.5 w-3.5 mr-1" />
+                                                            Add Rules
+                                                        </>
+                                                    )}
                                                 </Button>
                                             )}
                                         </div>
                                         {editingProgression === lesson.id ? (
-                                            <div className="space-y-2">
-                                                <textarea
-                                                    className="w-full text-xs font-mono p-2 border rounded-md min-h-[60px] bg-white"
-                                                    value={progressionRules}
-                                                    onChange={(e) => setProgressionRules(e.target.value)}
-                                                    placeholder='e.g. ["COMPLETED_PREVIOUS"]'
-                                                />
-                                                <div className="flex gap-x-2">
-                                                    <Button type="button" onClick={() => onUpdateProgression(lesson.id)} size="sm" className="h-7 text-[10px] font-bold">Save</Button>
-                                                    <Button type="button" onClick={() => setEditingProgression(null)} variant="outline" size="sm" className="h-7 text-[10px] font-bold">Cancel</Button>
+                                            <div className="space-y-4 bg-white p-4 rounded-lg border border-slate-200 shadow-inner">
+                                                <div className="space-y-3">
+                                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Quick Select</label>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {(() => {
+                                                            const allRules = Array.from(new Set([
+                                                                "COMPLETED_PREVIOUS",
+                                                                ...(initialData?.lessons?.flatMap((l: any) => l.progressionRules || []) || [])
+                                                            ]));
+                                                            return allRules.map((rule) => {
+                                                                const isSelected = progressionRules.includes(rule);
+                                                                return (
+                                                                    <Button
+                                                                        key={rule}
+                                                                        type="button"
+                                                                        variant={isSelected ? "default" : "outline"}
+                                                                        size="sm"
+                                                                        onClick={() => {
+                                                                            if (isSelected) {
+                                                                                setProgressionRules(progressionRules.filter(r => r !== rule));
+                                                                            } else {
+                                                                                setProgressionRules([...progressionRules, rule]);
+                                                                            }
+                                                                        }}
+                                                                        className="h-8 text-[11px] font-semibold"
+                                                                    >
+                                                                        {rule === "COMPLETED_PREVIOUS" ? "Complete Previous Lesson" : rule}
+                                                                    </Button>
+                                                                );
+                                                            });
+                                                        })()}
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-3">
+                                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Custom Rule</label>
+                                                    <div className="flex gap-x-2">
+                                                        <Input
+                                                            placeholder="Add any custom rule..."
+                                                            value={customRule}
+                                                            onChange={(e) => setCustomRule(e.target.value)}
+                                                            className="h-9 text-[11px]"
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") {
+                                                                    e.preventDefault();
+                                                                    const trimmed = customRule.trim();
+                                                                    if (trimmed && !progressionRules.includes(trimmed)) {
+                                                                        setProgressionRules([...progressionRules, trimmed]);
+                                                                        setCustomRule("");
+                                                                    }
+                                                                }
+                                                            }}
+                                                        />
+                                                        <Button
+                                                            type="button"
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                const trimmed = customRule.trim();
+                                                                if (trimmed && !progressionRules.includes(trimmed)) {
+                                                                    setProgressionRules([...progressionRules, trimmed]);
+                                                                    setCustomRule("");
+                                                                }
+                                                            }}
+                                                            variant="secondary"
+                                                            className="h-9 px-4 text-[11px] font-bold"
+                                                        >
+                                                            Add
+                                                        </Button>
+                                                    </div>
+                                                </div>
+
+                                                {progressionRules.length > 0 && (
+                                                    <div className="space-y-2 pt-2 border-t border-slate-50">
+                                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Selected Rules (To be saved)</label>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {progressionRules.map((rule) => (
+                                                                <Badge key={rule} variant="outline" className="flex items-center gap-x-1.5 px-2 py-1 bg-slate-50 border-slate-200 text-slate-700 text-[11px] hover:bg-slate-100 transition-colors">
+                                                                    {rule === "COMPLETED_PREVIOUS" ? "Complete Previous Lesson" : rule}
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(e) => {
+                                                                            e.preventDefault();
+                                                                            e.stopPropagation();
+                                                                            setProgressionRules(progressionRules.filter(r => r !== rule));
+                                                                        }}
+                                                                        className="ml-1 rounded-full p-0.5 hover:bg-slate-200 text-slate-400 hover:text-rose-500 transition-colors"
+                                                                    >
+                                                                        <X className="h-3 w-3" />
+                                                                    </button>
+                                                                </Badge>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                <div className="flex gap-x-2 pt-3 mt-1">
+                                                    <Button type="button" onClick={() => onUpdateProgression(lesson.id)} size="sm" className="h-9 px-5 text-[11px] font-bold">Save All Rules</Button>
+                                                    <Button type="button" onClick={() => setEditingProgression(null)} variant="ghost" size="sm" className="h-9 text-[11px] font-bold text-slate-400">Cancel</Button>
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="text-[12px] text-slate-600 bg-white p-2 rounded border border-slate-100">
-                                                {lesson.progressionRules && JSON.stringify(lesson.progressionRules) !== "[]"
-                                                    ? JSON.stringify(lesson.progressionRules)
-                                                    : "No specific rules set."}
+                                            <div className="flex flex-wrap gap-2 items-center min-h-[40px] bg-white/50 p-2 rounded-xl border border-dashed border-slate-200">
+                                                {lesson.progressionRules && lesson.progressionRules.length > 0 ? (
+                                                    lesson.progressionRules.map((rule: string) => (
+                                                        <Badge key={rule} variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200 border-none px-2 py-0.5 text-[11px] font-medium">
+                                                            {rule === "COMPLETED_PREVIOUS" ? "Complete Previous Lesson" : rule}
+                                                        </Badge>
+                                                    ))
+                                                ) : (
+                                                    <span className="text-[11px] text-slate-400 italic ml-1">No specific progression rules set. Students can access this lesson freely.</span>
+                                                )}
                                             </div>
                                         )}
                                     </div>

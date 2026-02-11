@@ -3,6 +3,8 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { createNotification } from "@/actions/notifications";
+import { NotificationType } from "@/lib/prisma";
 
 export const createCourse = async (title: string, values?: { price?: number; userId?: string; categoryId?: string; courseCode?: string; tagIds?: string[] }) => {
     try {
@@ -58,6 +60,7 @@ export const updateCourse = async (courseId: string, values: any) => {
                 ...(isAdmin ? {} : { userId }),
             },
             data: {
+                userId: isAdmin ? values.userId : undefined,
                 title: values.title,
                 // @ts-ignore
                 courseCode: values.courseCode,
@@ -75,6 +78,23 @@ export const updateCourse = async (courseId: string, values: any) => {
                 } : undefined,
             },
         });
+
+        // Notify enrolled students
+        const purchases = await db.purchase.findMany({
+            where: { courseId },
+            select: { userId: true }
+        });
+
+        for (const purchase of purchases) {
+            await createNotification({
+                userId: purchase.userId,
+                title: "Course Updated",
+                message: `The course "${course.title}" has been updated with new content. Check it out!`,
+                type: NotificationType.COURSE_UPDATE,
+                href: `/student/courses/${courseId}`,
+                metadata: { courseId }
+            });
+        }
 
         revalidatePath(`/instructor/courses/${courseId}`);
         revalidatePath(`/admin/courses/${courseId}/edit`);
@@ -272,3 +292,22 @@ export const adminDeleteCourse = async (courseId: string) => {
         return null;
     }
 };
+
+export const getCourses = async () => {
+    try {
+        const courses = await db.course.findMany({
+            where: { isPublished: true },
+            orderBy: { createdAt: "desc" },
+            include: {
+                _count: {
+                    select: { lessons: true }
+                }
+            }
+        });
+        return courses;
+    } catch (error) {
+        console.log("[GET_COURSES]", error);
+        return [];
+    }
+};
+

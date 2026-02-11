@@ -1,15 +1,26 @@
-"use client";
 
-import { ComingSoon } from "@/components/shared/coming-soon";
-import { Settings } from "lucide-react";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { getSettings } from "@/actions/settings";
+import { SettingsHeader } from "./_components/settings-header";
+import { SettingsForm } from "./_components/settings-form";
 
-const SettingsPage = () => {
+const SettingsPage = async () => {
+    const session = await auth();
+
+    if (session?.user?.role !== "ADMIN") {
+        return redirect("/");
+    }
+
+    const settings = await getSettings();
+
     return (
-        <ComingSoon
-            title="Global Settings"
-            icon={Settings}
-            description="Configure platform-wide branding, security protocols, and system integrations in the upcoming release."
-        />
+        <div className="p-6 space-y-6">
+            <SettingsHeader />
+            <div className="grid gap-6">
+                <SettingsForm initialData={settings} />
+            </div>
+        </div>
     );
 };
 

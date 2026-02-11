@@ -11,10 +11,24 @@ export const getGroups = async () => {
             include: {
                 category: true,
                 tags: true,
+                parent: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                },
+                leaders: {
+                    select: {
+                        id: true,
+                        name: true,
+                        image: true,
+                    }
+                },
                 _count: {
                     select: {
                         users: true,
                         learningPaths: true,
+                        children: true,
                     }
                 }
             },
@@ -27,15 +41,26 @@ export const getGroups = async () => {
     }
 };
 
-export const createGroup = async (values: { name: string; description?: string; categoryId?: string; tagIds?: string[] }) => {
+export const createGroup = async (values: {
+    name: string;
+    description?: string;
+    categoryId?: string;
+    tagIds?: string[];
+    parentId?: string;
+    leaderIds?: string[];
+}) => {
     try {
         const group = await db.group.create({
             data: {
                 name: values.name,
                 description: values.description,
                 categoryId: values.categoryId,
+                parentId: values.parentId || null,
                 tags: values.tagIds ? {
                     connect: values.tagIds.map((id) => ({ id })),
+                } : undefined,
+                leaders: values.leaderIds ? {
+                    connect: values.leaderIds.map((id) => ({ id })),
                 } : undefined,
             },
         });
@@ -47,7 +72,14 @@ export const createGroup = async (values: { name: string; description?: string; 
     }
 };
 
-export const updateGroup = async (id: string, values: { name?: string; description?: string; categoryId?: string; tagIds?: string[] }) => {
+export const updateGroup = async (id: string, values: {
+    name?: string;
+    description?: string;
+    categoryId?: string;
+    tagIds?: string[];
+    parentId?: string | null;
+    leaderIds?: string[];
+}) => {
     try {
         const group = await db.group.update({
             where: { id },
@@ -55,12 +87,17 @@ export const updateGroup = async (id: string, values: { name?: string; descripti
                 name: values.name,
                 description: values.description,
                 categoryId: values.categoryId,
+                parentId: values.parentId === undefined ? undefined : values.parentId,
                 tags: values.tagIds ? {
                     set: values.tagIds.map((id) => ({ id })),
+                } : undefined,
+                leaders: values.leaderIds ? {
+                    set: values.leaderIds.map((id) => ({ id })),
                 } : undefined,
             },
         });
         revalidatePath("/admin/groups");
+        revalidatePath(`/admin/groups/${id}`);
         return group;
     } catch (error) {
         console.error("[UPDATE_GROUP]", error);
@@ -70,24 +107,73 @@ export const updateGroup = async (id: string, values: { name?: string; descripti
 
 export const getGroupById = async (id: string) => {
     try {
-        return await db.group.findUnique({
+        const group = await db.group.findUnique({
             where: { id },
             include: {
                 category: true,
                 tags: true,
+                parent: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                },
+                leaders: {
+                    select: {
+                        id: true,
+                        name: true,
+                        image: true,
+                        email: true,
+                    }
+                },
+                users: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                    }
+                },
+                children: {
+                    include: {
+                        _count: {
+                            select: {
+                                users: true,
+                            }
+                        }
+                    }
+                },
+                assignedCourses: {
+                    include: {
+                        course: {
+                            include: {
+                                _count: {
+                                    select: {
+                                        lessons: true,
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 _count: {
                     select: {
                         users: true,
                         learningPaths: true,
+                        children: true,
+                        assignedCourses: true,
                     }
                 }
             }
         });
+
+        return group;
     } catch (error) {
         console.error("[GET_GROUP_BY_ID]", error);
         return null;
     }
 };
+
 
 export const deleteGroup = async (id: string) => {
     try {
@@ -102,7 +188,134 @@ export const deleteGroup = async (id: string) => {
     }
 };
 
-// --- Categories ---
+// --- Hierarchy & Enrollments ---
+
+export const getGroupHierarchy = async () => {
+    try {
+        const topLevelGroups = await db.group.findMany({
+            where: { parentId: null },
+            include: {
+                children: {
+                    include: {
+                        children: true,
+                    }
+                }
+            }
+        });
+        return topLevelGroups;
+    } catch (error) {
+        console.error("[GET_GROUP_HIERARCHY]", error);
+        return [];
+    }
+};
+
+export const enrollGroupInCourse = async (groupId: string, courseId: string) => {
+    try {
+        const enrollment = await db.courseGroup.create({
+            data: {
+                groupId,
+                courseId,
+            }
+        });
+        revalidatePath(`/admin/groups/${groupId}`);
+        return enrollment;
+    } catch (error) {
+        console.error("[ENROLL_GROUP_IN_COURSE]", error);
+        return null;
+    }
+};
+
+export const unenrollGroupFromCourse = async (groupId: string, courseId: string) => {
+    try {
+        await db.courseGroup.delete({
+            where: {
+                courseId_groupId: {
+                    courseId,
+                    groupId,
+                }
+            }
+        });
+        revalidatePath(`/admin/groups/${groupId}`);
+        return true;
+    } catch (error) {
+        console.error("[UNENROLL_GROUP_FROM_COURSE]", error);
+        return false;
+    }
+};
+
+export const addUsersToGroup = async (groupId: string, userIds: string[]) => {
+    try {
+        await db.group.update({
+            where: { id: groupId },
+            data: {
+                users: {
+                    connect: userIds.map(id => ({ id }))
+                }
+            }
+        });
+        revalidatePath(`/admin/groups/${groupId}`);
+        return true;
+    } catch (error) {
+        console.error("[ADD_USERS_TO_GROUP]", error);
+        return false;
+    }
+};
+
+export const removeUserFromGroup = async (groupId: string, userId: string) => {
+    try {
+        await db.group.update({
+            where: { id: groupId },
+            data: {
+                users: {
+                    disconnect: { id: userId }
+                }
+            }
+        });
+        revalidatePath(`/admin/groups/${groupId}`);
+        return true;
+    } catch (error) {
+        console.error("[REMOVE_USER_FROM_GROUP]", error);
+        return false;
+    }
+};
+
+export const bulkUserUpload = async (groupId: string, usersData: { email: string, name?: string }[]) => {
+    try {
+        for (const data of usersData) {
+            // Find or create user
+            let user = await db.user.findUnique({
+                where: { email: data.email }
+            });
+
+            if (!user) {
+                // For simplicity in this demo, we create a user with a default password/role
+                // In a real app, you'd send an invite email
+                user = await db.user.create({
+                    data: {
+                        email: data.email,
+                        name: data.name || data.email.split('@')[0],
+                        role: "STUDENT",
+                    }
+                });
+            }
+
+            // Add to group
+            await db.group.update({
+                where: { id: groupId },
+                data: {
+                    users: {
+                        connect: { id: user.id }
+                    }
+                }
+            });
+        }
+        revalidatePath(`/admin/groups/${groupId}`);
+        return { success: true, count: usersData.length };
+    } catch (error) {
+        console.error("[BULK_USER_UPLOAD]", error);
+        return { success: false, error: "Bulk upload failed" };
+    }
+};
 
 export const getGroupCategories = async () => {
     try {

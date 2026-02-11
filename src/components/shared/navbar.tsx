@@ -5,9 +5,12 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { useSettings } from "@/components/providers/settings-provider";
+import Image from "next/image";
 
 export const Navbar = () => {
     const { data: session, status } = useSession();
+    const { settings } = useSettings();
     const [isScrolled, setIsScrolled] = useState(false);
 
     useEffect(() => {
@@ -29,10 +32,25 @@ export const Navbar = () => {
         >
             <div className="container mx-auto px-6 flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-x-2">
-                    <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-xl">L</span>
-                    </div>
-                    <span className="font-bold text-xl tracking-tight text-slate-900">LuminaLearn</span>
+                    {settings?.siteLogo ? (
+                        <div className="relative h-10 w-10">
+                            <Image
+                                src={settings.siteLogo}
+                                alt="Logo"
+                                fill
+                                className="object-contain"
+                            />
+                        </div>
+                    ) : (
+                        <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center">
+                            <span className="text-white font-bold text-2xl">
+                                {settings?.siteName?.[0] || "L"}
+                            </span>
+                        </div>
+                    )}
+                    <span className="font-bold text-2xl tracking-tight text-slate-900">
+                        {settings?.siteName || "LuminaLearn"}
+                    </span>
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-x-8">

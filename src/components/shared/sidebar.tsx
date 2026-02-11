@@ -3,6 +3,7 @@ import { LogoutButton } from "./logout-button";
 import { BookOpen, Layout, List, BarChart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSession } from "next-auth/react";
+import { useSettings } from "@/components/providers/settings-provider";
 
 const routes = [
     {
@@ -24,6 +25,7 @@ const routes = [
 
 export const Sidebar = () => {
     const { data: session } = useSession();
+    const { settings } = useSettings();
 
     return (
         <div className="h-full border-r flex flex-col overflow-y-auto bg-white shadow-sm font-sans">

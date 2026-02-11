@@ -30,6 +30,11 @@ export const ourFileRouter = {
             console.log("File URL:", file.url);
             return { uploadedBy: metadata.userId };
         }),
+    courseImage: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
+        .middleware(async () => await handleAuth())
+        .onUploadComplete(({ metadata, file }) => {
+            return { uploadedBy: metadata.userId };
+        }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

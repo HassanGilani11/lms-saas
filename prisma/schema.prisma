@@ -40,7 +40,10 @@ model User {
   stripeSubscription StripeSubscription?
   learningPathEnrollments LearningPathUser[]
   groups             Group[]             @relation("UserGroups")
+  leadingGroups      Group[]             @relation("GroupLeaders")
   userAchievements   UserAchievement[]
+  timeLogs           TimeLog[]
+  notificationPreferences NotificationPreference[]
 }
 
 model UserType {
@@ -169,10 +172,16 @@ model Group {
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
 
+  parent        Group?              @relation("GroupHierarchy", fields: [parentId], references: [id])
+  parentId      String?
+  children      Group[]             @relation("GroupHierarchy")
+  
   category      GroupCategory?      @relation(fields: [categoryId], references: [id])
   tags          GroupTag[]
   learningPaths LearningPathGroup[]
+  assignedCourses CourseGroup[]
   users         User[]              @relation("UserGroups")
+  leaders       User[]              @relation("GroupLeaders")
 }
 
 model GroupCategory {
@@ -239,6 +248,8 @@ model Course {
   quizzes           Quiz[]
   learningPaths     LearningPathCourse[]
   tags              CourseTag[]
+  assignedGroups    CourseGroup[]
+  timeLogs          TimeLog[]
 
   @@index([categoryId])
 }
@@ -251,6 +262,18 @@ model CourseTag {
   updatedAt DateTime @updatedAt
   courses   Course[]
 }
+
+model CourseGroup {
+  courseId      String
+  groupId       String
+  course        Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  group         Group        @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([courseId, groupId])
+  @@index([courseId])
+  @@index([groupId])
+}
+
 
 model Lesson {
   id          String   @id @default(cuid())
@@ -288,6 +311,7 @@ model Topic {
   quiz         Quiz?          @relation(fields: [quizId], references: [id])
   userProgress UserProgress[]
   attachments  Attachment[]
+  timeLogs     TimeLog[]
 
   @@index([lessonId])
 }
@@ -435,6 +459,7 @@ model UserProgress {
   userId      String
   topicId     String
   isCompleted Boolean  @default(false)
+  totalTimeSpent Int      @default(0) // total time in seconds
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   topic       Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
@@ -520,15 +545,40 @@ model Comment {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
+  id        String           @id @default(cuid())
   userId    String
   title     String
   message   String
   href      String?
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType @default(SYSTEM)
+  metadata  Json?            @default("{}")
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
+
+model NotificationPreference {
+  id           String           @id @default(cuid())
+  userId       String
+  type         NotificationType
+  enabled      Boolean          @default(true)
+  emailEnabled Boolean          @default(false)
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type])
+  @@index([userId])
+}
+
+enum NotificationType {
+  ENROLLMENT
+  COURSE_UPDATE
+  DISCUSSION
+  QUIZ_GRADED
+  SYSTEM
+}
+
 
 model Report {
   id           String       @id @default(cuid())
@@ -573,4 +623,44 @@ enum ReportStatus {
   PENDING
   RESOLVED
   DISMISSED
+}
+
+model TimeLog {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String?
+  topicId   String?
+  duration  Int      // time spent in seconds
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  topic     Topic?   @relation(fields: [topicId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([topicId])
+}
+
+model AnalyticsAggregate {
+  id          String   @id @default(cuid())
+  type        String   // "COURSE_COMPLETION", "QUIZ_PERFORMANCE", "TIME_SPENT"
+  referenceId String   // ID of Course, Quiz, or User
+  value       Float
+  metadata    Json?    @default("{}")
+  date        DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type, referenceId])
+  @@index([date])
+}
+
+model SystemSettings {
+  id             String   @id @default("default")
+  siteName       String   @default("LMS SaaS")
+  siteLogo       String?
+  contactEmail   String?
+  emailTemplates Json?    @default("{}")
+  stripeCurrency String   @default("USD")
+  updatedAt      DateTime @updatedAt
 }

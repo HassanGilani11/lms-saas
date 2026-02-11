@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { LogoutButton } from "./logout-button";
 import { getCurrentUser } from "@/actions/user";
 import {
@@ -17,10 +18,8 @@ import {
     Contact,
     Map,
     Users as UsersCloud,
-    GitBranch,
     Bell,
     Share2,
-    MessagesSquare,
     ChevronDown,
     ChevronRight
 } from "lucide-react";
@@ -29,6 +28,7 @@ import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
+import { useSettings } from "@/components/providers/settings-provider";
 
 const routes = [
     {
@@ -92,19 +92,9 @@ const routes = [
         href: "/admin/payments",
     },
     {
-        icon: GitBranch,
-        label: "Branch",
-        href: "/admin/branches",
-    },
-    {
-        icon: AlertCircle,
-        label: "Report",
+        icon: BarChart,
+        label: "Analytics & Reports",
         href: "/admin/reports",
-    },
-    {
-        icon: Settings,
-        label: "Global Settings",
-        href: "/admin/settings",
     },
     {
         icon: Bell,
@@ -117,14 +107,15 @@ const routes = [
         href: "/admin/tools",
     },
     {
-        icon: MessagesSquare,
-        label: "Collaboration Tools",
-        href: "/admin/collaboration",
+        icon: Settings,
+        label: "System Settings",
+        href: "/admin/settings",
     },
 ];
 
 export const AdminSidebar = () => {
     const { data: session } = useSession();
+    const { settings } = useSettings();
     const pathname = usePathname();
     const [openMenus, setOpenMenus] = useState<string[]>(() => {
         const initial: string[] = [];
@@ -247,8 +238,26 @@ export const AdminSidebar = () => {
                 })}
             </div>
 
-            <div className="mt-8 px-6 mb-4">
-                <span className="text-xl font-bold tracking-tighter text-slate-900">LMS</span>
+            <div className="mt-8 px-6 mb-4 flex items-center gap-x-2">
+                {settings?.siteLogo ? (
+                    <div className="relative h-8 w-8">
+                        <Image
+                            fill
+                            src={settings.siteLogo}
+                            alt="Logo"
+                            className="object-contain"
+                        />
+                    </div>
+                ) : (
+                    <div className="h-8 w-8 bg-slate-900 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold text-lg">
+                            {settings?.siteName?.[0] || "L"}
+                        </span>
+                    </div>
+                )}
+                <span className="text-xl font-bold tracking-tighter text-slate-900">
+                    {settings?.siteName || "LMS"}
+                </span>
             </div>
 
             <div className="p-4 border-t">

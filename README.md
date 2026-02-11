@@ -7,6 +7,7 @@ A state-of-the-art, scalable, and feature-rich Learning Management System built 
 ## ✨ Key Features
 
 ### 🛡️ Admin Powerhouse
+- **Dynamic System Settings**: Global branding management including site name, logo, and contact email with real-time synchronization.
 - **Dynamic Dashboard**: Real-time analytics on platform growth, revenue, and engagement.
 - **Granular User Management**: Full control over users, roles, and permissions.
 - **System Activity Logs**: Audit-ready tracking of all major platform events.
@@ -28,12 +29,13 @@ A state-of-the-art, scalable, and feature-rich Learning Management System built 
 
 ## 🚀 Tech Stack
 
-- **Core Framework**: [Next.js 15.1.x](https://nextjs.org/) (App Router, Turbopack)
+- **Core Framework**: [Next.js 15.x](https://nextjs.org/) (App Router, Turbopack)
 - **UI Library**: [React 19](https://react.dev/)
-- **Styling Engine**: [Tailwind CSS 4.0+](https://tailwindcss.com/)
-- **Database ORM**: [Prisma 7.x](https://www.prisma.io/)
+- **Styling Engine**: [Tailwind CSS 4.0](https://tailwindcss.com/)
+- **Database ORM**: [Prisma 7.3](https://www.prisma.io/)
+- **File Storage**: [UploadThing](https://uploadthing.com/)
 - **Database**: PostgreSQL (Supabase / Local)
-- **Authentication**: [NextAuth.js v5 Beta](https://authjs.dev/)
+- **Authentication**: [NextAuth.js v5](https://authjs.dev/)
 - **Payment Processing**: [Stripe](https://stripe.com/)
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **State & Forms**: [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
@@ -68,6 +70,9 @@ NEXT_PUBLIC_APP_URL="http://localhost:3000"
 STRIPE_API_KEY="sk_test_..."
 STRIPE_WEBHOOK_SECRET="whsec_..."
 
+# UploadThing
+UPLOADTHING_TOKEN="ey..."
+
 # Optional: Supabase
 NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
@@ -79,12 +84,7 @@ npx prisma db push
 npx prisma generate
 ```
 
-### 4. Seed Initial Data (Optional)
-```bash
-npm run seed
-```
-
-### 5. Launch
+### 4. Launch
 ```bash
 npm run dev
 ```
@@ -95,14 +95,11 @@ npm run dev
 
 ```text
 src/
-├── actions/      # Reusable Server Actions (DB Logic, Auth)
+├── actions/      # Type-safe Server Actions (DB Logic, Auth, Settings)
 ├── app/          # Next.js App Router (Layouts & Page Views)
-│   ├── (dashboard) # Role-based private routes (Admin, Instructor, Student)
-│   ├── (public)    # Landing pages and catalog
-│   └── auth/       # Custom authentication flows
-├── components/   # Atomic UI Components & Layout Fragments
-├── hooks/        # Custom React Hooks for UI state
-├── lib/          # Core utilities (Prisma client, Stripe, Shared utils)
+├── components/   # Atomic UI Components & Providers
+├── hooks/        # Custom React Hooks
+├── lib/          # Core utilities (Prisma client, Stripe, UploadThing)
 └── prisma/       # Database Schema & Migrations
 ```
 
@@ -112,6 +109,7 @@ src/
 - [x] Core LMS Architecture
 - [x] Multi-role Authentication
 - [x] Course & Lesson Management
+- [x] Global Branding & System Settings
 - [/] Stripe Payment Integration (In Progress)
 - [ ] Mobile-First Progressive Web App (PWA)
 - [ ] AI-Powered Course Recommendations

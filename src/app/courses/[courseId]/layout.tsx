@@ -14,11 +14,8 @@ const CourseLayout = async ({
     const session = await auth();
     const resolvedParams = await params;
 
-    /* 
-    // Ideally check purchase/enrollment here.
     const userId = session?.user?.id;
     if (!userId) return redirect("/");
-    */
 
     const course = await db.course.findUnique({
         where: { id: resolvedParams.courseId },
@@ -32,11 +29,40 @@ const CourseLayout = async ({
                     }
                 },
                 orderBy: { position: "asc" }
-            }
+            },
+            assignedGroups: true,
         }
     });
 
     if (!course) return redirect("/");
+
+    // Access Check: Admin/Instructor, Direct Purchase, or Group Enrollment
+    const isAdmin = session.user.role === "ADMIN";
+    const isInstructor = session.user.role === "INSTRUCTOR"; // Usually check if they own the course too
+
+    const purchase = await db.purchase.findUnique({
+        where: {
+            userId_courseId: {
+                userId,
+                courseId: resolvedParams.courseId
+            }
+        }
+    });
+
+    // Check if user is in any group assigned to this course
+    const userGroups = await db.group.findMany({
+        where: {
+            users: { some: { id: userId } },
+            assignedCourses: { some: { courseId: resolvedParams.courseId } }
+        }
+    });
+
+    const hasAccess = isAdmin || !!purchase || userGroups.length > 0;
+
+    if (!hasAccess) {
+        return redirect("/");
+    }
+
 
     return (
         <div className="h-full">

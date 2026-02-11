@@ -30,37 +30,37 @@ import { toast } from "react-hot-toast";
 const NOTIFICATION_TYPES = [
     {
         type: "ENROLLMENT" as NotificationType,
-        label: "Course Enrollments",
-        description: "Get notified when you enroll in a new course or when a student joins your course.",
+        label: "New Student Enrollments",
+        description: "Get notified when a student joins your course.",
         icon: BookOpen
     },
     {
         type: "COURSE_UPDATE" as NotificationType,
-        label: "Course Updates",
-        description: "Receive alerts when course content, lessons, or topics are updated.",
+        label: "Course Content Manager",
+        description: "Receive alerts when content publish status changes.",
         icon: BookOpen
     },
     {
         type: "DISCUSSION" as NotificationType,
-        label: "New Discussions",
-        description: "Be notified when someone starts a discussion or replies to your comments.",
+        label: "Student Discussions",
+        description: "Be notified when a student starts a discussion or replies.",
         icon: MessageSquare
     },
     {
         type: "QUIZ_GRADED" as NotificationType,
-        label: "Quiz Results",
-        description: "Get alerts when your quiz has been graded or a student completes an assessment.",
+        label: "Assessment Alerts",
+        description: "Get alerts when students complete quizzes.",
         icon: Shield
     },
     {
         type: "SYSTEM" as NotificationType,
-        label: "System Announcements",
-        description: "Important updates regarding platform maintenance and new features.",
+        label: "Instructor News",
+        description: "Important dashboard and policy updates.",
         icon: Info
     },
 ];
 
-const AdminNotificationsPage = () => {
+const InstructorNotificationsPage = () => {
     const { notifications, markAsRead } = useNotifications();
     const [prefs, setPrefs] = useState<any[]>([]);
     const [isLoadingPrefs, setIsLoadingPrefs] = useState(true);
@@ -96,7 +96,7 @@ const AdminNotificationsPage = () => {
                     }
                     return [...prev, { type, enabled: true, emailEnabled: false, [field]: value }];
                 });
-                toast.success("Preferences updated");
+                toast.success("Settings saved");
             }
         } finally {
             setIsSavingPref(false);
@@ -105,18 +105,16 @@ const AdminNotificationsPage = () => {
 
     return (
         <div className="p-6 space-y-8 font-sans text-black">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Notification Center</h1>
-                    <p className="text-slate-500 mt-1">Manage all your system alerts and notification settings.</p>
-                </div>
+            <div>
+                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Instructor Notifications</h1>
+                <p className="text-slate-500 mt-1">Manage student interactions and course alerts.</p>
             </div>
 
             <Tabs defaultValue="history" className="space-y-6">
                 <TabsList className="bg-slate-100/50 p-1 rounded-xl h-12">
                     <TabsTrigger value="history" className="rounded-lg px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm gap-2">
                         <History className="h-4 w-4" />
-                        Alert History
+                        Log
                     </TabsTrigger>
                     <TabsTrigger value="settings" className="rounded-lg px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm gap-2">
                         <Settings className="h-4 w-4" />
@@ -129,7 +127,7 @@ const AdminNotificationsPage = () => {
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 border-b bg-slate-50/30">
                             <div>
                                 <CardTitle className="text-lg">Recent Alerts</CardTitle>
-                                <CardDescription>Your latest in-app notifications and updates.</CardDescription>
+                                <CardDescription>Your latest student-related activities.</CardDescription>
                             </div>
                             {notifications.some(n => !n.isRead) && (
                                 <Button variant="outline" size="sm" onClick={handleMarkAllRead}>
@@ -142,8 +140,8 @@ const AdminNotificationsPage = () => {
                             {notifications.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center p-20 text-center text-slate-400">
                                     <Inbox className="h-10 w-10 opacity-20 mb-2" />
-                                    <h3 className="text-lg font-semibold text-slate-900">No notifications</h3>
-                                    <p className="text-sm">When you receive alerts, they will appear here.</p>
+                                    <h3 className="text-lg font-semibold text-slate-900">Quiet day</h3>
+                                    <p className="text-sm">No new student activity recorded yet.</p>
                                 </div>
                             ) : (
                                 <div className="divide-y divide-slate-50">
@@ -183,7 +181,7 @@ const AdminNotificationsPage = () => {
                                                     {n.href && (
                                                         <Button variant="link" className="p-0 h-auto text-blue-600 font-bold text-xs" asChild>
                                                             <Link href={n.href}>
-                                                                View Details
+                                                                Manage Content
                                                                 <ChevronRight className="h-3 w-3 ml-1" />
                                                             </Link>
                                                         </Button>
@@ -211,8 +209,8 @@ const AdminNotificationsPage = () => {
                 <TabsContent value="settings" className="space-y-6">
                     <Card className="border-slate-100 shadow-sm overflow-hidden">
                         <CardHeader className="border-b bg-slate-50/30">
-                            <CardTitle className="text-lg">Notification Toggles</CardTitle>
-                            <CardDescription>Select which events you want to be notified about.</CardDescription>
+                            <CardTitle className="text-lg">Instructor Preferences</CardTitle>
+                            <CardDescription>Control alerts for student interactions.</CardDescription>
                         </CardHeader>
                         <CardContent className="p-0">
                             {isLoadingPrefs ? (
@@ -248,36 +246,10 @@ const AdminNotificationsPage = () => {
                             )}
                         </CardContent>
                     </Card>
-
-                    <Card className="border-slate-100 shadow-sm opacity-50 bg-slate-50/50">
-                        <CardHeader className="border-b">
-                            <div className="flex items-center gap-2">
-                                <CardTitle className="text-lg">Email Summaries</CardTitle>
-                                <span className="text-[9px] font-bold bg-slate-200 px-1.5 py-0.5 rounded text-slate-600">BETA</span>
-                            </div>
-                            <CardDescription>Get weekly course progress and interaction summaries.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="p-0 pointer-events-none grayscale">
-                            {NOTIFICATION_TYPES.slice(0, 3).map((item) => (
-                                <div key={item.type} className="flex items-center justify-between p-6">
-                                    <div className="flex items-start gap-4">
-                                        <div className="h-10 w-10 bg-white border border-slate-100 rounded-xl flex items-center justify-center">
-                                            <Mail className="h-5 w-5 text-slate-400" />
-                                        </div>
-                                        <div className="space-y-0.5">
-                                            <h4 className="font-bold text-slate-900">{item.label}</h4>
-                                            <p className="text-xs text-slate-500">Email notifications</p>
-                                        </div>
-                                    </div>
-                                    <Switch checked={false} disabled />
-                                </div>
-                            ))}
-                        </CardContent>
-                    </Card>
                 </TabsContent>
             </Tabs>
         </div>
     );
 };
 
-export default AdminNotificationsPage;
+export default InstructorNotificationsPage;

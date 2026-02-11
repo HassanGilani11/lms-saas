@@ -9,6 +9,7 @@ import {
     getGroupCategories,
     getGroupTags
 } from "@/actions/groups";
+import { getUsers } from "@/actions/user";
 import {
     Table,
     TableBody,
@@ -22,7 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Trash2, Users, MoreVertical, Eye, Plus, Pencil, Search, Filter, ArrowUpDown, ChevronLeft, ChevronRight, Hash } from "lucide-react";
+import { Trash2, Users, MoreVertical, Eye, Plus, Pencil, Search, Filter, ArrowUpDown, ChevronLeft, ChevronRight, Hash, UserCheck, Network } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
     DropdownMenu,
@@ -57,18 +58,22 @@ import { toast } from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
     description: z.string(),
     categoryId: z.string(),
     tagIds: z.array(z.string()),
+    parentId: z.string().optional(),
+    leaderIds: z.array(z.string()),
 });
 
 const AdminGroupsPage = () => {
     const [groups, setGroups] = useState<any[]>([]);
     const [categories, setCategories] = useState<any[]>([]);
     const [availableTags, setAvailableTags] = useState<any[]>([]);
+    const [allUsers, setAllUsers] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -82,43 +87,58 @@ const AdminGroupsPage = () => {
             description: "",
             categoryId: "",
             tagIds: [],
+            parentId: undefined,
+            leaderIds: [],
         },
     });
 
     const fetchData = async () => {
         setIsLoading(true);
-        const [groupsData, catData, tagData] = await Promise.all([
-            getGroups(),
-            getGroupCategories(),
-            getGroupTags()
-        ]);
-        setGroups(groupsData);
-        setCategories(catData);
-        setAvailableTags(tagData);
-        setIsLoading(false);
+        console.log("[GROUPS_PAGE] Fetching data...");
+        try {
+            const [groupsData, catData, tagData, usersData] = await Promise.all([
+                getGroups(),
+                getGroupCategories(),
+                getGroupTags(),
+                getUsers()
+            ]);
+            console.log("[GROUPS_PAGE] Data received:", { groupsCount: groupsData.length, groupsData });
+            setGroups(groupsData);
+            setCategories(catData);
+            setAvailableTags(tagData);
+            setAllUsers(usersData);
+        } catch (error) {
+            console.error("[GROUPS_PAGE] Fetch error:", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     useEffect(() => {
         fetchData();
     }, []);
 
+
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
             if (editingGroup) {
-                await updateGroup(editingGroup.id, values);
+                const res = await updateGroup(editingGroup.id, values);
+                if (!res) throw new Error("Failed to update group");
                 toast.success("Group updated successfully");
             } else {
-                await createGroup(values);
+                const res = await createGroup(values);
+                if (!res) throw new Error("Failed to create group");
                 toast.success("Group created successfully");
             }
             setIsDialogOpen(false);
             setEditingGroup(null);
             form.reset();
             fetchData();
-        } catch (error) {
-            toast.error(editingGroup ? "Failed to update group" : "Failed to create group");
+        } catch (error: any) {
+            toast.error(error.message || (editingGroup ? "Failed to update group" : "Failed to create group"));
         }
     };
+
 
     const onDelete = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -137,19 +157,24 @@ const AdminGroupsPage = () => {
             description: group.description || "",
             categoryId: group.categoryId || "",
             tagIds: group.tags?.map((t: any) => t.id) || [],
+            parentId: group.parentId || undefined,
+            leaderIds: group.leaders?.map((l: any) => l.id) || [],
         });
         setIsDialogOpen(true);
     };
 
-    const filteredGroups = groups.filter(group =>
-        group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        group.category?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredGroups = groups.filter(group => {
+        const query = searchQuery.toLowerCase();
+        const nameMatch = group.name.toLowerCase().includes(query);
+        const categoryMatch = group.category?.name?.toLowerCase().includes(query) ?? false;
+        return nameMatch || categoryMatch;
+    });
+
 
     return (
         <div className="p-6 text-black font-sans space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-[17px] font-bold text-slate-800">Groups</h1>
+                <h1 className="text-[17px] font-bold text-slate-800">Groups & Enterprise</h1>
             </div>
 
             <Card className="border-none shadow-sm overflow-hidden bg-white">
@@ -167,6 +192,8 @@ const AdminGroupsPage = () => {
                                         description: "",
                                         categoryId: "",
                                         tagIds: [],
+                                        parentId: undefined,
+                                        leaderIds: [],
                                     });
                                     setIsDialogOpen(true);
                                 }}
@@ -196,9 +223,9 @@ const AdminGroupsPage = () => {
                         <TableHeader>
                             <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
                                 <TableHead className="pl-6 font-bold text-slate-400 text-[11px] uppercase tracking-tighter">Group Name</TableHead>
-                                <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter">Category</TableHead>
+                                <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter">Category / Parent</TableHead>
+                                <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter text-center">Leaders</TableHead>
                                 <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter text-center">Members</TableHead>
-                                <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter text-center">Tags</TableHead>
                                 <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter text-center">Created At</TableHead>
                                 <TableHead className="text-right pr-6 font-bold text-slate-400 text-[11px] uppercase tracking-tighter">Options</TableHead>
                             </TableRow>
@@ -223,32 +250,41 @@ const AdminGroupsPage = () => {
                                             </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-slate-600 text-[12px]">
-                                        {group.category ? (
-                                            <Badge variant="outline" className="font-normal bg-slate-50 text-slate-600 border-slate-200">
-                                                {group.category.name}
-                                            </Badge>
-                                        ) : (
-                                            <span className="text-slate-400 italic">Uncategorized</span>
-                                        )}
+                                    <TableCell>
+                                        <div className="flex flex-col gap-y-1">
+                                            {group.category ? (
+                                                <Badge variant="outline" className="w-fit font-normal bg-slate-50 text-slate-600 border-slate-200 text-[10px]">
+                                                    {group.category.name}
+                                                </Badge>
+                                            ) : (
+                                                <span className="text-slate-400 italic text-[10px]">Uncategorized</span>
+                                            )}
+                                            {group.parent && (
+                                                <div className="flex items-center gap-x-1 text-slate-400 text-[10px]">
+                                                    <Network className="h-3 w-3" />
+                                                    {group.parent.name}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        <div className="flex -space-x-2 overflow-hidden justify-center">
+                                            {group.leaders?.length > 0 ? (
+                                                group.leaders.map((leader: any) => (
+                                                    <Avatar key={leader.id} className="inline-block h-6 w-6 rounded-full ring-2 ring-white">
+                                                        <AvatarImage src={leader.image || ""} />
+                                                        <AvatarFallback className="text-[10px] bg-indigo-100 text-indigo-700 font-bold">{leader.name?.charAt(0)}</AvatarFallback>
+                                                    </Avatar>
+                                                ))
+                                            ) : (
+                                                <span className="text-slate-300"><UserCheck className="h-4 w-4" /></span>
+                                            )}
+                                        </div>
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <Badge variant="secondary" className="bg-slate-100 text-slate-600 font-bold text-[11px]">
                                             {group._count.users} Users
                                         </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        <div className="flex flex-wrap gap-1 justify-center max-w-[200px]">
-                                            {group.tags.slice(0, 3).map((tag: any) => (
-                                                <span key={tag.id} className="inline-flex items-center text-[10px] bg-slate-50 border border-slate-100 px-1.5 py-0.5 rounded text-slate-500 font-medium">
-                                                    <Hash className="h-2.5 w-2.5 mr-0.5 opacity-50" />
-                                                    {tag.name}
-                                                </span>
-                                            ))}
-                                            {group.tags.length > 3 && (
-                                                <span className="text-[9px] text-slate-400 pl-1">+{group.tags.length - 3}</span>
-                                            )}
-                                        </div>
                                     </TableCell>
                                     <TableCell className="text-center font-medium text-slate-500 text-[12px]">
                                         {format(new Date(group.createdAt), "MMM d, yyyy")}
@@ -308,7 +344,7 @@ const AdminGroupsPage = () => {
             </div>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-bold">
                             {editingGroup ? "Edit Group" : "Create Group"}
@@ -353,6 +389,37 @@ const AdminGroupsPage = () => {
                                     )}
                                 />
                             </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="parentId"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[13px] font-bold text-slate-700">Parent Group (Optional)</FormLabel>
+                                            <Select
+                                                onValueChange={(val) => field.onChange(val === "none" ? undefined : val)}
+                                                value={field.value || "none"}
+                                                defaultValue={field.value || "none"}
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger className="h-10 text-[13px]">
+                                                        <SelectValue placeholder="Select parent" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="none">None (Top Level)</SelectItem>
+                                                    {groups.filter(g => g.id !== editingGroup?.id).map((g) => (
+                                                        <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
                             <FormField
                                 control={form.control}
                                 name="description"
@@ -366,6 +433,50 @@ const AdminGroupsPage = () => {
                                     </FormItem>
                                 )}
                             />
+
+                            <div className="space-y-3 pt-2">
+                                <FormLabel className="text-[13px] font-bold text-slate-700 uppercase tracking-wider">Group Leaders</FormLabel>
+                                <FormField
+                                    control={form.control}
+                                    name="leaderIds"
+                                    render={({ field }) => (
+                                        <FormItem className="space-y-0">
+                                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-48 overflow-y-auto p-1">
+                                                {allUsers.filter(u => u.role === "ADMIN" || u.role === "INSTRUCTOR").map((user) => (
+                                                    <FormItem
+                                                        key={user.id}
+                                                        className="flex flex-row items-center space-x-3 space-y-0 p-2.5 rounded-lg bg-slate-50 border border-slate-100/50 hover:bg-slate-100 transition-colors"
+                                                    >
+                                                        <FormControl>
+                                                            <Checkbox
+                                                                checked={field.value?.includes(user.id)}
+                                                                onCheckedChange={(checked) => {
+                                                                    return checked
+                                                                        ? field.onChange([...field.value, user.id])
+                                                                        : field.onChange(
+                                                                            field.value?.filter(
+                                                                                (value: any) => value !== user.id
+                                                                            )
+                                                                        )
+                                                                }}
+                                                            />
+                                                        </FormControl>
+                                                        <div className="flex items-center gap-x-1.5 overflow-hidden">
+                                                            <Avatar className="h-5 w-5">
+                                                                <AvatarImage src={user.image || ""} />
+                                                                <AvatarFallback className="text-[8px]">{user.name?.charAt(0)}</AvatarFallback>
+                                                            </Avatar>
+                                                            <FormLabel className="text-[11px] font-medium text-slate-600 truncate cursor-pointer">
+                                                                {user.name}
+                                                            </FormLabel>
+                                                        </div>
+                                                    </FormItem>
+                                                ))}
+                                            </div>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
 
                             <div className="space-y-3 pt-2">
                                 <FormLabel className="text-[13px] font-bold text-slate-700 uppercase tracking-wider">Group Tags</FormLabel>
@@ -423,3 +534,4 @@ const AdminGroupsPage = () => {
 };
 
 export default AdminGroupsPage;
+

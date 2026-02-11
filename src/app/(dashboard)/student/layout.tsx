@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { StudentSidebar } from "@/components/shared/student-sidebar";
+import { StudentHeader } from "@/components/shared/student-header";
 import { redirect } from "next/navigation";
 
 const StudentLayout = async ({ children }: { children: React.ReactNode }) => {
@@ -18,7 +19,12 @@ const StudentLayout = async ({ children }: { children: React.ReactNode }) => {
             <div className="hidden md:flex h-full w-56 flex-col fixed inset-y-0 z-50">
                 <StudentSidebar />
             </div>
-            <main className="md:pl-56 h-full pt-4 px-6">{children}</main>
+            <main className="md:pl-56 h-full flex flex-col">
+                <StudentHeader />
+                <div className="flex-1 p-6 overflow-y-auto">
+                    {children}
+                </div>
+            </main>
         </div>
     );
 };

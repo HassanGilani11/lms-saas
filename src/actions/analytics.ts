@@ -209,3 +209,250 @@ export const getRecentActivities = async () => {
         return [];
     }
 };
+
+/**
+ * Get completion rates for all courses.
+ */
+export const getCourseCompletionRates = async () => {
+    try {
+        const session = await auth();
+        if (!session?.user || session.user.role !== "ADMIN") {
+            throw new Error("Unauthorized");
+        }
+
+        const courses = await db.course.findMany({
+            include: {
+                _count: {
+                    select: {
+                        lessons: true,
+                        purchases: true,
+                    }
+                },
+                lessons: {
+                    include: {
+                        topics: {
+                            include: {
+                                userProgress: true,
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const completionData = courses.map(course => {
+            const totalTopics = course.lessons.reduce((acc, lesson) => acc + lesson.topics.length, 0);
+            const studentCount = course._count.purchases;
+
+            if (totalTopics === 0 || studentCount === 0) {
+                return {
+                    id: course.id,
+                    title: course.title,
+                    completionRate: 0,
+                    studentCount
+                };
+            }
+
+            let completedTopics = 0;
+            course.lessons.forEach(lesson => {
+                lesson.topics.forEach(topic => {
+                    completedTopics += topic.userProgress.filter(p => p.isCompleted).length;
+                });
+            });
+
+            const rate = (completedTopics / (totalTopics * studentCount)) * 100;
+
+            return {
+                id: course.id,
+                title: course.title,
+                completionRate: Math.round(rate),
+                studentCount
+            };
+        });
+
+        return completionData;
+    } catch (error) {
+        console.error("[GET_COURSE_COMPLETION_RATES]", error);
+        return [];
+    }
+};
+
+/**
+ * Get performance data for all quizzes.
+ */
+export const getQuizPerformanceAnalytics = async () => {
+    try {
+        const session = await auth();
+        if (!session?.user || session.user.role !== "ADMIN") {
+            throw new Error("Unauthorized");
+        }
+
+        const quizzes = await db.quiz.findMany({
+            include: {
+                course: {
+                    select: { title: true }
+                },
+                attempts: {
+                    where: { status: "COMPLETED" }
+                }
+            }
+        });
+
+        return quizzes.map(quiz => {
+            const totalAttempts = quiz.attempts.length;
+            const avgScore = totalAttempts > 0
+                ? quiz.attempts.reduce((acc, curr) => acc + curr.score, 0) / totalAttempts
+                : 0;
+            const passCount = quiz.attempts.filter(a => a.score >= quiz.passingScore).length;
+            const passRate = totalAttempts > 0 ? (passCount / totalAttempts) * 100 : 0;
+
+            return {
+                id: quiz.id,
+                title: quiz.title,
+                course: quiz.course?.title || "Standalone",
+                avgScore: Math.round(avgScore),
+                passRate: Math.round(passRate),
+                totalAttempts
+            };
+        });
+    } catch (error) {
+        console.error("[GET_QUIZ_PERFORMANCE]", error);
+        return [];
+    }
+};
+
+/**
+ * Get time spent analytics across courses.
+ */
+export const getTimeSpentAnalytics = async () => {
+    try {
+        const session = await auth();
+        if (!session?.user || session.user.role !== "ADMIN") {
+            throw new Error("Unauthorized");
+        }
+
+        const timeLogs = await db.timeLog.groupBy({
+            by: ['courseId'],
+            _sum: {
+                duration: true
+            },
+            where: {
+                courseId: { not: null }
+            }
+        });
+
+        const courses = await db.course.findMany({
+            where: {
+                id: { in: timeLogs.map(l => l.courseId as string) }
+            },
+            select: { id: true, title: true }
+        });
+
+        return timeLogs.map(log => {
+            const course = courses.find(c => c.id === log.courseId);
+            return {
+                courseId: log.courseId,
+                title: course?.title || "Unknown",
+                totalMinutes: Math.round((log._sum.duration || 0) / 60)
+            };
+        });
+    } catch (error) {
+        console.error("[GET_TIME_SPENT_ANALYTICS]", error);
+        return [];
+    }
+};
+
+/**
+ * Get group-level aggregated analytics.
+ */
+export const getGroupLevelAnalytics = async () => {
+    try {
+        const session = await auth();
+        if (!session?.user || session.user.role !== "ADMIN") {
+            throw new Error("Unauthorized");
+        }
+
+        const groups = await db.group.findMany({
+            include: {
+                users: {
+                    include: {
+                        quizAttempts: {
+                            where: { status: "COMPLETED" }
+                        },
+                        userAchievements: true,
+                    }
+                }
+            }
+        });
+
+        return groups.map(group => {
+            let totalScore = 0;
+            let totalAttempts = 0;
+            group.users.forEach(user => {
+                user.quizAttempts.forEach(attempt => {
+                    totalScore += attempt.score;
+                    totalAttempts++;
+                });
+            });
+
+            return {
+                id: group.id,
+                name: group.name,
+                userCount: group.users.length,
+                avgQuizScore: totalAttempts > 0 ? Math.round(totalScore / totalAttempts) : 0,
+                totalAchievements: group.users.reduce((acc, user) => acc + user.userAchievements.length, 0)
+            };
+        });
+    } catch (error) {
+        console.error("[GET_GROUP_LEVEL_ANALYTICS]", error);
+        return [];
+    }
+};
+
+/**
+ * Log time spent on a topic.
+ */
+export const logTimeSpent = async (topicId: string, courseId: string, duration: number) => {
+    try {
+        const session = await auth();
+        const userId = session?.user?.id;
+
+        if (!userId) return null;
+
+        return await db.$transaction(async (tx) => {
+            const log = await tx.timeLog.create({
+                data: {
+                    userId,
+                    courseId,
+                    topicId,
+                    duration
+                }
+            });
+
+            await tx.userProgress.upsert({
+                where: {
+                    userId_topicId: {
+                        userId,
+                        topicId
+                    }
+                },
+                update: {
+                    totalTimeSpent: {
+                        increment: duration
+                    }
+                },
+                create: {
+                    userId,
+                    topicId,
+                    totalTimeSpent: duration
+                }
+            });
+
+            return log;
+        });
+    } catch (error) {
+        console.error("[LOG_TIME_SPENT]", error);
+        return null;
+    }
+};
+

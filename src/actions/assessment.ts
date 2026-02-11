@@ -3,6 +3,8 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { createNotification } from "@/actions/notifications";
+import { NotificationType } from "@/lib/prisma";
 
 /**
  * Start a new quiz attempt.
@@ -115,6 +117,15 @@ export const submitQuizAttempt = async (
                 status: "COMPLETED",
                 completedAt: new Date(),
             },
+        });
+
+        await createNotification({
+            userId,
+            title: "Quiz Graded",
+            message: `Your attempt on "${attempt.quiz.title}" has been graded. Score: ${score}%`,
+            type: NotificationType.QUIZ_GRADED,
+            href: `/student/quizzes/${attempt.quizId}/results`,
+            metadata: { quizId: attempt.quizId, score }
         });
 
         return updatedAttempt;

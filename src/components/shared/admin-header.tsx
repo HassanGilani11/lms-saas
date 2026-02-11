@@ -8,6 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/hooks/use-sidebar";
+import { NotificationDropdown } from "@/components/notifications/notification-dropdown";
 
 export const AdminHeader = () => {
     const { toggle } = useSidebar();
@@ -41,10 +42,7 @@ export const AdminHeader = () => {
                 <div className="flex items-center gap-x-4">
                     <Sun className="h-4 w-4 text-slate-400 hover:text-slate-600 cursor-pointer" />
                     <History className="h-4 w-4 text-slate-400 hover:text-slate-600 cursor-pointer" />
-                    <div className="relative">
-                        <Bell className="h-4 w-4 text-slate-400 hover:text-slate-600 cursor-pointer" />
-                        <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full border border-white" />
-                    </div>
+                    <NotificationDropdown />
                 </div>
             </div>
         </div>
