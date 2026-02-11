@@ -8,10 +8,7 @@ export const getGroupProgressReport = async (groupId: string) => {
             where: { id: groupId },
             include: {
                 users: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
+                    include: {
                         userProgress: {
                             include: {
                                 topic: {

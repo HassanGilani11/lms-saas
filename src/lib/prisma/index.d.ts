@@ -4605,6 +4605,7 @@ export namespace Prisma {
     userAchievements: number
     timeLogs: number
     notificationPreferences: number
+    userProgress: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4624,6 +4625,7 @@ export namespace Prisma {
     userAchievements?: boolean | UserCountOutputTypeCountUserAchievementsArgs
     timeLogs?: boolean | UserCountOutputTypeCountTimeLogsArgs
     notificationPreferences?: boolean | UserCountOutputTypeCountNotificationPreferencesArgs
+    userProgress?: boolean | UserCountOutputTypeCountUserProgressArgs
   }
 
   // Custom InputTypes
@@ -4747,6 +4749,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountNotificationPreferencesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: NotificationPreferenceWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountUserProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserProgressWhereInput
   }
 
 
@@ -5664,6 +5673,7 @@ export namespace Prisma {
     userAchievements?: boolean | User$userAchievementsArgs<ExtArgs>
     timeLogs?: boolean | User$timeLogsArgs<ExtArgs>
     notificationPreferences?: boolean | User$notificationPreferencesArgs<ExtArgs>
+    userProgress?: boolean | User$userProgressArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -5732,6 +5742,7 @@ export namespace Prisma {
     userAchievements?: boolean | User$userAchievementsArgs<ExtArgs>
     timeLogs?: boolean | User$timeLogsArgs<ExtArgs>
     notificationPreferences?: boolean | User$notificationPreferencesArgs<ExtArgs>
+    userProgress?: boolean | User$userProgressArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -5758,6 +5769,7 @@ export namespace Prisma {
       userAchievements: Prisma.$UserAchievementPayload<ExtArgs>[]
       timeLogs: Prisma.$TimeLogPayload<ExtArgs>[]
       notificationPreferences: Prisma.$NotificationPreferencePayload<ExtArgs>[]
+      userProgress: Prisma.$UserProgressPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6184,6 +6196,7 @@ export namespace Prisma {
     userAchievements<T extends User$userAchievementsArgs<ExtArgs> = {}>(args?: Subset<T, User$userAchievementsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserAchievementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     timeLogs<T extends User$timeLogsArgs<ExtArgs> = {}>(args?: Subset<T, User$timeLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TimeLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     notificationPreferences<T extends User$notificationPreferencesArgs<ExtArgs> = {}>(args?: Subset<T, User$notificationPreferencesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPreferencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    userProgress<T extends User$userProgressArgs<ExtArgs> = {}>(args?: Subset<T, User$userProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7032,6 +7045,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: NotificationPreferenceScalarFieldEnum | NotificationPreferenceScalarFieldEnum[]
+  }
+
+  /**
+   * User.userProgress
+   */
+  export type User$userProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserProgress
+     */
+    select?: UserProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserProgress
+     */
+    omit?: UserProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserProgressInclude<ExtArgs> | null
+    where?: UserProgressWhereInput
+    orderBy?: UserProgressOrderByWithRelationInput | UserProgressOrderByWithRelationInput[]
+    cursor?: UserProgressWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UserProgressScalarFieldEnum | UserProgressScalarFieldEnum[]
   }
 
   /**
@@ -39082,6 +39119,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     topic?: boolean | TopicDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userProgress"]>
 
   export type UserProgressSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -39093,6 +39131,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     topic?: boolean | TopicDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userProgress"]>
 
   export type UserProgressSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -39104,6 +39143,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     topic?: boolean | TopicDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userProgress"]>
 
   export type UserProgressSelectScalar = {
@@ -39119,18 +39159,22 @@ export namespace Prisma {
   export type UserProgressOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "topicId" | "isCompleted" | "totalTimeSpent" | "createdAt" | "updatedAt", ExtArgs["result"]["userProgress"]>
   export type UserProgressInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     topic?: boolean | TopicDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }
   export type UserProgressIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     topic?: boolean | TopicDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }
   export type UserProgressIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     topic?: boolean | TopicDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }
 
   export type $UserProgressPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "UserProgress"
     objects: {
       topic: Prisma.$TopicPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -39535,6 +39579,7 @@ export namespace Prisma {
   export interface Prisma__UserProgressClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     topic<T extends TopicDefaultArgs<ExtArgs> = {}>(args?: Subset<T, TopicDefaultArgs<ExtArgs>>): Prisma__TopicClient<$Result.GetResult<Prisma.$TopicPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -52930,6 +52975,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementListRelationFilter
     timeLogs?: TimeLogListRelationFilter
     notificationPreferences?: NotificationPreferenceListRelationFilter
+    userProgress?: UserProgressListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -52963,6 +53009,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementOrderByRelationAggregateInput
     timeLogs?: TimeLogOrderByRelationAggregateInput
     notificationPreferences?: NotificationPreferenceOrderByRelationAggregateInput
+    userProgress?: UserProgressOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -52999,6 +53046,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementListRelationFilter
     timeLogs?: TimeLogListRelationFilter
     notificationPreferences?: NotificationPreferenceListRelationFilter
+    userProgress?: UserProgressListRelationFilter
   }, "id" | "username" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -55042,6 +55090,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"UserProgress"> | Date | string
     updatedAt?: DateTimeFilter<"UserProgress"> | Date | string
     topic?: XOR<TopicScalarRelationFilter, TopicWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type UserProgressOrderByWithRelationInput = {
@@ -55053,6 +55102,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     topic?: TopicOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
   }
 
   export type UserProgressWhereUniqueInput = Prisma.AtLeast<{
@@ -55068,6 +55118,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"UserProgress"> | Date | string
     updatedAt?: DateTimeFilter<"UserProgress"> | Date | string
     topic?: XOR<TopicScalarRelationFilter, TopicWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id" | "userId_topicId">
 
   export type UserProgressOrderByWithAggregationInput = {
@@ -55870,6 +55921,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -55903,6 +55955,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -55936,6 +55989,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -55969,6 +56023,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -58123,12 +58178,12 @@ export namespace Prisma {
 
   export type UserProgressCreateInput = {
     id?: string
-    userId: string
     isCompleted?: boolean
     totalTimeSpent?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     topic: TopicCreateNestedOneWithoutUserProgressInput
+    user: UserCreateNestedOneWithoutUserProgressInput
   }
 
   export type UserProgressUncheckedCreateInput = {
@@ -58143,12 +58198,12 @@ export namespace Prisma {
 
   export type UserProgressUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
     isCompleted?: BoolFieldUpdateOperationsInput | boolean
     totalTimeSpent?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     topic?: TopicUpdateOneRequiredWithoutUserProgressNestedInput
+    user?: UserUpdateOneRequiredWithoutUserProgressNestedInput
   }
 
   export type UserProgressUncheckedUpdateInput = {
@@ -58173,7 +58228,6 @@ export namespace Prisma {
 
   export type UserProgressUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
     isCompleted?: BoolFieldUpdateOperationsInput | boolean
     totalTimeSpent?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -59101,6 +59155,12 @@ export namespace Prisma {
     none?: NotificationPreferenceWhereInput
   }
 
+  export type UserProgressListRelationFilter = {
+    every?: UserProgressWhereInput
+    some?: UserProgressWhereInput
+    none?: UserProgressWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -59163,6 +59223,10 @@ export namespace Prisma {
   }
 
   export type NotificationPreferenceOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type UserProgressOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -60241,16 +60305,6 @@ export namespace Prisma {
   export type QuizNullableScalarRelationFilter = {
     is?: QuizWhereInput | null
     isNot?: QuizWhereInput | null
-  }
-
-  export type UserProgressListRelationFilter = {
-    every?: UserProgressWhereInput
-    some?: UserProgressWhereInput
-    none?: UserProgressWhereInput
-  }
-
-  export type UserProgressOrderByRelationAggregateInput = {
-    _count?: SortOrder
   }
 
   export type TopicCountOrderByAggregateInput = {
@@ -61345,6 +61399,13 @@ export namespace Prisma {
     connect?: NotificationPreferenceWhereUniqueInput | NotificationPreferenceWhereUniqueInput[]
   }
 
+  export type UserProgressCreateNestedManyWithoutUserInput = {
+    create?: XOR<UserProgressCreateWithoutUserInput, UserProgressUncheckedCreateWithoutUserInput> | UserProgressCreateWithoutUserInput[] | UserProgressUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UserProgressCreateOrConnectWithoutUserInput | UserProgressCreateOrConnectWithoutUserInput[]
+    createMany?: UserProgressCreateManyUserInputEnvelope
+    connect?: UserProgressWhereUniqueInput | UserProgressWhereUniqueInput[]
+  }
+
   export type AccountUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -61465,6 +61526,13 @@ export namespace Prisma {
     connectOrCreate?: NotificationPreferenceCreateOrConnectWithoutUserInput | NotificationPreferenceCreateOrConnectWithoutUserInput[]
     createMany?: NotificationPreferenceCreateManyUserInputEnvelope
     connect?: NotificationPreferenceWhereUniqueInput | NotificationPreferenceWhereUniqueInput[]
+  }
+
+  export type UserProgressUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<UserProgressCreateWithoutUserInput, UserProgressUncheckedCreateWithoutUserInput> | UserProgressCreateWithoutUserInput[] | UserProgressUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UserProgressCreateOrConnectWithoutUserInput | UserProgressCreateOrConnectWithoutUserInput[]
+    createMany?: UserProgressCreateManyUserInputEnvelope
+    connect?: UserProgressWhereUniqueInput | UserProgressWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -61729,6 +61797,20 @@ export namespace Prisma {
     deleteMany?: NotificationPreferenceScalarWhereInput | NotificationPreferenceScalarWhereInput[]
   }
 
+  export type UserProgressUpdateManyWithoutUserNestedInput = {
+    create?: XOR<UserProgressCreateWithoutUserInput, UserProgressUncheckedCreateWithoutUserInput> | UserProgressCreateWithoutUserInput[] | UserProgressUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UserProgressCreateOrConnectWithoutUserInput | UserProgressCreateOrConnectWithoutUserInput[]
+    upsert?: UserProgressUpsertWithWhereUniqueWithoutUserInput | UserProgressUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: UserProgressCreateManyUserInputEnvelope
+    set?: UserProgressWhereUniqueInput | UserProgressWhereUniqueInput[]
+    disconnect?: UserProgressWhereUniqueInput | UserProgressWhereUniqueInput[]
+    delete?: UserProgressWhereUniqueInput | UserProgressWhereUniqueInput[]
+    connect?: UserProgressWhereUniqueInput | UserProgressWhereUniqueInput[]
+    update?: UserProgressUpdateWithWhereUniqueWithoutUserInput | UserProgressUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: UserProgressUpdateManyWithWhereWithoutUserInput | UserProgressUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: UserProgressScalarWhereInput | UserProgressScalarWhereInput[]
+  }
+
   export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -61969,6 +62051,20 @@ export namespace Prisma {
     update?: NotificationPreferenceUpdateWithWhereUniqueWithoutUserInput | NotificationPreferenceUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: NotificationPreferenceUpdateManyWithWhereWithoutUserInput | NotificationPreferenceUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: NotificationPreferenceScalarWhereInput | NotificationPreferenceScalarWhereInput[]
+  }
+
+  export type UserProgressUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<UserProgressCreateWithoutUserInput, UserProgressUncheckedCreateWithoutUserInput> | UserProgressCreateWithoutUserInput[] | UserProgressUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UserProgressCreateOrConnectWithoutUserInput | UserProgressCreateOrConnectWithoutUserInput[]
+    upsert?: UserProgressUpsertWithWhereUniqueWithoutUserInput | UserProgressUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: UserProgressCreateManyUserInputEnvelope
+    set?: UserProgressWhereUniqueInput | UserProgressWhereUniqueInput[]
+    disconnect?: UserProgressWhereUniqueInput | UserProgressWhereUniqueInput[]
+    delete?: UserProgressWhereUniqueInput | UserProgressWhereUniqueInput[]
+    connect?: UserProgressWhereUniqueInput | UserProgressWhereUniqueInput[]
+    update?: UserProgressUpdateWithWhereUniqueWithoutUserInput | UserProgressUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: UserProgressUpdateManyWithWhereWithoutUserInput | UserProgressUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: UserProgressScalarWhereInput | UserProgressScalarWhereInput[]
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -63907,12 +64003,26 @@ export namespace Prisma {
     connect?: TopicWhereUniqueInput
   }
 
+  export type UserCreateNestedOneWithoutUserProgressInput = {
+    create?: XOR<UserCreateWithoutUserProgressInput, UserUncheckedCreateWithoutUserProgressInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUserProgressInput
+    connect?: UserWhereUniqueInput
+  }
+
   export type TopicUpdateOneRequiredWithoutUserProgressNestedInput = {
     create?: XOR<TopicCreateWithoutUserProgressInput, TopicUncheckedCreateWithoutUserProgressInput>
     connectOrCreate?: TopicCreateOrConnectWithoutUserProgressInput
     upsert?: TopicUpsertWithoutUserProgressInput
     connect?: TopicWhereUniqueInput
     update?: XOR<XOR<TopicUpdateToOneWithWhereWithoutUserProgressInput, TopicUpdateWithoutUserProgressInput>, TopicUncheckedUpdateWithoutUserProgressInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutUserProgressNestedInput = {
+    create?: XOR<UserCreateWithoutUserProgressInput, UserUncheckedCreateWithoutUserProgressInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUserProgressInput
+    upsert?: UserUpsertWithoutUserProgressInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutUserProgressInput, UserUpdateWithoutUserProgressInput>, UserUncheckedUpdateWithoutUserProgressInput>
   }
 
   export type CourseCreateNestedOneWithoutCertificatesInput = {
@@ -65310,6 +65420,34 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type UserProgressCreateWithoutUserInput = {
+    id?: string
+    isCompleted?: boolean
+    totalTimeSpent?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    topic: TopicCreateNestedOneWithoutUserProgressInput
+  }
+
+  export type UserProgressUncheckedCreateWithoutUserInput = {
+    id?: string
+    topicId: string
+    isCompleted?: boolean
+    totalTimeSpent?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserProgressCreateOrConnectWithoutUserInput = {
+    where: UserProgressWhereUniqueInput
+    create: XOR<UserProgressCreateWithoutUserInput, UserProgressUncheckedCreateWithoutUserInput>
+  }
+
+  export type UserProgressCreateManyUserInputEnvelope = {
+    data: UserProgressCreateManyUserInput | UserProgressCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AccountUpsertWithWhereUniqueWithoutUserInput = {
     where: AccountWhereUniqueInput
     update: XOR<AccountUpdateWithoutUserInput, AccountUncheckedUpdateWithoutUserInput>
@@ -65819,6 +65957,35 @@ export namespace Prisma {
     emailEnabled?: BoolFilter<"NotificationPreference"> | boolean
   }
 
+  export type UserProgressUpsertWithWhereUniqueWithoutUserInput = {
+    where: UserProgressWhereUniqueInput
+    update: XOR<UserProgressUpdateWithoutUserInput, UserProgressUncheckedUpdateWithoutUserInput>
+    create: XOR<UserProgressCreateWithoutUserInput, UserProgressUncheckedCreateWithoutUserInput>
+  }
+
+  export type UserProgressUpdateWithWhereUniqueWithoutUserInput = {
+    where: UserProgressWhereUniqueInput
+    data: XOR<UserProgressUpdateWithoutUserInput, UserProgressUncheckedUpdateWithoutUserInput>
+  }
+
+  export type UserProgressUpdateManyWithWhereWithoutUserInput = {
+    where: UserProgressScalarWhereInput
+    data: XOR<UserProgressUpdateManyMutationInput, UserProgressUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type UserProgressScalarWhereInput = {
+    AND?: UserProgressScalarWhereInput | UserProgressScalarWhereInput[]
+    OR?: UserProgressScalarWhereInput[]
+    NOT?: UserProgressScalarWhereInput | UserProgressScalarWhereInput[]
+    id?: StringFilter<"UserProgress"> | string
+    userId?: StringFilter<"UserProgress"> | string
+    topicId?: StringFilter<"UserProgress"> | string
+    isCompleted?: BoolFilter<"UserProgress"> | boolean
+    totalTimeSpent?: IntFilter<"UserProgress"> | number
+    createdAt?: DateTimeFilter<"UserProgress"> | Date | string
+    updatedAt?: DateTimeFilter<"UserProgress"> | Date | string
+  }
+
   export type UserCreateWithoutAccountsInput = {
     id?: string
     name?: string | null
@@ -65849,6 +66016,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -65881,6 +66049,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -65929,6 +66098,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -65961,6 +66131,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -65993,6 +66164,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -66025,6 +66197,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -66073,6 +66246,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -66105,6 +66279,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type CourseCreateWithoutCategoryInput = {
@@ -66822,6 +66997,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutLearningPathEnrollmentsInput = {
@@ -66854,6 +67030,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutLearningPathEnrollmentsInput = {
@@ -66963,6 +67140,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutLearningPathEnrollmentsInput = {
@@ -66995,6 +67173,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type GroupCreateWithoutChildrenInput = {
@@ -67180,6 +67359,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutGroupsInput = {
@@ -67212,6 +67392,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutGroupsInput = {
@@ -67249,6 +67430,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutLeadingGroupsInput = {
@@ -67281,6 +67463,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutLeadingGroupsInput = {
@@ -68005,6 +68188,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCoursesInput = {
@@ -68037,6 +68221,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutCoursesInput = {
@@ -68340,6 +68525,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCoursesInput = {
@@ -68372,6 +68558,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type LessonUpsertWithWhereUniqueWithoutCourseInput = {
@@ -69119,11 +69306,11 @@ export namespace Prisma {
 
   export type UserProgressCreateWithoutTopicInput = {
     id?: string
-    userId: string
     isCompleted?: boolean
     totalTimeSpent?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutUserProgressInput
   }
 
   export type UserProgressUncheckedCreateWithoutTopicInput = {
@@ -69309,19 +69496,6 @@ export namespace Prisma {
   export type UserProgressUpdateManyWithWhereWithoutTopicInput = {
     where: UserProgressScalarWhereInput
     data: XOR<UserProgressUpdateManyMutationInput, UserProgressUncheckedUpdateManyWithoutTopicInput>
-  }
-
-  export type UserProgressScalarWhereInput = {
-    AND?: UserProgressScalarWhereInput | UserProgressScalarWhereInput[]
-    OR?: UserProgressScalarWhereInput[]
-    NOT?: UserProgressScalarWhereInput | UserProgressScalarWhereInput[]
-    id?: StringFilter<"UserProgress"> | string
-    userId?: StringFilter<"UserProgress"> | string
-    topicId?: StringFilter<"UserProgress"> | string
-    isCompleted?: BoolFilter<"UserProgress"> | boolean
-    totalTimeSpent?: IntFilter<"UserProgress"> | number
-    createdAt?: DateTimeFilter<"UserProgress"> | Date | string
-    updatedAt?: DateTimeFilter<"UserProgress"> | Date | string
   }
 
   export type AttachmentUpsertWithWhereUniqueWithoutTopicInput = {
@@ -70028,6 +70202,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutQuizAttemptsInput = {
@@ -70060,6 +70235,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutQuizAttemptsInput = {
@@ -70181,6 +70357,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutQuizAttemptsInput = {
@@ -70213,6 +70390,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type QuizResponseUpsertWithWhereUniqueWithoutAttemptInput = {
@@ -70393,6 +70571,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutStripeCustomerInput = {
@@ -70425,6 +70604,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutStripeCustomerInput = {
@@ -70473,6 +70653,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStripeCustomerInput = {
@@ -70505,6 +70686,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutStripeSubscriptionInput = {
@@ -70537,6 +70719,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutStripeSubscriptionInput = {
@@ -70569,6 +70752,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutStripeSubscriptionInput = {
@@ -70617,6 +70801,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStripeSubscriptionInput = {
@@ -70649,6 +70834,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type CourseCreateWithoutAttachmentsInput = {
@@ -70960,6 +71146,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPurchasesInput = {
@@ -70992,6 +71179,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPurchasesInput = {
@@ -71105,6 +71293,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPurchasesInput = {
@@ -71137,6 +71326,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type TopicCreateWithoutUserProgressInput = {
@@ -71182,6 +71372,77 @@ export namespace Prisma {
   export type TopicCreateOrConnectWithoutUserProgressInput = {
     where: TopicWhereUniqueInput
     create: XOR<TopicCreateWithoutUserProgressInput, TopicUncheckedCreateWithoutUserProgressInput>
+  }
+
+  export type UserCreateWithoutUserProgressInput = {
+    id?: string
+    name?: string | null
+    username?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    password?: string | null
+    role?: $Enums.UserRole
+    phone?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    certificates?: CertificateCreateNestedManyWithoutUserInput
+    comments?: CommentCreateNestedManyWithoutUserInput
+    courses?: CourseCreateNestedManyWithoutUserInput
+    discussions?: DiscussionCreateNestedManyWithoutUserInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    purchases?: PurchaseCreateNestedManyWithoutUserInput
+    quizAttempts?: QuizAttemptCreateNestedManyWithoutUserInput
+    reports?: ReportCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    stripeCustomer?: StripeCustomerCreateNestedOneWithoutUserInput
+    stripeSubscription?: StripeSubscriptionCreateNestedOneWithoutUserInput
+    learningPathEnrollments?: LearningPathUserCreateNestedManyWithoutUserInput
+    groups?: GroupCreateNestedManyWithoutUsersInput
+    leadingGroups?: GroupCreateNestedManyWithoutLeadersInput
+    userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
+    timeLogs?: TimeLogCreateNestedManyWithoutUserInput
+    notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutUserProgressInput = {
+    id?: string
+    name?: string | null
+    username?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    password?: string | null
+    role?: $Enums.UserRole
+    phone?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    certificates?: CertificateUncheckedCreateNestedManyWithoutUserInput
+    comments?: CommentUncheckedCreateNestedManyWithoutUserInput
+    courses?: CourseUncheckedCreateNestedManyWithoutUserInput
+    discussions?: DiscussionUncheckedCreateNestedManyWithoutUserInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    purchases?: PurchaseUncheckedCreateNestedManyWithoutUserInput
+    quizAttempts?: QuizAttemptUncheckedCreateNestedManyWithoutUserInput
+    reports?: ReportUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    stripeCustomer?: StripeCustomerUncheckedCreateNestedOneWithoutUserInput
+    stripeSubscription?: StripeSubscriptionUncheckedCreateNestedOneWithoutUserInput
+    learningPathEnrollments?: LearningPathUserUncheckedCreateNestedManyWithoutUserInput
+    groups?: GroupUncheckedCreateNestedManyWithoutUsersInput
+    leadingGroups?: GroupUncheckedCreateNestedManyWithoutLeadersInput
+    userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
+    timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutUserProgressInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutUserProgressInput, UserUncheckedCreateWithoutUserProgressInput>
   }
 
   export type TopicUpsertWithoutUserProgressInput = {
@@ -71233,6 +71494,83 @@ export namespace Prisma {
     discussions?: DiscussionUncheckedUpdateManyWithoutTopicNestedInput
     attachments?: AttachmentUncheckedUpdateManyWithoutTopicNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutTopicNestedInput
+  }
+
+  export type UserUpsertWithoutUserProgressInput = {
+    update: XOR<UserUpdateWithoutUserProgressInput, UserUncheckedUpdateWithoutUserProgressInput>
+    create: XOR<UserCreateWithoutUserProgressInput, UserUncheckedCreateWithoutUserProgressInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutUserProgressInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutUserProgressInput, UserUncheckedUpdateWithoutUserProgressInput>
+  }
+
+  export type UserUpdateWithoutUserProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    certificates?: CertificateUpdateManyWithoutUserNestedInput
+    comments?: CommentUpdateManyWithoutUserNestedInput
+    courses?: CourseUpdateManyWithoutUserNestedInput
+    discussions?: DiscussionUpdateManyWithoutUserNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    purchases?: PurchaseUpdateManyWithoutUserNestedInput
+    quizAttempts?: QuizAttemptUpdateManyWithoutUserNestedInput
+    reports?: ReportUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    stripeCustomer?: StripeCustomerUpdateOneWithoutUserNestedInput
+    stripeSubscription?: StripeSubscriptionUpdateOneWithoutUserNestedInput
+    learningPathEnrollments?: LearningPathUserUpdateManyWithoutUserNestedInput
+    groups?: GroupUpdateManyWithoutUsersNestedInput
+    leadingGroups?: GroupUpdateManyWithoutLeadersNestedInput
+    userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
+    timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
+    notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutUserProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    certificates?: CertificateUncheckedUpdateManyWithoutUserNestedInput
+    comments?: CommentUncheckedUpdateManyWithoutUserNestedInput
+    courses?: CourseUncheckedUpdateManyWithoutUserNestedInput
+    discussions?: DiscussionUncheckedUpdateManyWithoutUserNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    purchases?: PurchaseUncheckedUpdateManyWithoutUserNestedInput
+    quizAttempts?: QuizAttemptUncheckedUpdateManyWithoutUserNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    stripeCustomer?: StripeCustomerUncheckedUpdateOneWithoutUserNestedInput
+    stripeSubscription?: StripeSubscriptionUncheckedUpdateOneWithoutUserNestedInput
+    learningPathEnrollments?: LearningPathUserUncheckedUpdateManyWithoutUserNestedInput
+    groups?: GroupUncheckedUpdateManyWithoutUsersNestedInput
+    leadingGroups?: GroupUncheckedUpdateManyWithoutLeadersNestedInput
+    userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
+    timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type CourseCreateWithoutCertificatesInput = {
@@ -71324,6 +71662,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCertificatesInput = {
@@ -71356,6 +71695,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutCertificatesInput = {
@@ -71469,6 +71809,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCertificatesInput = {
@@ -71501,6 +71842,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserAchievementCreateWithoutAchievementInput = {
@@ -71571,6 +71913,7 @@ export namespace Prisma {
     leadingGroups?: GroupCreateNestedManyWithoutLeadersInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutUserAchievementsInput = {
@@ -71603,6 +71946,7 @@ export namespace Prisma {
     leadingGroups?: GroupUncheckedCreateNestedManyWithoutLeadersInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutUserAchievementsInput = {
@@ -71678,6 +72022,7 @@ export namespace Prisma {
     leadingGroups?: GroupUpdateManyWithoutLeadersNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutUserAchievementsInput = {
@@ -71710,6 +72055,7 @@ export namespace Prisma {
     leadingGroups?: GroupUncheckedUpdateManyWithoutLeadersNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type AchievementUpsertWithoutUserAchievementsInput = {
@@ -71852,6 +72198,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutDiscussionsInput = {
@@ -71884,6 +72231,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutDiscussionsInput = {
@@ -72027,6 +72375,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDiscussionsInput = {
@@ -72059,6 +72408,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReportUpsertWithWhereUniqueWithoutDiscussionInput = {
@@ -72195,6 +72545,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCommentsInput = {
@@ -72227,6 +72578,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutCommentsInput = {
@@ -72387,6 +72739,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -72419,6 +72772,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReportUpsertWithWhereUniqueWithoutCommentInput = {
@@ -72467,6 +72821,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -72499,6 +72854,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -72547,6 +72903,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -72579,6 +72936,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutNotificationPreferencesInput = {
@@ -72611,6 +72969,7 @@ export namespace Prisma {
     leadingGroups?: GroupCreateNestedManyWithoutLeadersInput
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutNotificationPreferencesInput = {
@@ -72643,6 +73002,7 @@ export namespace Prisma {
     leadingGroups?: GroupUncheckedCreateNestedManyWithoutLeadersInput
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutNotificationPreferencesInput = {
@@ -72691,6 +73051,7 @@ export namespace Prisma {
     leadingGroups?: GroupUpdateManyWithoutLeadersNestedInput
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationPreferencesInput = {
@@ -72723,6 +73084,7 @@ export namespace Prisma {
     leadingGroups?: GroupUncheckedUpdateManyWithoutLeadersNestedInput
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type CommentCreateWithoutReportsInput = {
@@ -72811,6 +73173,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutReportsInput = {
@@ -72843,6 +73206,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     timeLogs?: TimeLogUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutReportsInput = {
@@ -72959,6 +73323,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReportsInput = {
@@ -72991,6 +73356,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutTimeLogsInput = {
@@ -73023,6 +73389,7 @@ export namespace Prisma {
     leadingGroups?: GroupCreateNestedManyWithoutLeadersInput
     userAchievements?: UserAchievementCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutTimeLogsInput = {
@@ -73055,6 +73422,7 @@ export namespace Prisma {
     leadingGroups?: GroupUncheckedCreateNestedManyWithoutLeadersInput
     userAchievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    userProgress?: UserProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutTimeLogsInput = {
@@ -73207,6 +73575,7 @@ export namespace Prisma {
     leadingGroups?: GroupUpdateManyWithoutLeadersNestedInput
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTimeLogsInput = {
@@ -73239,6 +73608,7 @@ export namespace Prisma {
     leadingGroups?: GroupUncheckedUpdateManyWithoutLeadersNestedInput
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type CourseUpsertWithoutTimeLogsInput = {
@@ -73485,6 +73855,15 @@ export namespace Prisma {
     type: $Enums.NotificationType
     enabled?: boolean
     emailEnabled?: boolean
+  }
+
+  export type UserProgressCreateManyUserInput = {
+    id?: string
+    topicId: string
+    isCompleted?: boolean
+    totalTimeSpent?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type AccountUpdateWithoutUserInput = {
@@ -73985,6 +74364,33 @@ export namespace Prisma {
     emailEnabled?: BoolFieldUpdateOperationsInput | boolean
   }
 
+  export type UserProgressUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    isCompleted?: BoolFieldUpdateOperationsInput | boolean
+    totalTimeSpent?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    topic?: TopicUpdateOneRequiredWithoutUserProgressNestedInput
+  }
+
+  export type UserProgressUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    topicId?: StringFieldUpdateOperationsInput | string
+    isCompleted?: BoolFieldUpdateOperationsInput | boolean
+    totalTimeSpent?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserProgressUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    topicId?: StringFieldUpdateOperationsInput | string
+    isCompleted?: BoolFieldUpdateOperationsInput | boolean
+    totalTimeSpent?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type CourseCreateManyCategoryInput = {
     id?: string
     userId: string
@@ -74361,6 +74767,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutGroupsInput = {
@@ -74393,6 +74800,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutGroupsInput = {
@@ -74440,6 +74848,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutLeadingGroupsInput = {
@@ -74472,6 +74881,7 @@ export namespace Prisma {
     userAchievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
     timeLogs?: TimeLogUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    userProgress?: UserProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutLeadingGroupsInput = {
@@ -75090,11 +75500,11 @@ export namespace Prisma {
 
   export type UserProgressUpdateWithoutTopicInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
     isCompleted?: BoolFieldUpdateOperationsInput | boolean
     totalTimeSpent?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutUserProgressNestedInput
   }
 
   export type UserProgressUncheckedUpdateWithoutTopicInput = {

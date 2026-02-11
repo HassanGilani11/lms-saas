@@ -44,6 +44,7 @@ model User {
   userAchievements        UserAchievement[]
   timeLogs                TimeLog[]
   notificationPreferences NotificationPreference[]
+  userProgress            UserProgress[]
 }
 
 model UserType {
@@ -462,6 +463,7 @@ model UserProgress {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   topic          Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, topicId])
   @@index([topicId])

@@ -3,7 +3,7 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { SystemSettings } from "@prisma/client";
 import {
@@ -37,6 +37,11 @@ interface SettingsFormProps {
 
 export const SettingsForm = ({ initialData }: SettingsFormProps) => {
     const [isLoading, setIsLoading] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -64,6 +69,10 @@ export const SettingsForm = ({ initialData }: SettingsFormProps) => {
             setIsLoading(false);
         }
     };
+
+    if (!isMounted) {
+        return null;
+    }
 
     return (
         <Form {...form}>
