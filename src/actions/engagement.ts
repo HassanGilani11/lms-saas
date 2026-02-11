@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
  * Post a new discussion thread in a lesson.
  * Includes basic rate limiting (1 post per 5 seconds).
  */
-export const postDiscussion = async (lessonId: string, title: string, content: string) => {
+export const postDiscussion = async (topicId: string, title: string, content: string) => {
     try {
         const session = await auth();
         const userId = session?.user?.id;
@@ -27,14 +27,14 @@ export const postDiscussion = async (lessonId: string, title: string, content: s
 
         const discussion = await db.discussion.create({
             data: {
-                lessonId,
+                topicId,
                 userId,
                 title,
                 content,
             }
         });
 
-        revalidatePath(`/courses/[courseId]/lessons/${lessonId}`);
+        revalidatePath(`/courses/[courseId]/lessons/[lessonId]`);
         return discussion;
     } catch (error) {
         console.log("[POST_DISCUSSION]", error);

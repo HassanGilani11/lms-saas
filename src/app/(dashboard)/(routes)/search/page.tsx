@@ -11,7 +11,7 @@ const SearchPage = async () => {
         },
         include: {
             category: true,
-            modules: {
+            lessons: {
                 where: {
                     isPublished: true,
                 },
@@ -49,7 +49,7 @@ const SearchPage = async () => {
                             </p>
                             <div className="mt-3 flex items-center justify-between">
                                 <Badge variant="secondary">
-                                    {course.modules.length} {course.modules.length === 1 ? "Module" : "Modules"}
+                                    {course.lessons.length} {course.lessons.length === 1 ? "Lesson" : "Lessons"}
                                 </Badge>
                                 <p className="font-bold text-slate-700">
                                     {course.price ? `$${course.price.toFixed(2)}` : "Free"}

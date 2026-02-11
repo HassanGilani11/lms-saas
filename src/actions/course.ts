@@ -217,6 +217,13 @@ export const deleteCourse = async (courseId: string) => {
 
 export const reorderLessons = async (courseId: string, list: { id: string; position: number }[]) => {
     try {
+        const session = await auth();
+        const userId = session?.user?.id;
+
+        if (!userId) {
+            throw new Error("Unauthorized");
+        }
+
         const isAdmin = session?.user?.role === "ADMIN";
 
         const courseOwner = await db.course.findUnique({
