@@ -7,20 +7,21 @@ A state-of-the-art, scalable, and feature-rich Learning Management System built 
 ## ✨ Key Features
 
 ### 🛡️ Admin Powerhouse
+- **Real-time Notifications**: Instant system-wide notifications for new registrations, enrollments, and updates, synchronized across the dashboard.
 - **Dynamic System Settings**: Global branding management including site name, logo, and contact email with real-time synchronization.
-- **Dynamic Dashboard**: Real-time analytics on platform growth, revenue, and engagement.
+- **Dynamic Dashboard**: Real-time analytics on platform growth, revenue, and engagement with interactive charts.
 - **Granular User Management**: Full control over users, roles, and permissions.
 - **System Activity Logs**: Audit-ready tracking of all major platform events.
-- **Custom Branding**: Tools to manage categories, tags, and platform aesthetics.
 
 ### 👨‍🏫 Instructor Excellence
 - **Intuitive Course Builder**: Drag-and-drop hierarchy for sections (Lessons) and content (Topics).
 - **Rich Media Support**: Integrate Videos, PDFs, and interactive Text lessons.
-- **Advanced Quizzing**: Comprehensive quiz engine with multiple question types and automated grading.
+- **Advanced Quizzing**: Comprehensive quiz engine with multiple question types, automated grading, and real-time performance tracking.
 - **Student Progress Tracking**: Monitor individual and group learning paths in real-time.
 
 ### 📝 Student Experience
-- **Sleek Learning Interface**: Distraction-free content delivery with progress persistence.
+- **Sleek Learning Interface**: Distraction-free content delivery with progress persistence and Search UI enhancements.
+- **Guest Checkout**: Seamless enrollment process for non-registered users via secure guest flows.
 - **Gamification**: Earn achievements and track learning milestones.
 - **Interactive Discussions**: Peer-to-peer and instructor engagement within lessons.
 - **Certificate Generation**: Automated, premium certificates upon course completion.
@@ -36,7 +37,7 @@ A state-of-the-art, scalable, and feature-rich Learning Management System built 
 - **File Storage**: [UploadThing](https://uploadthing.com/)
 - **Database**: PostgreSQL (Supabase / Local)
 - **Authentication**: [NextAuth.js v5](https://authjs.dev/)
-- **Payment Processing**: [Stripe](https://stripe.com/)
+- **Payment Processing**: [Stripe](https://stripe.com/) & **Cash on Delivery (COD)**
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **State & Forms**: [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
 
@@ -95,11 +96,11 @@ npm run dev
 
 ```text
 src/
-├── actions/      # Type-safe Server Actions (DB Logic, Auth, Settings)
+├── actions/      # Type-safe Server Actions (DB Logic, Auth, Settings, Notifications)
 ├── app/          # Next.js App Router (Layouts & Page Views)
-├── components/   # Atomic UI Components & Providers
+├── components/   # Atomic UI Components & Providers (Real-time Notif Hooks)
 ├── hooks/        # Custom React Hooks
-├── lib/          # Core utilities (Prisma client, Stripe, UploadThing)
+├── lib/          # Core utilities (Prisma client, Stripe, Events, Mail)
 └── prisma/       # Database Schema & Migrations
 ```
 
@@ -108,9 +109,12 @@ src/
 ## 🗺️ Roadmap
 - [x] Core LMS Architecture
 - [x] Multi-role Authentication
-- [x] Course & Lesson Management
+- [x] Course & Lesson Management (Default Publishing)
 - [x] Global Branding & System Settings
-- [/] Stripe Payment Integration (In Progress)
+- [x] Payment Gateway Integration (Stripe & COD)
+- [x] Student Module & Guest Checkout
+- [x] Advanced Quiz Module & Grading
+- [x] Real-time Admin Notifications
 - [ ] Mobile-First Progressive Web App (PWA)
 - [ ] AI-Powered Course Recommendations
 - [ ] Live Video Streaming Sessions
