@@ -194,7 +194,14 @@ export const gradeEssayQuestion = async (
         // Recalculate total score
         const attempt = await db.quizAttempt.findUnique({
             where: { id: attemptId },
-            include: { responses: true, quiz: true }
+            include: {
+                responses: true,
+                quiz: {
+                    include: {
+                        questions: true
+                    }
+                }
+            }
         });
 
         if (attempt) {

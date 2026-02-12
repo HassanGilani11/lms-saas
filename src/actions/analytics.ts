@@ -37,7 +37,11 @@ export const getMyOrders = async () => {
 /**
  * Get revenue statistics for the current instructor.
  */
-export const getInstructorRevenue = async () => {
+export const getInstructorRevenue = async (): Promise<{
+    totalRevenue: number;
+    totalSales: number;
+    revenueByCourse: { title: string; amount: number }[];
+}> => {
     try {
         const session = await auth();
         const userId = session?.user?.id;
@@ -64,7 +68,7 @@ export const getInstructorRevenue = async () => {
         const totalSales = purchases.length;
 
         // Group by course
-        const revenueByCourse = purchases.reduce((acc: any, purchase) => {
+        const revenueByCourse = purchases.reduce((acc: Record<string, number>, purchase) => {
             const courseTitle = purchase.course.title;
             if (!acc[courseTitle]) {
                 acc[courseTitle] = 0;
@@ -78,7 +82,7 @@ export const getInstructorRevenue = async () => {
             totalSales,
             revenueByCourse: Object.entries(revenueByCourse).map(([title, amount]) => ({
                 title,
-                amount
+                amount: amount as number
             }))
         };
     } catch (error) {

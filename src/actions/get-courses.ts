@@ -12,7 +12,7 @@ type CourseWithProgress = {
     category: { name: string } | null;
     lessons: { id: string }[];
     isEnrolled: boolean;
-    lastActivity?: Date | null;
+    lastActivity: Date | null | undefined;
 };
 
 export const getCoursesWithProgress = async (): Promise<CourseWithProgress[]> => {

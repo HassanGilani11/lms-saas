@@ -15,14 +15,16 @@ export const createCheckoutSession = async (courseId: string) => {
     try {
         const session = await auth();
         const user = session?.user;
-        const isGuest = !user || !user.id || !user.email;
+        const userId = user?.id;
+        const userEmail = user?.email;
+        const isGuest = !user || !userId || !userEmail;
 
         // If not a guest, verify existing purchase
-        if (!isGuest) {
+        if (!isGuest && userId) {
             const purchase = await db.purchase.findUnique({
                 where: {
                     userId_courseId: {
-                        userId: user!.id,
+                        userId,
                         courseId,
                     },
                 },
@@ -43,9 +45,9 @@ export const createCheckoutSession = async (courseId: string) => {
 
         let customerId: string | undefined;
 
-        if (!isGuest && user?.id) {
+        if (!isGuest && userId && userEmail) {
             const stripeCustomer = await db.stripeCustomer.findUnique({
-                where: { userId: user.id },
+                where: { userId },
                 select: { stripeCustomerId: true },
             });
 
@@ -53,15 +55,15 @@ export const createCheckoutSession = async (courseId: string) => {
                 customerId = stripeCustomer.stripeCustomerId;
             } else {
                 const customer = await stripe.customers.create({
-                    email: user.email!, // Safe assert, checked above
+                    email: userEmail,
                     metadata: {
-                        userId: user.id,
+                        userId,
                     },
                 });
 
                 await db.stripeCustomer.create({
                     data: {
-                        userId: user.id,
+                        userId,
                         stripeCustomerId: customer.id,
                     },
                 });
@@ -108,7 +110,7 @@ export const createCheckoutSession = async (courseId: string) => {
                 cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/cancel?courseId=${courseId}`,
                 metadata: {
                     courseId: courseId,
-                    userId: user!.id,
+                    userId: userId as string,
                     courseTitle: course.title,
                     instructorId: course.userId,
                 },
