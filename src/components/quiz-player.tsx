@@ -190,7 +190,7 @@ export const QuizPlayer = ({ quizId, userId }: QuizPlayerProps) => {
                 <CardContent className="space-y-6">
                     <div className="flex justify-center py-6">
                         <div className={`p-6 rounded-full border-4 ${isPassed ? "border-green-500 bg-green-50 text-green-700" : "border-red-500 bg-red-50 text-red-700"} w-40 h-40 flex flex-col items-center justify-center`}>
-                            <span className="text-4xl font-bold">{attempt.score}</span>
+                            <span className="text-4xl font-bold">{attempt.score}%</span>
                             <span className="text-sm font-semibold uppercase">{isPassed ? "Passed" : "Failed"}</span>
                         </div>
                     </div>
@@ -208,6 +208,22 @@ export const QuizPlayer = ({ quizId, userId }: QuizPlayerProps) => {
     }
 
     // Active Quiz Interface
+    if (!quiz.questions || quiz.questions.length === 0) {
+        return (
+            <Card className="max-w-3xl mx-auto my-10 border-t-4 border-t-amber-500">
+                <CardHeader className="text-center">
+                    <CardTitle className="text-2xl mb-2">Quiz Empty</CardTitle>
+                    <p className="text-slate-500">This quiz has no questions yet.</p>
+                </CardHeader>
+                <CardContent className="text-center">
+                    <Button variant="outline" onClick={() => router.push(`/courses/${quiz.courseId}`)}>
+                        Return to Course
+                    </Button>
+                </CardContent>
+            </Card>
+        );
+    }
+
     const question = quiz.questions[currentQIndex];
     const progress = ((currentQIndex + 1) / quiz.questions.length) * 100;
 
@@ -244,7 +260,7 @@ export const QuizPlayer = ({ quizId, userId }: QuizPlayerProps) => {
                                 onValueChange={handleAnswerChange}
                                 className="space-y-3"
                             >
-                                {question.options.map((opt: any) => (
+                                {question.options?.map((opt: any) => (
                                     <div key={opt.id} className={`flex items-center space-x-2 border p-4 rounded-lg hover:bg-slate-50 transition-colors ${answers[question.id] === opt.id ? "border-indigo-500 bg-indigo-50 hover:bg-indigo-50" : "border-slate-200"}`}>
                                         <RadioGroupItem value={opt.id} id={opt.id} />
                                         <Label htmlFor={opt.id} className="flex-grow cursor-pointer font-normal text-base">

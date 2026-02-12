@@ -1,15 +1,16 @@
-"use client";
+import { getAdminPurchases } from "@/actions/purchase";
+import { TransactionsTable } from "./_components/transactions-table";
 
-import { ComingSoon } from "@/components/shared/coming-soon";
-import { CreditCard } from "lucide-react";
+const PaymentGatewayPage = async () => {
+    const transactions = await getAdminPurchases();
 
-const PaymentGatewayPage = () => {
     return (
-        <ComingSoon
-            title="Payment Gateway"
-            icon={CreditCard}
-            description="Our advanced payment processing system with multi-currency support and automated invoicing is on its way."
-        />
+        <div className="space-y-6 font-sans">
+            <h1 className="text-[15px] font-bold text-slate-800 uppercase tracking-tight">
+                Transaction Management
+            </h1>
+            <TransactionsTable data={transactions} />
+        </div>
     );
 };
 

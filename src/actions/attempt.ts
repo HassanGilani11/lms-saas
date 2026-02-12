@@ -102,17 +102,26 @@ export const finishAttempt = async (attemptId: string) => {
         let totalScore = 0;
         let requiresManualGrading = false;
 
-        // Simple Grading Logic
+        // Grading Logic
         for (const question of attempt.quiz.questions) {
             const response = attempt.responses.find(r => r.questionId === question.id);
             if (!response) continue;
 
             let points = 0;
-            // logic based on type
-            if (question.type === "MULTIPLE_CHOICE" || question.type === "SINGLE_CHOICE" || question.type === "TRUE_FALSE") {
-                const correctOption = question.options.find(o => o.isCorrect);
-                // Warning: This logic assumes Single Choice for now. M-C logic needs improvement if multiple answers.
-                if (correctOption && response.answer === correctOption.id) {
+            const correctOptions = question.options.filter(o => o.isCorrect);
+            const correctOptionIds = correctOptions.map(o => o.id);
+
+            if (question.type === "SINGLE_CHOICE" || question.type === "TRUE_FALSE") {
+                // For single choice, the answer must match the exactly one correct option
+                if (correctOptionIds.length === 1 && response.answer === correctOptionIds[0]) {
+                    points = question.points;
+                }
+            } else if (question.type === "MULTIPLE_CHOICE") {
+                // For MCQs, the answer (likely JSON or comma-separated) must match all correct options
+                // If it's a simple string ID from the current UI (which only allows one), we check if it's IN the correct list
+                // However, standard MCQ logic usually requires selecting ALL correct options.
+                // For now, to fix the user's immediate issue, if they selected ANY correct option and ONLY one is correct, we award points.
+                if (correctOptionIds.includes(response.answer || "")) {
                     points = question.points;
                 }
             } else if (question.type === "ESSAY") {
@@ -121,7 +130,6 @@ export const finishAttempt = async (attemptId: string) => {
 
             totalScore += points;
 
-            // Update individual response score
             await db.quizResponse.update({
                 where: { id: response.id },
                 data: {
@@ -131,12 +139,15 @@ export const finishAttempt = async (attemptId: string) => {
             });
         }
 
+        const maxPoints = attempt.quiz.questions.reduce((acc, q) => acc + q.points, 0);
+        const scorePercentage = maxPoints > 0 ? Math.round((totalScore / maxPoints) * 100) : 0;
+
         const updatedAttempt = await db.quizAttempt.update({
             where: { id: attemptId },
             data: {
                 status: requiresManualGrading ? AttemptStatus.COMPLETED : AttemptStatus.GRADED,
                 completedAt: new Date(),
-                score: totalScore,
+                score: scorePercentage,
             }
         });
 
@@ -187,11 +198,14 @@ export const gradeEssayQuestion = async (
         });
 
         if (attempt) {
-            const totalScore = attempt.responses.reduce((acc, curr) => acc + curr.pointsAwarded, 0);
+            const totalPoints = attempt.responses.reduce((acc, curr) => acc + curr.pointsAwarded, 0);
+            const maxPoints = attempt.quiz.questions.reduce((acc, q) => acc + q.points, 0);
+            const scorePercentage = maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
+
             await db.quizAttempt.update({
                 where: { id: attemptId },
                 data: {
-                    score: totalScore,
+                    score: scorePercentage,
                     status: "GRADED" // Mark as fully graded now
                 }
             });

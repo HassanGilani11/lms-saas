@@ -20,6 +20,7 @@ import {
     Users as UsersCloud,
     Bell,
     Share2,
+    Tag,
     ChevronDown,
     ChevronRight
 } from "lucide-react";
@@ -85,6 +86,11 @@ const routes = [
             { label: "Group Categories", href: "/admin/groups/categories" },
             { label: "Group Tags", href: "/admin/groups/tags" },
         ]
+    },
+    {
+        icon: Tag,
+        label: "Coupons",
+        href: "/admin/coupons",
     },
     {
         icon: CreditCard,

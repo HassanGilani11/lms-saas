@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { LogoutButton } from "./logout-button";
-import { BookOpen, Layout, List, BarChart } from "lucide-react";
+import { BookOpen, Layout, List, BarChart, Wallet } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSession } from "next-auth/react";
 import { useSettings } from "@/components/providers/settings-provider";
@@ -20,6 +20,11 @@ const routes = [
         icon: BarChart,
         label: "Analytics",
         href: "/instructor/analytics",
+    },
+    {
+        icon: Wallet,
+        label: "Revenue",
+        href: "/instructor/revenue",
     },
 ];
 

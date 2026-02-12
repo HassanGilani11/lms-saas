@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { sendEnrollmentEmail } from "@/lib/mail";
 import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
@@ -46,16 +47,70 @@ export async function POST(req: Request) {
             });
         } else {
             // One-time purchase completion
-            if (!session?.metadata?.courseId) {
+            let userId = session?.metadata?.userId;
+            const courseId = session?.metadata?.courseId;
+
+            if (!courseId) {
                 return new NextResponse("Course id is required", { status: 400 });
             }
 
-            await db.purchase.create({
-                data: {
-                    courseId: session.metadata.courseId,
-                    userId: session.metadata.userId,
-                },
+            // Handle Guest Checkout (missing userId)
+            if (!userId) {
+                const email = session.customer_details?.email || session.customer_email;
+                if (!email) {
+                    return new NextResponse("Email is required for guest checkout", { status: 400 });
+                }
+
+                // Ensure user exists (idempotent)
+                const userKey = await db.user.findUnique({ where: { email } });
+                if (userKey) {
+                    userId = userKey.id;
+                } else {
+                    const newUser = await db.user.create({
+                        data: {
+                            email,
+                            role: "STUDENT",
+                        }
+                    });
+                    userId = newUser.id;
+                }
+            }
+
+            // Ensure purchase (idempotent check)
+            const existingPurchase = await db.purchase.findUnique({
+                where: {
+                    userId_courseId: {
+                        userId: userId!,
+                        courseId,
+                    }
+                }
             });
+
+            if (!existingPurchase) {
+                await db.purchase.create({
+                    data: {
+                        courseId: courseId,
+                        userId: userId!,
+                        amount: session.amount_total ? session.amount_total / 100 : 0,
+                        currency: session.currency?.toUpperCase() || "USD",
+                        stripeSessionId: session.id,
+                        stripePaymentIntentId: session.payment_intent as string,
+                        status: "COMPLETED",
+                        type: "STRIPE",
+                    },
+                });
+
+                // Send email
+                const userEmail = session.customer_details?.email || session.customer_email;
+                if (userEmail) {
+                    await sendEnrollmentEmail(
+                        userEmail,
+                        session.metadata?.courseTitle || "your course",
+                        session.amount_total ? session.amount_total / 100 : 0,
+                        session.id
+                    );
+                }
+            }
         }
     }
 

@@ -50,15 +50,24 @@ export default function LoginPage() {
 
         try {
             const data: any = await login(values);
-            setError(data?.error);
-            setSuccess(data?.success);
+
+            if (data?.error) {
+                setError(data.error);
+                setIsLoading(false);
+                return;
+            }
+
             if (data?.success) {
+                setSuccess(data.success);
                 router.refresh();
-                router.push("/dashboard");
+
+                // Small delay to allow success state to be seen before redirect
+                setTimeout(() => {
+                    router.push("/dashboard");
+                }, 1000);
             }
         } catch {
             setError("Something went wrong");
-        } finally {
             setIsLoading(false);
         }
     };

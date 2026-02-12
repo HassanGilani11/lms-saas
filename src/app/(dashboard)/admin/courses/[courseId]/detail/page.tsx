@@ -7,6 +7,7 @@ import { ChevronRight, Pencil, ArrowLeft, BookOpen, Clock, Users, BarChart } fro
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
+import { formatPrice } from "@/lib/format";
 
 const CourseDetailPage = () => {
     const params = useParams();
@@ -81,7 +82,7 @@ const CourseDetailPage = () => {
                                     <div className="p-4 bg-slate-50 rounded-xl space-y-1">
                                         <span className="text-[10px] font-bold text-slate-400 uppercase">Price</span>
                                         <div className="text-[13px] font-bold text-slate-700">
-                                            ${course.price?.toFixed(2) || "0.00"}
+                                            {formatPrice(course.price || 0)}
                                         </div>
                                     </div>
                                     <div className="p-4 bg-slate-50 rounded-xl space-y-1">

@@ -7,40 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getContacts } from "@/actions/contact";
 import { getRecentActivities } from "@/actions/analytics";
 
-const notifications = [
-    {
-        id: 1,
-        icon: Bug,
-        text: "You have a bug that needs t...",
-        time: "Just now",
-        color: "text-blue-500",
-        bg: "bg-blue-50"
-    },
-    {
-        id: 2,
-        icon: UserPlus,
-        text: "New user registered",
-        time: "59 minutes ago",
-        color: "text-slate-600",
-        bg: "bg-slate-50"
-    },
-    {
-        id: 3,
-        icon: Bug,
-        text: "You have a bug that needs t...",
-        time: "12 hours ago",
-        color: "text-blue-500",
-        bg: "bg-blue-50"
-    },
-    {
-        id: 4,
-        icon: Rss,
-        text: "Andi Lane subscribed to you",
-        time: "Today, 11:59 AM",
-        color: "text-slate-600",
-        bg: "bg-slate-50"
-    }
-];
+import AdminNotificationsList from "../notifications/admin-notifications-list";
 
 export const AdminRightSidebar = async () => {
     const contactsData = await getContacts();
@@ -53,21 +20,7 @@ export const AdminRightSidebar = async () => {
             {/* Notifications */}
             <div className="space-y-4">
                 <h3 className="text-[13px] font-bold text-slate-800">Notifications</h3>
-                <div className="space-y-4">
-                    {notifications.map((notif) => (
-                        <div key={notif.id} className="flex gap-x-3 group cursor-pointer">
-                            <div className={`h-8 w-8 rounded-full ${notif.bg} flex items-center justify-center shrink-0`}>
-                                <notif.icon className={`h-4 w-4 ${notif.color}`} />
-                            </div>
-                            <div className="flex flex-col min-w-0">
-                                <span className="text-[11px] font-medium text-slate-700 truncate group-hover:text-blue-600 transition-colors">
-                                    {notif.text}
-                                </span>
-                                <span className="text-[10px] text-slate-400">{notif.time}</span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                <AdminNotificationsList />
             </div>
 
             {/* Activities */}

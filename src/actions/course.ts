@@ -76,8 +76,34 @@ export const updateCourse = async (courseId: string, values: any) => {
                 tags: values.tagIds ? {
                     set: values.tagIds.map((id: string) => ({ id })),
                 } : undefined,
+                ...(values.isActive ? {
+                    lessons: {
+                        updateMany: {
+                            where: { isPublished: false },
+                            data: { isPublished: true }
+                        }
+                    }
+                } : {})
             },
         });
+
+        // If active, also publish all topics (updateMany doesn't support nested updates deeper than 1 level easily in some Prisma versions)
+        if (values.isActive) {
+            const lessons = await db.lesson.findMany({
+                where: { courseId },
+                select: { id: true }
+            });
+
+            const lessonIds = lessons.map(l => l.id);
+
+            await db.topic.updateMany({
+                where: {
+                    lessonId: { in: lessonIds },
+                    isPublished: false
+                },
+                data: { isPublished: true }
+            });
+        }
 
         // Notify enrolled students
         const purchases = await db.purchase.findMany({
@@ -91,7 +117,7 @@ export const updateCourse = async (courseId: string, values: any) => {
                 title: "Course Updated",
                 message: `The course "${course.title}" has been updated with new content. Check it out!`,
                 type: NotificationType.COURSE_UPDATE,
-                href: `/student/courses/${courseId}`,
+                href: `/courses/${courseId}`,
                 metadata: { courseId }
             });
         }

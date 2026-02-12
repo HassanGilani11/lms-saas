@@ -16,16 +16,15 @@ export default auth((req) => {
 
     const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth");
     const isUploadThingRoute = nextUrl.pathname.startsWith("/api/uploadthing");
-    const isPublicRoute = ["/", "/auth/login", "/auth/register"].includes(
-        nextUrl.pathname
-    );
+    const isPublicRoute = ["/", "/auth/login", "/auth/register"].includes(nextUrl.pathname) || nextUrl.pathname.startsWith("/courses");
+    const isWebhookRoute = nextUrl.pathname.startsWith("/api/webhook");
     const isAuthRoute = nextUrl.pathname.startsWith("/auth");
     const isAdminRoute = nextUrl.pathname.startsWith("/admin");
     const isInstructorRoute = nextUrl.pathname.startsWith("/instructor");
     const isStudentRoute = nextUrl.pathname.startsWith("/student");
     const isDashboardRoute = nextUrl.pathname === "/dashboard";
 
-    if (isApiAuthRoute || isUploadThingRoute) return NextResponse.next();
+    if (isApiAuthRoute || isUploadThingRoute || isWebhookRoute) return NextResponse.next();
 
     if (isAuthRoute) {
         return NextResponse.next();

@@ -416,6 +416,13 @@ exports.Prisma.PurchaseScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   courseId: 'courseId',
+  status: 'status',
+  amount: 'amount',
+  currency: 'currency',
+  type: 'type',
+  stripePaymentIntentId: 'stripePaymentIntentId',
+  stripeSessionId: 'stripeSessionId',
+  receiptUrl: 'receiptUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -537,6 +544,30 @@ exports.Prisma.SystemSettingsScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.CouponScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  slug: 'slug',
+  code: 'code',
+  type: 'type',
+  amount: 'amount',
+  redemptions: 'redemptions',
+  maxRedemptions: 'maxRedemptions',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  applyToAllCourses: 'applyToAllCourses',
+  applyToAllGroups: 'applyToAllGroups',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  token: 'token',
+  expires: 'expires'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -592,6 +623,18 @@ exports.AttemptStatus = exports.$Enums.AttemptStatus = {
   GRADED: 'GRADED'
 };
 
+exports.PurchaseStatus = exports.$Enums.PurchaseStatus = {
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+};
+
+exports.PurchaseType = exports.$Enums.PurchaseType = {
+  STRIPE: 'STRIPE',
+  COD: 'COD',
+  FREE: 'FREE'
+};
+
 exports.NotificationType = exports.$Enums.NotificationType = {
   ENROLLMENT: 'ENROLLMENT',
   COURSE_UPDATE: 'COURSE_UPDATE',
@@ -604,6 +647,11 @@ exports.ReportStatus = exports.$Enums.ReportStatus = {
   PENDING: 'PENDING',
   RESOLVED: 'RESOLVED',
   DISMISSED: 'DISMISSED'
+};
+
+exports.CouponType = exports.$Enums.CouponType = {
+  FLAT: 'FLAT',
+  PERCENTAGE: 'PERCENTAGE'
 };
 
 exports.Prisma.ModelName = {
@@ -647,7 +695,9 @@ exports.Prisma.ModelName = {
   Report: 'Report',
   TimeLog: 'TimeLog',
   AnalyticsAggregate: 'AnalyticsAggregate',
-  SystemSettings: 'SystemSettings'
+  SystemSettings: 'SystemSettings',
+  Coupon: 'Coupon',
+  PasswordResetToken: 'PasswordResetToken'
 };
 
 /**

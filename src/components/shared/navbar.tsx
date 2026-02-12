@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -9,6 +10,7 @@ import { useSettings } from "@/components/providers/settings-provider";
 import Image from "next/image";
 
 export const Navbar = () => {
+    const pathname = usePathname();
     const { data: session, status } = useSession();
     const { settings } = useSettings();
     const [isScrolled, setIsScrolled] = useState(false);
@@ -20,6 +22,10 @@ export const Navbar = () => {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    // Hide Navbar on course player routes
+    const isPlayerPage = pathname?.includes("/topics/");
+    if (isPlayerPage) return null;
 
     return (
         <header
@@ -49,11 +55,14 @@ export const Navbar = () => {
                         </div>
                     )}
                     <span className="font-bold text-2xl tracking-tight text-slate-900">
-                        {settings?.siteName || "LuminaLearn"}
+                        {settings?.siteName || "LMS SaaS"}
                     </span>
                 </Link>
 
-                <nav className="hidden md:flex items-center gap-x-8">
+                <nav className="hidden md:flex items-center justify-center gap-x-8 absolute left-1/2 -translate-x-1/2">
+                    <Link href="/courses" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
+                        Courses
+                    </Link>
                     <Link href="#features" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
                         Features
                     </Link>
@@ -67,20 +76,20 @@ export const Navbar = () => {
 
                 <div className="flex items-center gap-x-4">
                     {status === "loading" ? (
-                        <div className="h-9 w-24 bg-slate-100 animate-pulse rounded-md" />
+                        <div className="h-9 w-24 bg-slate-100 animate-pulse rounded-full" />
                     ) : session ? (
-                        <Button asChild variant="default" className="bg-slate-900 hover:bg-slate-800">
+                        <Button asChild variant="default" className="bg-slate-900 hover:bg-slate-800 rounded-xl px-6">
                             <Link href="/dashboard">Dashboard</Link>
                         </Button>
                     ) : (
-                        <>
-                            <Button asChild variant="ghost" className="text-slate-600 hover:text-slate-900">
+                        <div className="flex items-center gap-x-2">
+                            <Button asChild variant="ghost" className="text-slate-600 hover:text-slate-900 rounded-full px-5 font-semibold">
                                 <Link href="/auth/login">Login</Link>
                             </Button>
-                            <Button asChild variant="default" className="bg-slate-900 hover:bg-slate-800">
-                                <Link href="/auth/register">Get Started</Link>
+                            <Button asChild variant="default" className="bg-slate-900 hover:bg-slate-800 rounded-xl px-6 font-semibold shadow-lg shadow-slate-200">
+                                <Link href="/auth/register">Start Learning</Link>
                             </Button>
-                        </>
+                        </div>
                     )}
                 </div>
             </div>

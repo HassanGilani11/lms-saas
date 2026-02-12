@@ -43,6 +43,7 @@ const formSchema = z.object({
     categoryId: z.string().min(1, "Category is required"),
     description: z.string().default(""),
     price: z.coerce.number().min(0).default(0),
+    priceType: z.enum(["FREE", "PAID"]).default("FREE"),
     introVideoUrl: z.string().default(""),
     capacity: z.coerce.number().min(0).default(0),
     level: z.string().default("Beginner"),
@@ -73,6 +74,7 @@ const EditCoursePage = () => {
             categoryId: "",
             description: "",
             price: 0,
+            priceType: "FREE",
             introVideoUrl: "",
             capacity: 0,
             level: "Beginner",
@@ -100,6 +102,7 @@ const EditCoursePage = () => {
                 categoryId: courseData.categoryId || "",
                 description: (courseData as any).description || "",
                 price: (courseData as any).price || 0,
+                priceType: (courseData as any).price > 0 ? "PAID" : "FREE",
                 introVideoUrl: (courseData as any).introVideoUrl || "",
                 capacity: (courseData as any).capacity || 0,
                 level: (courseData as any).level || "Beginner",
@@ -125,7 +128,11 @@ const EditCoursePage = () => {
 
     const onSubmit = async (values: FormValues) => {
         try {
-            const course = await updateCourse(courseId, values);
+            const submitValues = {
+                ...values,
+                price: values.priceType === "FREE" ? 0 : values.price
+            };
+            const course = await updateCourse(courseId, submitValues);
 
             if (course) {
                 toast.success("Course updated successfully");
@@ -347,17 +354,40 @@ const EditCoursePage = () => {
                             />
                             <FormField
                                 control={form.control}
-                                name="price"
+                                name="priceType"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-[13px] font-bold text-slate-700 uppercase tracking-wider">Price ($)</FormLabel>
-                                        <FormControl>
-                                            <Input type="number" step="0.01" className="h-11 bg-slate-50 border-none text-[14px]" {...field} />
-                                        </FormControl>
+                                        <FormLabel className="text-[13px] font-bold text-slate-700 uppercase tracking-wider">Price Type</FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="h-11 bg-slate-50 border-none text-[14px]">
+                                                    <SelectValue placeholder="Select price type" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="FREE">Free</SelectItem>
+                                                <SelectItem value="PAID">Paid</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
+                            {form.watch("priceType") === "PAID" && (
+                                <FormField
+                                    control={form.control}
+                                    name="price"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[13px] font-bold text-slate-700 uppercase tracking-wider">Price ($)</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" step="0.01" className="h-11 bg-slate-50 border-none text-[14px]" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            )}
                             <FormField
                                 control={form.control}
                                 name="level"

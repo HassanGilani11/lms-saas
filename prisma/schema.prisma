@@ -442,10 +442,23 @@ model Attachment {
   @@index([topicId])
 }
 
+enum PurchaseStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
 model Purchase {
   id        String   @id @default(cuid())
   userId    String
   courseId  String
+  status    PurchaseStatus @default(COMPLETED)
+  amount                Float?         @default(0)
+  currency              String?        @default("USD")
+  type                  PurchaseType   @default(STRIPE)
+  stripePaymentIntentId String?
+  stripeSessionId       String?
+  receiptUrl            String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
@@ -453,6 +466,12 @@ model Purchase {
 
   @@unique([userId, courseId])
   @@index([courseId])
+}
+
+enum PurchaseType {
+  STRIPE
+  COD
+  FREE
 }
 
 model UserProgress {
@@ -665,4 +684,35 @@ model SystemSettings {
   emailTemplates Json?    @default("{}")
   stripeCurrency String   @default("USD")
   updatedAt      DateTime @updatedAt
+}
+
+model Coupon {
+  id                 String     @id @default(cuid())
+  title              String
+  slug               String     @unique
+  code               String     @unique
+  type               CouponType @default(FLAT)
+  amount             Float      @default(0)
+  redemptions        Int        @default(0)
+  maxRedemptions     Int        @default(0)
+  startDate          DateTime?
+  endDate            DateTime?
+  applyToAllCourses  Boolean    @default(true)
+  applyToAllGroups   Boolean    @default(true)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+}
+
+enum CouponType {
+  FLAT
+  PERCENTAGE
+}
+
+model PasswordResetToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
 }

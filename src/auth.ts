@@ -73,6 +73,33 @@ export const {
         ...authConfig.providers,
         Credentials({
             async authorize(credentials) {
+                // Auto-login via Stripe Session
+                if (credentials.stripeSessionId) {
+                    try {
+                        const { stripe } = await import("@/lib/stripe");
+                        const sessionId = credentials.stripeSessionId as string;
+                        const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+                        if (!session || session.payment_status !== "paid") {
+                            return null;
+                        }
+
+                        // The user should have been created by the webhook or the ensureGuestUser action
+                        // We can look up by email if metadata.userId is missing (legacy/guest flow)
+                        const email = session.customer_details?.email || session.customer_email;
+                        if (!email) return null;
+
+                        const user = await db.user.findUnique({
+                            where: { email }
+                        });
+
+                        return user;
+                    } catch (error) {
+                        console.log("Stripe login error:", error);
+                        return null;
+                    }
+                }
+
                 const { email, password } = credentials as any;
 
                 if (!email || !password) return null;

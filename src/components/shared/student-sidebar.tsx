@@ -1,6 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { LogoutButton } from "./logout-button";
-import { Search, Compass, Layout } from "lucide-react";
+import { Search, Compass, Layout, BookOpen, ShoppingBag } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSession } from "next-auth/react";
 import { useSettings } from "@/components/providers/settings-provider";
@@ -15,6 +17,16 @@ const routes = [
         icon: Compass,
         label: "Browse",
         href: "/search",
+    },
+    {
+        icon: BookOpen,
+        label: "Courses",
+        href: "/courses",
+    },
+    {
+        icon: ShoppingBag,
+        label: "My Orders",
+        href: "/student/orders",
     },
 ];
 

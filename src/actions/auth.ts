@@ -6,6 +6,8 @@ import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
 import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/mail";
+import { createNotification } from "@/actions/notifications";
+import { NotificationType } from "@/lib/prisma";
 
 /**
  * Register a new user.
@@ -35,6 +37,26 @@ export const register = async (values: any) => {
         const verificationToken = await generateVerificationToken(email);
         await sendVerificationEmail(verificationToken.identifier, verificationToken.token);
 
+        // Notify admins about new registration
+        try {
+            const admins = await db.user.findMany({
+                where: { role: "ADMIN" },
+                select: { id: true }
+            });
+
+            for (const admin of admins) {
+                await createNotification({
+                    userId: admin.id,
+                    title: "New User Registered",
+                    message: `${name || email} has joined the platform.`,
+                    type: NotificationType.SYSTEM,
+                    href: "/admin/users",
+                });
+            }
+        } catch (error) {
+            console.error("[REGISTER_NOTIF_ERROR]", error);
+        }
+
         return { success: "Confirmation email sent!" };
     } catch (error) {
         console.error("[REGISTER_ERROR]", error);
@@ -49,11 +71,15 @@ export const login = async (values: any) => {
     const { email, password } = values;
 
     try {
-        await signIn("credentials", {
+        const result = await signIn("credentials", {
             email,
             password,
-            redirectTo: "/dashboard",
+            redirect: false,
         });
+
+        if (result?.error) {
+            return { error: "Invalid credentials!" };
+        }
 
         return { success: "Logged in!" };
     } catch (error) {
@@ -66,6 +92,7 @@ export const login = async (values: any) => {
             }
         }
 
+        // Re-throw if it's not an AuthError (unlikely with redirect: false)
         throw error;
     }
 };

@@ -12,6 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { PlusCircle, Pencil, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
+import { formatPrice } from "@/lib/format";
 
 const courses = [
     {
@@ -62,7 +63,7 @@ const InstructorCoursesPage = () => {
                             <TableRow key={course.id}>
                                 <TableCell className="font-medium">{course.title}</TableCell>
                                 <TableCell>
-                                    {course.price ? `$${course.price.toFixed(2)}` : "Free"}
+                                    {formatPrice(course.price || 0)}
                                 </TableCell>
                                 <TableCell>
                                     {course.isPublished ? (

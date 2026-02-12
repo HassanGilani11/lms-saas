@@ -41,6 +41,7 @@ export const createLesson = async (courseId: string, title: string) => {
                 title,
                 courseId,
                 position: newPosition,
+                isPublished: true,
             },
         });
 
@@ -98,6 +99,7 @@ export const createTopic = async (
                 lessonId,
                 type,
                 position: newPosition,
+                isPublished: true,
             },
         });
 

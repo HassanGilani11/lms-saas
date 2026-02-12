@@ -4,206 +4,138 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 
 /**
- * Get global platform-level statistics for Admins.
+ * Fetch purchase history for the current student.
  */
-export const getGlobalStats = async () => {
+export const getMyOrders = async () => {
     try {
         const session = await auth();
-        if (!session?.user || session.user.role !== "ADMIN") {
-            throw new Error("Unauthorized");
-        }
+        const userId = session?.user?.id;
 
-        const totalUsers = await db.user.count();
-        const totalCourses = await db.course.count();
-        const totalPurchases = await db.purchase.count();
+        if (!userId) throw new Error("Unauthorized");
 
-        // Mock revenue calculation: in a real app, you'd store successful charge amounts in a Sales table.
-        // Here we'll sum the prices of all courses that have been purchased.
-        const purchases = await db.purchase.findMany({
+        const orders = await db.purchase.findMany({
+            where: { userId },
             include: {
                 course: {
                     select: {
+                        title: true,
+                        imageUrl: true,
                         price: true,
                     }
                 }
-            }
+            },
+            orderBy: { createdAt: "desc" }
         });
 
-        const calculatedRevenue = purchases.reduce((acc: number, curr: any) => acc + (curr.course.price || 0), 0);
-
-        return {
-            totalUsers,
-            totalCourses,
-            totalPurchases,
-            totalRevenue: calculatedRevenue,
-        };
+        return orders;
     } catch (error) {
-        console.log("[GET_GLOBAL_STATS]", error);
-        return null;
+        console.log("[GET_ORDERS]", error);
+        return [];
     }
 };
 
 /**
- * Get instructor-specific statistics.
+ * Get revenue statistics for the current instructor.
  */
-export const getInstructorStats = async () => {
+export const getInstructorRevenue = async () => {
     try {
         const session = await auth();
         const userId = session?.user?.id;
 
-        if (!userId || session.user.role !== "INSTRUCTOR") {
-            throw new Error("Unauthorized");
-        }
+        if (!userId) throw new Error("Unauthorized");
 
-        // Get all courses owned by this instructor
-        const courses = await db.course.findMany({
-            where: { userId },
+        const purchases = await db.purchase.findMany({
+            where: {
+                course: {
+                    userId: userId // Only courses owned by this instructor
+                },
+                status: "COMPLETED"
+            },
             include: {
-                purchases: true,
-            }
-        });
-
-        const totalCourses = courses.length;
-        const totalEnrollments = courses.reduce((acc: number, curr: any) => acc + curr.purchases.length, 0);
-        const totalRevenue = courses.reduce((acc: number, curr: any) => {
-            const courseRevenue = curr.purchases.length * (curr.price || 0);
-            return acc + courseRevenue;
-        }, 0);
-
-        return {
-            totalCourses,
-            totalEnrollments,
-            totalRevenue,
-        };
-    } catch (error) {
-        console.log("[GET_INSTRUCTOR_STATS]", error);
-        return null;
-    }
-};
-
-/**
- * Get course-level engagement metrics for an instructor.
- */
-export const getCourseEngagement = async (courseId: string) => {
-    try {
-        const session = await auth();
-        const userId = session?.user?.id;
-
-        if (!userId) {
-            throw new Error("Unauthorized");
-        }
-
-        const course = await db.course.findUnique({
-            where: { id: courseId, userId },
-            include: {
-                purchases: true,
-                lessons: {
-                    include: {
-                        topics: {
-                            include: {
-                                userProgress: true,
-                            }
-                        }
+                course: {
+                    select: {
+                        title: true,
                     }
                 }
             }
         });
 
-        if (!course) {
-            throw new Error("Course not found or unauthorized");
-        }
+        const totalRevenue = purchases.reduce((acc, purchase) => acc + (purchase.amount || 0), 0);
+        const totalSales = purchases.length;
 
-        // Calculate engagement: total topics vs total completions
-        let totalTopics = 0;
-        let totalCompletions = 0;
-
-        course.lessons.forEach((lesson) => {
-            lesson.topics.forEach((topic) => {
-                totalTopics++;
-                // Sum completions across all users for this topic
-                totalCompletions += topic.userProgress.filter((p) => p.isCompleted).length;
-            });
-        });
-
-        const totalLessons = course.lessons.length;
-        const studentCount = course.purchases.length || 1;
-        const potentialCompletions = totalTopics * studentCount;
-        const avgCompletionRate = potentialCompletions > 0 ? (totalCompletions / potentialCompletions) : 0;
+        // Group by course
+        const revenueByCourse = purchases.reduce((acc: any, purchase) => {
+            const courseTitle = purchase.course.title;
+            if (!acc[courseTitle]) {
+                acc[courseTitle] = 0;
+            }
+            acc[courseTitle] += purchase.amount || 0;
+            return acc;
+        }, {});
 
         return {
-            totalLessons,
-            avgCompletionRate,
+            totalRevenue,
+            totalSales,
+            revenueByCourse: Object.entries(revenueByCourse).map(([title, amount]) => ({
+                title,
+                amount
+            }))
         };
     } catch (error) {
-        console.log("[GET_COURSE_ENGAGEMENT]", error);
-        return null;
+        console.log("[GET_REVENUE]", error);
+        return {
+            totalRevenue: 0,
+            totalSales: 0,
+            revenueByCourse: []
+        };
     }
 };
 
 /**
- * Get recent system activities for the Admin dashboard.
- * Aggregates data from User creation, Course updates, and Purchases.
+ * Fetch recent system activities for the admin dashboard.
  */
 export const getRecentActivities = async () => {
     try {
-        const session = await auth();
-        if (!session?.user || session.user.role !== "ADMIN") {
-            throw new Error("Unauthorized");
-        }
+        // Fetch recent users
+        const newUsers = await db.user.findMany({
+            take: 5,
+            orderBy: { createdAt: "desc" },
+        });
 
-        const [users, courses, purchases] = await Promise.all([
-            // New Users
-            db.user.findMany({
-                take: 3,
-                orderBy: { createdAt: "desc" },
-                select: { id: true, name: true, image: true, createdAt: true }
-            }),
-            // Course Updates (published/created)
-            db.course.findMany({
-                take: 3,
-                orderBy: { updatedAt: "desc" },
-                select: { id: true, title: true, updatedAt: true, user: { select: { name: true, image: true } } }
-            }),
-            // New Purchases
-            db.purchase.findMany({
-                take: 3,
-                orderBy: { createdAt: "desc" },
-                include: {
-                    user: { select: { name: true, image: true } },
-                    course: { select: { title: true } }
-                }
-            })
-        ]);
+        // Fetch recent purchases
+        const newPurchases = await db.purchase.findMany({
+            take: 5,
+            orderBy: { createdAt: "desc" },
+            include: {
+                user: true,
+                course: true,
+            }
+        });
 
-        const activities = [
-            ...users.map(u => ({
-                id: `user-${u.id}`,
-                user: u.name || "Unknown User",
-                avatar: u.image,
-                action: "New user registered",
-                time: u.createdAt,
-            })),
-            ...courses.map(c => ({
-                id: `course-${c.id}`,
-                user: c.user?.name || "Instructor",
-                avatar: c.user?.image,
-                action: `Updated course: ${c.title}`,
-                time: c.updatedAt,
-            })),
-            ...purchases.map(p => ({
-                id: `purchase-${p.id}`,
-                user: p.user?.name || "Student",
-                avatar: p.user?.image,
-                action: `Purchased ${p.course.title}`,
-                time: p.createdAt,
-            }))
-        ];
+        // Map to common activity format
+        // Shape expected: { id, avatar, user, action, time }
+        const userActivities = newUsers.map((user) => ({
+            id: `user-${user.id}`,
+            avatar: user.image,
+            user: user.name || user.email || "Unknown User",
+            action: "Registered on the platform",
+            time: user.createdAt,
+        }));
 
-        // Sort by most recent
-        return activities
+        const purchaseActivities = newPurchases.map((purchase) => ({
+            id: `purchase-${purchase.id}`,
+            avatar: purchase.user.image,
+            user: purchase.user.name || purchase.user.email || "Unknown User",
+            action: `Enrolled in "${purchase.course.title}"`,
+            time: purchase.createdAt,
+        }));
+
+        // Combine and sort by most recent
+        const allActivities = [...userActivities, ...purchaseActivities]
             .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
             .slice(0, 10);
 
+        return allActivities;
     } catch (error) {
         console.log("[GET_RECENT_ACTIVITIES]", error);
         return [];
@@ -211,248 +143,197 @@ export const getRecentActivities = async () => {
 };
 
 /**
- * Get completion rates for all courses.
+ * Get course completion rates for the admin reports.
  */
 export const getCourseCompletionRates = async () => {
     try {
-        const session = await auth();
-        if (!session?.user || session.user.role !== "ADMIN") {
-            throw new Error("Unauthorized");
-        }
-
         const courses = await db.course.findMany({
+            where: { isPublished: true },
             include: {
-                _count: {
-                    select: {
-                        lessons: true,
-                        purchases: true,
-                    }
-                },
                 lessons: {
+                    where: { isPublished: true },
                     include: {
                         topics: {
-                            include: {
-                                userProgress: true,
-                            }
+                            where: { isPublished: true }
                         }
                     }
-                }
+                },
+                purchases: true
             }
         });
 
-        const completionData = courses.map(course => {
+        const completionData = await Promise.all(courses.map(async (course) => {
             const totalTopics = course.lessons.reduce((acc, lesson) => acc + lesson.topics.length, 0);
-            const studentCount = course._count.purchases;
 
-            if (totalTopics === 0 || studentCount === 0) {
+            if (totalTopics === 0) return null;
+
+            const enrolledUserIds = course.purchases.map(p => p.userId);
+            if (enrolledUserIds.length === 0) {
                 return {
                     id: course.id,
                     title: course.title,
-                    completionRate: 0,
-                    studentCount
+                    studentCount: 0,
+                    completionRate: 0
                 };
             }
 
-            let completedTopics = 0;
-            course.lessons.forEach(lesson => {
-                lesson.topics.forEach(topic => {
-                    completedTopics += topic.userProgress.filter(p => p.isCompleted).length;
-                });
+            // Get progress for all enrolled users
+            const totalProgress = await db.userProgress.count({
+                where: {
+                    userId: { in: enrolledUserIds },
+                    topic: { lesson: { courseId: course.id } },
+                    isCompleted: true
+                }
             });
 
-            const rate = (completedTopics / (totalTopics * studentCount)) * 100;
+            // Calculate average completion rate
+            // Total possible completions = users * topics
+            const totalPossible = enrolledUserIds.length * totalTopics;
+            const completionRate = totalPossible > 0 ? Math.round((totalProgress / totalPossible) * 100) : 0;
 
             return {
                 id: course.id,
                 title: course.title,
-                completionRate: Math.round(rate),
-                studentCount
+                studentCount: enrolledUserIds.length,
+                completionRate
             };
-        });
+        }));
 
-        return completionData;
+        return completionData.filter(Boolean);
     } catch (error) {
-        console.error("[GET_COURSE_COMPLETION_RATES]", error);
+        console.log("[GET_COURSE_COMPLETION_RATES]", error);
         return [];
     }
 };
 
 /**
- * Get performance data for all quizzes.
+ * Get quiz performance analytics for admin reports.
  */
 export const getQuizPerformanceAnalytics = async () => {
     try {
-        const session = await auth();
-        if (!session?.user || session.user.role !== "ADMIN") {
-            throw new Error("Unauthorized");
-        }
-
         const quizzes = await db.quiz.findMany({
             include: {
-                course: {
-                    select: { title: true }
-                },
-                attempts: {
-                    where: { status: "COMPLETED" }
-                }
+                course: true,
+                attempts: true
             }
         });
 
         return quizzes.map(quiz => {
             const totalAttempts = quiz.attempts.length;
-            const avgScore = totalAttempts > 0
-                ? quiz.attempts.reduce((acc, curr) => acc + curr.score, 0) / totalAttempts
-                : 0;
-            const passCount = quiz.attempts.filter(a => a.score >= quiz.passingScore).length;
-            const passRate = totalAttempts > 0 ? (passCount / totalAttempts) * 100 : 0;
+            if (totalAttempts === 0) {
+                return {
+                    id: quiz.id,
+                    title: quiz.title,
+                    course: quiz.course?.title || "N/A",
+                    avgScore: 0,
+                    passRate: 0,
+                    totalAttempts: 0
+                };
+            }
+
+            const totalScore = quiz.attempts.reduce((acc, attempt) => acc + attempt.score, 0);
+            const avgScore = Math.round(totalScore / totalAttempts);
+
+            const passedAttempts = quiz.attempts.filter(a => a.score >= quiz.passingScore).length;
+            const passRate = Math.round((passedAttempts / totalAttempts) * 100);
 
             return {
                 id: quiz.id,
                 title: quiz.title,
-                course: quiz.course?.title || "Standalone",
-                avgScore: Math.round(avgScore),
-                passRate: Math.round(passRate),
+                course: quiz.course?.title || "N/A",
+                avgScore,
+                passRate,
                 totalAttempts
             };
         });
     } catch (error) {
-        console.error("[GET_QUIZ_PERFORMANCE]", error);
+        console.log("[GET_QUIZ_ANALYTICS]", error);
         return [];
     }
 };
 
 /**
- * Get time spent analytics across courses.
+ * Get time spent analytics for admin reports.
  */
 export const getTimeSpentAnalytics = async () => {
     try {
-        const session = await auth();
-        if (!session?.user || session.user.role !== "ADMIN") {
-            throw new Error("Unauthorized");
-        }
-
+        // Aggregate time spent by course
         const timeLogs = await db.timeLog.groupBy({
             by: ['courseId'],
             _sum: {
                 duration: true
-            },
-            where: {
-                courseId: { not: null }
             }
         });
 
-        const courses = await db.course.findMany({
-            where: {
-                id: { in: timeLogs.map(l => l.courseId as string) }
-            },
-            select: { id: true, title: true }
-        });
+        // Enrich with course details
+        const data = await Promise.all(timeLogs.map(async (log) => {
+            if (!log.courseId) return null;
 
-        return timeLogs.map(log => {
-            const course = courses.find(c => c.id === log.courseId);
+            const course = await db.course.findUnique({
+                where: { id: log.courseId },
+                select: { title: true }
+            });
+
+            if (!course) return null;
+
             return {
                 courseId: log.courseId,
-                title: course?.title || "Unknown",
+                title: course.title,
                 totalMinutes: Math.round((log._sum.duration || 0) / 60)
             };
-        });
+        }));
+
+        return data.filter(Boolean);
     } catch (error) {
-        console.error("[GET_TIME_SPENT_ANALYTICS]", error);
+        console.log("[GET_TIME_ANALYTICS]", error);
         return [];
     }
 };
 
 /**
- * Get group-level aggregated analytics.
+ * Get group level analytics for admin reports.
  */
 export const getGroupLevelAnalytics = async () => {
     try {
-        const session = await auth();
-        if (!session?.user || session.user.role !== "ADMIN") {
-            throw new Error("Unauthorized");
-        }
-
         const groups = await db.group.findMany({
             include: {
                 users: {
                     include: {
-                        quizAttempts: {
-                            where: { status: "COMPLETED" }
-                        },
-                        userAchievements: true,
+                        quizAttempts: true,
+                        userAchievements: true
                     }
                 }
             }
         });
 
         return groups.map(group => {
+            const userCount = group.users.length;
+
+            // Calculate avg quiz score for group members
             let totalScore = 0;
             let totalAttempts = 0;
+            let totalAchievements = 0;
+
             group.users.forEach(user => {
+                totalAchievements += user.userAchievements.length;
                 user.quizAttempts.forEach(attempt => {
                     totalScore += attempt.score;
                     totalAttempts++;
                 });
             });
 
+            const avgQuizScore = totalAttempts > 0 ? Math.round(totalScore / totalAttempts) : 0;
+
             return {
                 id: group.id,
                 name: group.name,
-                userCount: group.users.length,
-                avgQuizScore: totalAttempts > 0 ? Math.round(totalScore / totalAttempts) : 0,
-                totalAchievements: group.users.reduce((acc, user) => acc + user.userAchievements.length, 0)
+                userCount,
+                avgQuizScore,
+                totalAchievements
             };
         });
     } catch (error) {
-        console.error("[GET_GROUP_LEVEL_ANALYTICS]", error);
+        console.log("[GET_GROUP_ANALYTICS]", error);
         return [];
     }
 };
-
-/**
- * Log time spent on a topic.
- */
-export const logTimeSpent = async (topicId: string, courseId: string, duration: number) => {
-    try {
-        const session = await auth();
-        const userId = session?.user?.id;
-
-        if (!userId) return null;
-
-        return await db.$transaction(async (tx) => {
-            const log = await tx.timeLog.create({
-                data: {
-                    userId,
-                    courseId,
-                    topicId,
-                    duration
-                }
-            });
-
-            await tx.userProgress.upsert({
-                where: {
-                    userId_topicId: {
-                        userId,
-                        topicId
-                    }
-                },
-                update: {
-                    totalTimeSpent: {
-                        increment: duration
-                    }
-                },
-                create: {
-                    userId,
-                    topicId,
-                    totalTimeSpent: duration
-                }
-            });
-
-            return log;
-        });
-    } catch (error) {
-        console.error("[LOG_TIME_SPENT]", error);
-        return null;
-    }
-};
-
