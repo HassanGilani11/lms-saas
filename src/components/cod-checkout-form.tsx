@@ -71,7 +71,7 @@ export const CodCheckoutForm = ({
             };
             const response = await enrollWithCod(courseId, submissionData);
 
-            if (response.success) {
+            if (response.success && response.purchase) {
                 toast.success("Enrollment request submitted!");
                 router.push(`/payment/success?courseId=${courseId}&purchaseId=${response.purchase.id}`);
             } else {
