@@ -113,7 +113,7 @@ const SuccessContent = () => {
 
             <div className="pt-4 flex flex-col gap-4">
                 <Button asChild size="lg" className="h-14 text-lg font-bold bg-indigo-600 hover:bg-slate-900 transition-all rounded-2xl shadow-xl shadow-indigo-500/20">
-                    <Link href={`/courses/${courseId}`} className="flex items-center gap-2">
+                    <Link href={courseId ? `/courses/${courseId}` : "/student"} className="flex items-center gap-2">
                         Start Learning Now
                         <ArrowRight className="h-5 w-5" />
                     </Link>

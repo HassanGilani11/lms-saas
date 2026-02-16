@@ -3,8 +3,13 @@ import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
 import { CoursesList } from "@/components/courses-list";
 import { ArrowRight } from "lucide-react";
+import { auth } from "@/auth";
 
 export default async function Home() {
+  const session = await auth();
+  const userId = session?.user?.id;
+  const isAdmin = session?.user?.role === "ADMIN";
+
   const courses = await db.course.findMany({
     where: {
       isPublished: true,
@@ -18,6 +23,11 @@ export default async function Home() {
         },
         select: { id: true }
       },
+      purchases: userId ? {
+        where: {
+          userId: userId
+        }
+      } : false,
     },
     orderBy: {
       createdAt: "desc",
@@ -28,7 +38,7 @@ export default async function Home() {
   const formattedCourses = courses.map((course) => ({
     ...course,
     progress: null,
-    isEnrolled: false,
+    isEnrolled: (course.purchases?.length || 0) > 0 || isAdmin,
   }));
 
   return (

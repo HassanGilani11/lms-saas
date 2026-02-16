@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
-import { ToastProvider } from "@/components/providers/toast-provider";
-import { NotificationProvider } from "@/components/providers/notification-provider";
 import { getSettings } from "@/actions/settings";
-import { SettingsProvider } from "@/components/providers/settings-provider";
-import { ThemeProvider } from "@/components/providers/theme-provider";
+
+import { Providers } from "@/components/providers/providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -35,25 +32,12 @@ export default async function RootLayout({
   const settings = await getSettings();
 
   return (
-    <SessionProvider session={session}>
-      <html lang="en">
-        <body className={inter.className}>
-          <SettingsProvider settings={settings}>
-            <ToastProvider />
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {/* Notification Provider wraps app */}
-              <NotificationProvider>
-                {children}
-              </NotificationProvider>
-            </ThemeProvider>
-          </SettingsProvider>
-        </body>
-      </html>
-    </SessionProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className}>
+        <Providers session={session} settings={settings}>
+          {children}
+        </Providers>
+      </body>
+    </html>
   );
 }

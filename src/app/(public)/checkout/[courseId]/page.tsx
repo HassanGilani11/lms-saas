@@ -168,6 +168,7 @@ const CheckoutPage = async ({
                                     isFree={!course.price || course.price === 0}
                                     fullWidth
                                     initiallyShowOptions={true}
+                                    checkoutMode={true}
                                 />
                             </div>
 

@@ -12,7 +12,7 @@ import { sendEnrollmentEmail } from "@/lib/mail";
  * Handle Cash on Delivery (COD) enrollment.
  * Creates a Purchase record with PENDING status.
  */
-export const enrollWithCod = async (courseId: string, guestDetails?: { email: string; name: string }) => {
+export const enrollWithCod = async (courseId: string, details: { email: string; name: string; phone: string; address: string }) => {
     try {
         console.log("[ENROLL_COD] Starting enrollment for course:", courseId);
         const session = await auth();
@@ -21,10 +21,10 @@ export const enrollWithCod = async (courseId: string, guestDetails?: { email: st
 
         let generatedPassword = "";
 
-        // Handle Guest User Creation
-        if (!userId && guestDetails) {
-            const { email, name } = guestDetails;
+        const { email, name, phone, address } = details;
 
+        // Handle User Creation or Update
+        if (!userId) {
             // Check if user exists
             const existingUser = await db.user.findUnique({
                 where: { email }
@@ -32,6 +32,12 @@ export const enrollWithCod = async (courseId: string, guestDetails?: { email: st
 
             if (existingUser) {
                 userId = existingUser.id;
+                // Update existing user's missing info if needed, or just proceed
+                // We might want to update phone/address if they provided new ones
+                await db.user.update({
+                    where: { id: userId },
+                    data: { phone, address }
+                });
             } else {
                 generatedPassword = Math.random().toString(36).slice(-10);
                 const hashedPassword = await bcrypt.hash(generatedPassword, 10);
@@ -43,10 +49,18 @@ export const enrollWithCod = async (courseId: string, guestDetails?: { email: st
                         name,
                         password: hashedPassword,
                         role: "STUDENT",
+                        phone,
+                        address,
                     }
                 });
                 userId = newUser.id;
             }
+        } else {
+            // Logged in user - update profile with new details
+            await db.user.update({
+                where: { id: userId },
+                data: { phone, address }
+            });
         }
 
         if (!userId) {
@@ -112,7 +126,7 @@ export const enrollWithCod = async (courseId: string, guestDetails?: { email: st
                 await createNotification({
                     userId: admin.id,
                     title: "New Enrollment Request (COD)",
-                    message: `${guestDetails?.name || session?.user?.name || "A student"} requested enrollment in "${course.title}".`,
+                    message: `${details.name} requested enrollment in "${course.title}".`,
                     type: NotificationType.ENROLLMENT,
                     href: "/admin/payments",
                     metadata: { purchaseId: purchase.id }
@@ -123,18 +137,18 @@ export const enrollWithCod = async (courseId: string, guestDetails?: { email: st
             // Don't fail the whole enrollment if notification fails
         }
 
-        if (guestDetails) {
+        if (generatedPassword) {
             await sendEnrollmentEmail(
-                guestDetails.email,
+                details.email,
                 course.title,
                 course.price || 0,
                 purchase.id,
-                generatedPassword || undefined
+                generatedPassword
             );
         }
 
         revalidatePath(`/courses/${courseId}`);
-        return { success: true, purchase, isGuest: !!guestDetails };
+        return { success: true, purchase, isGuest: !!generatedPassword };
     } catch (error: any) {
         console.log("[ENROLL_COD_ERROR]", error);
         return {

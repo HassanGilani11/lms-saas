@@ -98,7 +98,7 @@ export const CourseCard = ({
                         <Button
                             className="w-full rounded-xl py-4 text-xs font-bold bg-slate-900 hover:bg-slate-800 shadow-sm transition-all group-hover:bg-indigo-600 group-hover:text-white h-9"
                         >
-                            {isEnrolled ? "Open Course" : "Open"}
+                            {isEnrolled ? "Open Course" : "Enroll"}
                         </Button>
                     </div>
                 </div>
