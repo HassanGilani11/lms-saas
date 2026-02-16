@@ -73,11 +73,11 @@ const ReportPage = () => {
     }
 
     return (
-        <div className="p-6 space-y-8 font-sans text-black">
+        <div className="p-6 space-y-8 font-sans text-slate-900 dark:text-slate-100">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">System Reports & Analytics</h1>
-                    <p className="text-slate-500 mt-1">Monitor course performance, student engagement, and group activities.</p>
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">System Reports & Analytics</h1>
+                    <p className="text-slate-500 dark:text-slate-400 mt-1">Monitor course performance, student engagement, and group activities.</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" onClick={fetchData}>
@@ -87,32 +87,32 @@ const ReportPage = () => {
             </div>
 
             <Tabs defaultValue="courses" className="space-y-6">
-                <TabsList className="bg-slate-100 p-1 rounded-xl h-auto flex flex-wrap gap-1">
-                    <TabsTrigger value="courses" className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsList className="bg-slate-100 dark:bg-slate-800 p-1 rounded-xl h-auto flex flex-wrap gap-1">
+                    <TabsTrigger value="courses" className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-950 data-[state=active]:shadow-sm">
                         <CheckCircle2 className="h-4 w-4 mr-2" />
                         Course Completion
                     </TabsTrigger>
-                    <TabsTrigger value="quizzes" className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                    <TabsTrigger value="quizzes" className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-950 data-[state=active]:shadow-sm">
                         <CheckSquare className="h-4 w-4 mr-2" />
                         Quiz Performance
                     </TabsTrigger>
-                    <TabsTrigger value="time" className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                    <TabsTrigger value="time" className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-950 data-[state=active]:shadow-sm">
                         <Clock className="h-4 w-4 mr-2" />
                         Time Tracking
                     </TabsTrigger>
-                    <TabsTrigger value="groups" className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                    <TabsTrigger value="groups" className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-950 data-[state=active]:shadow-sm">
                         <Users className="h-4 w-4 mr-2" />
                         Group Analytics
                     </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="courses" className="space-y-6">
-                    <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-                        <div className="flex items-center gap-x-2 text-slate-600">
+                    <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <div className="flex items-center gap-x-2 text-slate-600 dark:text-slate-400">
                             <TrendingUp className="h-5 w-5 text-emerald-500" />
                             <span className="font-semibold">Course Engagement Report</span>
                         </div>
-                        <Button variant="ghost" size="sm" className="text-blue-600 h-8" onClick={() => handleExport(completionData, "course_completion_report")}>
+                        <Button variant="ghost" size="sm" className="text-blue-600 dark:text-blue-400 h-8" onClick={() => handleExport(completionData, "course_completion_report")}>
                             <Download className="h-4 w-4 mr-2" />
                             Export Data
                         </Button>
@@ -120,11 +120,11 @@ const ReportPage = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {completionData.map((course) => (
-                            <Card key={course.id} className="border-none shadow-sm hover:shadow-md transition-shadow">
+                            <Card key={course.id} className="border-none shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-slate-900">
                                 <CardHeader className="pb-2">
                                     <div className="flex justify-between items-start">
-                                        <CardTitle className="text-lg font-bold truncate pr-2">{course.title}</CardTitle>
-                                        <div className="bg-slate-100 px-2 py-1 rounded text-[10px] font-bold text-slate-500">
+                                        <CardTitle className="text-lg font-bold truncate pr-2 text-slate-900 dark:text-slate-100">{course.title}</CardTitle>
+                                        <div className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-[10px] font-bold text-slate-500 dark:text-slate-400">
                                             {course.studentCount} ENROLLED
                                         </div>
                                     </div>
@@ -133,13 +133,13 @@ const ReportPage = () => {
                                 <CardContent>
                                     <div className="space-y-4">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-2xl font-bold text-slate-900">{course.completionRate}%</span>
+                                            <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">{course.completionRate}%</span>
                                             <div className={cn(
                                                 "h-2 w-2 rounded-full",
                                                 course.completionRate > 70 ? "bg-emerald-500" : course.completionRate > 30 ? "bg-amber-500" : "bg-red-500"
                                             )} />
                                         </div>
-                                        <Progress value={course.completionRate} className="h-2" />
+                                        <Progress value={course.completionRate} className="h-2 bg-slate-100 dark:bg-slate-800" />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -148,51 +148,51 @@ const ReportPage = () => {
                 </TabsContent>
 
                 <TabsContent value="quizzes" className="space-y-6">
-                    <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-                        <div className="flex items-center gap-x-2 text-slate-600">
+                    <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <div className="flex items-center gap-x-2 text-slate-600 dark:text-slate-400">
                             <Target className="h-5 w-5 text-indigo-500" />
                             <span className="font-semibold">Performance Assessment Analytics</span>
                         </div>
-                        <Button variant="ghost" size="sm" className="text-blue-600 h-8" onClick={() => handleExport(quizData, "quiz_performance_report")}>
+                        <Button variant="ghost" size="sm" className="text-blue-600 dark:text-blue-400 h-8" onClick={() => handleExport(quizData, "quiz_performance_report")}>
                             <Download className="h-4 w-4 mr-2" />
                             Export Data
                         </Button>
                     </div>
 
-                    <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-slate-50 border-b border-slate-100">
+                            <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                                 <tr>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Quiz Title</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Course</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Avg. Score</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Pass Rate</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-center">Attempts</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Quiz Title</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Course</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Avg. Score</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Pass Rate</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase text-center">Attempts</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                                 {quizData.map((quiz) => (
-                                    <tr key={quiz.id} className="hover:bg-slate-50/50 transition-colors">
-                                        <td className="px-6 py-4 font-semibold text-slate-900">{quiz.title}</td>
-                                        <td className="px-6 py-4 text-sm text-slate-500">{quiz.course}</td>
+                                    <tr key={quiz.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                                        <td className="px-6 py-4 font-semibold text-slate-900 dark:text-slate-200">{quiz.title}</td>
+                                        <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">{quiz.course}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-x-2">
-                                                <span className="font-bold">{quiz.avgScore}%</span>
-                                                <div className="w-16 h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                                                <span className="font-bold text-slate-700 dark:text-slate-300">{quiz.avgScore}%</span>
+                                                <div className="w-16 h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                                     <div className="h-full bg-indigo-500" style={{ width: `${quiz.avgScore}%` }} />
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-x-2">
-                                                <span className="font-bold">{quiz.passRate}%</span>
-                                                <div className="w-16 h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                                                <span className="font-bold text-slate-700 dark:text-slate-300">{quiz.passRate}%</span>
+                                                <div className="w-16 h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                                     <div className="h-full bg-emerald-500" style={{ width: `${quiz.passRate}%` }} />
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-center">
-                                            <span className="bg-slate-100 px-3 py-1 rounded-full text-xs font-bold text-slate-600">
+                                            <span className="bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full text-xs font-bold text-slate-600 dark:text-slate-400">
                                                 {quiz.totalAttempts}
                                             </span>
                                         </td>
@@ -200,7 +200,7 @@ const ReportPage = () => {
                                 ))}
                                 {quizData.length === 0 && (
                                     <tr>
-                                        <td colSpan={5} className="px-6 py-12 text-center text-slate-400">
+                                        <td colSpan={5} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500">
                                             No quiz attempts recorded yet.
                                         </td>
                                     </tr>
@@ -211,12 +211,12 @@ const ReportPage = () => {
                 </TabsContent>
 
                 <TabsContent value="time" className="space-y-6">
-                    <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-                        <div className="flex items-center gap-x-2 text-slate-600">
+                    <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <div className="flex items-center gap-x-2 text-slate-600 dark:text-slate-400">
                             <Clock className="h-5 w-5 text-sky-500" />
                             <span className="font-semibold">User Activity & Time Allocation</span>
                         </div>
-                        <Button variant="ghost" size="sm" className="text-blue-600 h-8" onClick={() => handleExport(timeData, "time_spent_report")}>
+                        <Button variant="ghost" size="sm" className="text-blue-600 dark:text-blue-400 h-8" onClick={() => handleExport(timeData, "time_spent_report")}>
                             <Download className="h-4 w-4 mr-2" />
                             Export Data
                         </Button>
@@ -224,17 +224,17 @@ const ReportPage = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {timeData.map((course) => (
-                            <div key={course.courseId} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow group flex flex-col items-center text-center">
-                                <div className="h-12 w-12 bg-sky-50 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <div key={course.courseId} className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow group flex flex-col items-center text-center">
+                                <div className="h-12 w-12 bg-sky-50 dark:bg-sky-900/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                     <Clock className="h-6 w-6 text-sky-500" />
                                 </div>
-                                <h3 className="font-bold text-slate-900 truncate w-full mb-1">{course.title}</h3>
-                                <div className="text-3xl font-black text-slate-900 mb-1">{course.totalMinutes}</div>
-                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Minutes Spent</div>
+                                <h3 className="font-bold text-slate-900 dark:text-slate-100 truncate w-full mb-1">{course.title}</h3>
+                                <div className="text-3xl font-black text-slate-900 dark:text-slate-100 mb-1">{course.totalMinutes}</div>
+                                <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Minutes Spent</div>
                             </div>
                         ))}
                         {timeData.length === 0 && (
-                            <div className="col-span-full py-20 bg-slate-50 border border-dashed rounded-2xl flex flex-col items-center justify-center text-slate-400 text-sm">
+                            <div className="col-span-full py-20 bg-slate-50 dark:bg-slate-800 border border-dashed dark:border-slate-700 rounded-2xl flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 text-sm">
                                 <Clock className="h-10 w-10 mb-2 opacity-20" />
                                 No activity logs recorded yet.
                             </div>
@@ -243,12 +243,12 @@ const ReportPage = () => {
                 </TabsContent>
 
                 <TabsContent value="groups" className="space-y-6">
-                    <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-                        <div className="flex items-center gap-x-2 text-slate-600">
+                    <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <div className="flex items-center gap-x-2 text-slate-600 dark:text-slate-400">
                             <Users className="h-5 w-5 text-amber-500" />
                             <span className="font-semibold">Group-Level Performance Overview</span>
                         </div>
-                        <Button variant="ghost" size="sm" className="text-blue-600 h-8" onClick={() => handleExport(groupData, "group_analytics_report")}>
+                        <Button variant="ghost" size="sm" className="text-blue-600 dark:text-blue-400 h-8" onClick={() => handleExport(groupData, "group_analytics_report")}>
                             <Download className="h-4 w-4 mr-2" />
                             Export Data
                         </Button>
@@ -256,30 +256,30 @@ const ReportPage = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {groupData.map((group) => (
-                            <div key={group.id} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
-                                <div className="flex border-b border-slate-50 pb-4 mb-4 justify-between items-center">
+                            <div key={group.id} className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all">
+                                <div className="flex border-b border-slate-50 dark:border-slate-800 pb-4 mb-4 justify-between items-center">
                                     <div>
-                                        <h3 className="text-lg font-bold text-slate-900">{group.name}</h3>
-                                        <div className="text-xs font-medium text-slate-400">{group.userCount} Members</div>
+                                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{group.name}</h3>
+                                        <div className="text-xs font-medium text-slate-400 dark:text-slate-500">{group.userCount} Members</div>
                                     </div>
-                                    <div className="h-10 w-10 bg-slate-50 rounded-lg flex items-center justify-center">
-                                        <Users className="h-5 w-5 text-slate-400" />
+                                    <div className="h-10 w-10 bg-slate-50 dark:bg-slate-800 rounded-lg flex items-center justify-center">
+                                        <Users className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-amber-50/50 p-4 rounded-xl">
-                                        <div className="text-2xl font-black text-amber-700">{group.avgQuizScore}%</div>
-                                        <div className="text-[10px] font-bold text-amber-600/70 uppercase">Avg. Quiz Score</div>
+                                    <div className="bg-amber-50/50 dark:bg-amber-900/10 p-4 rounded-xl">
+                                        <div className="text-2xl font-black text-amber-700 dark:text-amber-500">{group.avgQuizScore}%</div>
+                                        <div className="text-[10px] font-bold text-amber-600/70 dark:text-amber-500/70 uppercase">Avg. Quiz Score</div>
                                     </div>
-                                    <div className="bg-indigo-50/50 p-4 rounded-xl">
-                                        <div className="text-2xl font-black text-indigo-700">{group.totalAchievements}</div>
-                                        <div className="text-[10px] font-bold text-indigo-600/70 uppercase">Total Badges</div>
+                                    <div className="bg-indigo-50/50 dark:bg-indigo-900/10 p-4 rounded-xl">
+                                        <div className="text-2xl font-black text-indigo-700 dark:text-indigo-500">{group.totalAchievements}</div>
+                                        <div className="text-[10px] font-bold text-indigo-600/70 dark:text-indigo-500/70 uppercase">Total Badges</div>
                                     </div>
                                 </div>
                             </div>
                         ))}
                         {groupData.length === 0 && (
-                            <div className="col-span-full py-20 bg-slate-50 border border-dashed rounded-2xl flex flex-col items-center justify-center text-slate-400 text-sm">
+                            <div className="col-span-full py-20 bg-slate-50 dark:bg-slate-900 border border-dashed dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 text-sm">
                                 No groups registered in the system.
                             </div>
                         )}

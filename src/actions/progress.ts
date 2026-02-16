@@ -108,6 +108,8 @@ export const toggleTopicCompletion = async (
 
             if (topic?.lesson?.courseId) {
                 await checkAndIssueCertificate(topic.lesson.courseId);
+                revalidatePath(`/courses/${topic.lesson.courseId}`);
+                revalidatePath(`/courses/${topic.lesson.courseId}/topics/${topicId}`);
             }
         }
 

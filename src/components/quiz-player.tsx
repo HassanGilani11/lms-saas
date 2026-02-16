@@ -12,6 +12,7 @@ import {
     Flag
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -271,13 +272,28 @@ export const QuizPlayer = ({ quizId, userId }: QuizPlayerProps) => {
                             </RadioGroup>
                         )}
 
+                        {question.type === "SHORT_ANSWER" && (
+                            <div className="space-y-2">
+                                <Label className="text-slate-500 font-medium tracking-tight">Your Answer</Label>
+                                <Input
+                                    value={answers[question.id] || ""}
+                                    onChange={(e) => handleAnswerChange(e.target.value)}
+                                    placeholder="Type your answer here..."
+                                    className="text-lg h-14"
+                                />
+                            </div>
+                        )}
+
                         {question.type === "ESSAY" && (
-                            <Textarea
-                                value={answers[question.id] || ""}
-                                onChange={(e) => handleAnswerChange(e.target.value)}
-                                placeholder="Type your answer here..."
-                                className="h-40 text-base"
-                            />
+                            <div className="space-y-2">
+                                <Label className="text-slate-500 font-medium tracking-tight">Your Answer</Label>
+                                <Textarea
+                                    value={answers[question.id] || ""}
+                                    onChange={(e) => handleAnswerChange(e.target.value)}
+                                    placeholder="Type your answer here..."
+                                    className="h-40 text-base"
+                                />
+                            </div>
                         )}
                     </div>
                 </CardContent>

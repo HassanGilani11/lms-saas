@@ -632,6 +632,7 @@ enum QuestionType {
   SINGLE_CHOICE
   TRUE_FALSE
   ESSAY
+  SHORT_ANSWER
 }
 
 enum AttemptStatus {

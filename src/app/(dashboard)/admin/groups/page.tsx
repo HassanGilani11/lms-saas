@@ -172,13 +172,13 @@ const AdminGroupsPage = () => {
 
 
     return (
-        <div className="p-6 text-black font-sans space-y-6">
+        <div className="p-6 text-slate-900 dark:text-slate-100 font-sans space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-[17px] font-bold text-slate-800">Groups & Enterprise</h1>
+                <h1 className="text-[17px] font-bold text-slate-800 dark:text-slate-100">Groups & Enterprise</h1>
             </div>
 
-            <Card className="border-none shadow-sm overflow-hidden bg-white">
-                <CardHeader className="px-6 py-4 border-b">
+            <Card className="border-none shadow-sm overflow-hidden bg-white dark:bg-slate-900">
+                <CardHeader className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-x-2">
                             <Button
@@ -200,20 +200,20 @@ const AdminGroupsPage = () => {
                             >
                                 <Plus className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200">
                                 <Filter className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200">
                                 <ArrowUpDown className="h-4 w-4" />
                             </Button>
                         </div>
                         <div className="relative group">
-                            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
+                            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600 dark:group-focus-within:text-slate-300 transition-colors" />
                             <Input
                                 placeholder="Search groups..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="h-8 w-64 pl-9 bg-slate-50 border-none text-[13px] focus-visible:ring-1 focus-visible:ring-slate-200"
+                                className="h-8 w-64 pl-9 bg-slate-50 dark:bg-slate-800 border-none text-[13px] focus-visible:ring-1 focus-visible:ring-slate-200 dark:focus-visible:ring-slate-700"
                             />
                         </div>
                     </div>
@@ -221,13 +221,13 @@ const AdminGroupsPage = () => {
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
-                            <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                                <TableHead className="pl-6 font-bold text-slate-400 text-[11px] uppercase tracking-tighter">Group Name</TableHead>
-                                <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter">Category / Parent</TableHead>
-                                <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter text-center">Leaders</TableHead>
-                                <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter text-center">Members</TableHead>
-                                <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter text-center">Created At</TableHead>
-                                <TableHead className="text-right pr-6 font-bold text-slate-400 text-[11px] uppercase tracking-tighter">Options</TableHead>
+                            <TableRow className="bg-slate-50/50 dark:bg-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                                <TableHead className="pl-6 font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter">Group Name</TableHead>
+                                <TableHead className="font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter">Category / Parent</TableHead>
+                                <TableHead className="font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter text-center">Leaders</TableHead>
+                                <TableHead className="font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter text-center">Members</TableHead>
+                                <TableHead className="font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter text-center">Created At</TableHead>
+                                <TableHead className="text-right pr-6 font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter">Options</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -253,7 +253,7 @@ const AdminGroupsPage = () => {
                                     <TableCell>
                                         <div className="flex flex-col gap-y-1">
                                             {group.category ? (
-                                                <Badge variant="outline" className="w-fit font-normal bg-slate-50 text-slate-600 border-slate-200 text-[10px]">
+                                                <Badge variant="outline" className="w-fit font-normal bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 text-[10px]">
                                                     {group.category.name}
                                                 </Badge>
                                             ) : (
@@ -336,11 +336,11 @@ const AdminGroupsPage = () => {
             </Card>
 
             <div className="flex items-center justify-center gap-x-2 pt-4">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 border bg-white shadow-sm"><ChevronLeft className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm"><ChevronLeft className="h-4 w-4" /></Button>
                 {[1].map(p => (
-                    <Button key={p} variant={p === 1 ? "default" : "ghost"} className={`h-8 w-10 text-[12px] font-bold border ${p === 1 ? "bg-slate-100 text-slate-900 shadow-sm" : "bg-white text-slate-400 shadow-sm"}`}>{p}</Button>
+                    <Button key={p} variant={p === 1 ? "default" : "ghost"} className={`h-8 w-10 text-[12px] font-bold border ${p === 1 ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm dark:border-slate-700" : "bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500 shadow-sm dark:border-slate-800"}`}>{p}</Button>
                 ))}
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 border bg-white shadow-sm"><ChevronRight className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm"><ChevronRight className="h-4 w-4" /></Button>
             </div>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

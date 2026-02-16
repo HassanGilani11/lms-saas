@@ -122,12 +122,12 @@ const LearningPathsPage = () => {
     );
 
     return (
-        <div className="p-6 space-y-6 bg-[#f8fafc] min-h-full font-sans">
+        <div className="p-6 space-y-6 bg-[#f8fafc] dark:bg-slate-950 min-h-full font-sans">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-[20px] font-bold text-slate-900 tracking-tight">Learning Pathways</h1>
-                    <p className="text-[13px] text-slate-500 mt-1">Manage and curate course sequences for your students.</p>
+                    <h1 className="text-[20px] font-bold text-slate-900 dark:text-slate-100 tracking-tight">Learning Pathways</h1>
+                    <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1">Manage and curate course sequences for your students.</p>
                 </div>
                 <div className="flex items-center gap-x-3">
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -137,7 +137,7 @@ const LearningPathsPage = () => {
                                 Add Learning Path
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="font-sans">
+                        <DialogContent className="font-sans bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
                             <DialogHeader>
                                 <DialogTitle className="text-[16px] font-bold">Create New Learning Path</DialogTitle>
                             </DialogHeader>
@@ -148,7 +148,7 @@ const LearningPathsPage = () => {
                                         name="title"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[13px] font-bold text-slate-700">Path Title</FormLabel>
+                                                <FormLabel className="text-[13px] font-bold text-slate-700 dark:text-slate-300">Path Title</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="e.g. Full Stack Web Development" className="h-10 text-[13px]" {...field} />
                                                 </FormControl>
@@ -161,7 +161,7 @@ const LearningPathsPage = () => {
                                         name="categoryId"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[13px] font-bold text-slate-700">Category</FormLabel>
+                                                <FormLabel className="text-[13px] font-bold text-slate-700 dark:text-slate-300">Category</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <FormControl>
                                                         <SelectTrigger className="h-10 text-[13px]">
@@ -178,7 +178,7 @@ const LearningPathsPage = () => {
                                             </FormItem>
                                         )}
                                     />
-                                    <Button type="submit" className="w-full h-10 bg-slate-900 text-[13px] font-bold mt-6" disabled={form.formState.isSubmitting}>
+                                    <Button type="submit" className="w-full h-10 bg-slate-900 text-[13px] font-bold mt-6 dark:bg-slate-100 dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200" disabled={form.formState.isSubmitting}>
                                         Create Path
                                     </Button>
                                 </form>
@@ -189,37 +189,37 @@ const LearningPathsPage = () => {
             </div>
 
             {/* Stats/Filters Row */}
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+            <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
                 <div className="relative w-full md:w-96">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input
                         placeholder="Search learning paths..."
-                        className="pl-10 h-10 bg-slate-50/50 border-slate-100 text-[13px] focus-visible:ring-slate-200"
+                        className="pl-10 h-10 bg-slate-50/50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800 text-[13px] focus-visible:ring-slate-200 dark:focus-visible:ring-slate-700 dark:text-slate-100 placeholder:text-slate-400"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
                 <div className="flex items-center gap-x-2 w-full md:w-auto">
-                    <Button variant="outline" className="h-10 text-[13px] font-medium border-slate-100 flex items-center gap-2">
+                    <Button variant="outline" className="h-10 text-[13px] font-medium border-slate-100 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300 flex items-center gap-2">
                         <Filter className="h-4 w-4" /> Filter
                     </Button>
-                    <Button variant="outline" className="h-10 text-[13px] font-medium border-slate-100 flex items-center gap-2">
+                    <Button variant="outline" className="h-10 text-[13px] font-medium border-slate-100 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300 flex items-center gap-2">
                         <ArrowUpDown className="h-4 w-4" /> Sort
                     </Button>
                 </div>
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
                 <Table>
                     <TableHeader>
-                        <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                            <TableHead className="pl-6 font-bold text-slate-400 text-[11px] uppercase tracking-tighter">Path Info</TableHead>
-                            <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter text-center">Courses</TableHead>
-                            <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter text-center">Enrollments</TableHead>
-                            <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter">Category</TableHead>
-                            <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter">Status</TableHead>
-                            <TableHead className="text-right pr-6 font-bold text-slate-400 text-[11px] uppercase tracking-tighter">Options</TableHead>
+                        <TableRow className="bg-slate-50/50 dark:bg-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                            <TableHead className="pl-6 font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter">Path Info</TableHead>
+                            <TableHead className="font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter text-center">Courses</TableHead>
+                            <TableHead className="font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter text-center">Enrollments</TableHead>
+                            <TableHead className="font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter">Category</TableHead>
+                            <TableHead className="font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter">Status</TableHead>
+                            <TableHead className="text-right pr-6 font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter">Options</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -228,26 +228,26 @@ const LearningPathsPage = () => {
                         ) : filteredPaths.length === 0 ? (
                             <TableRow><TableCell colSpan={6} className="h-24 text-center text-slate-400 text-[13px]">No learning paths found.</TableCell></TableRow>
                         ) : filteredPaths.map((path) => (
-                            <TableRow key={path.id} className="group hover:bg-slate-50/50 transition-colors border-b last:border-0">
+                            <TableRow key={path.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors border-b dark:border-slate-800 last:border-0">
                                 <TableCell className="pl-6 py-4">
                                     <div className="flex items-center gap-x-3 group cursor-pointer" onClick={() => router.push(`/admin/learning-paths/${path.id}`)}>
-                                        <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 group-hover:bg-slate-200 transition-colors">
+                                        <div className="h-10 w-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors">
                                             <BookOpen className="h-5 w-5" />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-[13px] text-slate-700 leading-none group-hover:text-blue-600 transition-colors">{path.title}</p>
+                                            <p className="font-bold text-[13px] text-slate-700 dark:text-slate-200 leading-none group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{path.title}</p>
                                             <p className="text-[11px] text-slate-400 mt-1">{path.slug || "No slug"}</p>
                                         </div>
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-center py-4">
-                                    <Badge variant="secondary" className="bg-blue-50 text-blue-600 border-blue-100 text-[11px] font-bold px-2 py-0.5">{path._count.courses}</Badge>
+                                    <Badge variant="secondary" className="bg-blue-50 text-blue-600 border-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-900/50 text-[11px] font-bold px-2 py-0.5">{path._count.courses}</Badge>
                                 </TableCell>
                                 <TableCell className="text-center py-4">
-                                    <Badge variant="secondary" className="bg-emerald-50 text-emerald-600 border-emerald-100 text-[11px] font-bold px-2 py-0.5">{path._count.enrollments}</Badge>
+                                    <Badge variant="secondary" className="bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/50 text-[11px] font-bold px-2 py-0.5">{path._count.enrollments}</Badge>
                                 </TableCell>
                                 <TableCell className="py-4">
-                                    <span className="text-[13px] text-slate-600 font-medium">{path.category?.name || "-"}</span>
+                                    <span className="text-[13px] text-slate-600 dark:text-slate-300 font-medium">{path.category?.name || "-"}</span>
                                 </TableCell>
                                 <TableCell className="py-4">
                                     <Badge className={`${path.isActive ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-slate-50 text-slate-600 border-slate-100"} text-[11px] font-bold px-2 py-0.5 border shadow-none`}>

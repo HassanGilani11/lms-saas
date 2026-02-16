@@ -86,20 +86,20 @@ const MyInfoPage = () => {
 
     return (
         <div className="p-6 space-y-6 font-sans">
-            <h1 className="text-[15px] font-bold text-slate-800">My Info</h1>
+            <h1 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">My Info</h1>
 
-            <Card className="border-none shadow-sm overflow-hidden bg-white">
+            <Card className="border-none shadow-sm overflow-hidden bg-white dark:bg-slate-900">
                 <CardContent className="p-8">
                     <div className="flex items-center gap-x-6 mb-12">
-                        <Avatar className="h-24 w-24 border-4 border-slate-50 shadow-sm">
+                        <Avatar className="h-24 w-24 border-4 border-slate-50 dark:border-slate-800 shadow-sm">
                             <AvatarImage src={user?.image || ""} />
-                            <AvatarFallback className="bg-slate-100 text-2xl font-bold">
+                            <AvatarFallback className="bg-slate-100 dark:bg-slate-800 text-2xl font-bold text-slate-700 dark:text-slate-300">
                                 {user?.name?.[0] || user?.email?.[0]}
                             </AvatarFallback>
                         </Avatar>
                         <div className="space-y-1">
-                            <h2 className="text-xl font-bold text-slate-900">{user?.name || "User Name"}</h2>
-                            <div className="flex items-center gap-x-2 text-slate-400 text-[12px] font-medium">
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{user?.name || "User Name"}</h2>
+                            <div className="flex items-center gap-x-2 text-slate-400 dark:text-slate-500 text-[12px] font-medium">
                                 <MapPin size={14} />
                                 <span>{user?.address?.split(',')?.slice(-2)?.join(',') || "Florida, United States"}</span>
                             </div>
@@ -107,13 +107,13 @@ const MyInfoPage = () => {
                     </div>
 
                     <div className="space-y-8">
-                        <div className="flex items-center justify-between border-b pb-4">
-                            <h3 className="text-[14px] font-bold text-slate-800 tracking-tight">Personal Details</h3>
+                        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+                            <h3 className="text-[14px] font-bold text-slate-800 dark:text-slate-100 tracking-tight">Personal Details</h3>
                             <Button
                                 onClick={() => setIsDialogOpen(true)}
                                 variant="ghost"
                                 size="sm"
-                                className="text-slate-400 hover:text-slate-900 gap-x-2"
+                                className="text-slate-400 hover:text-slate-900 dark:text-slate-500 dark:hover:text-slate-200 gap-x-2"
                             >
                                 <Pencil size={14} />
                                 <span className="text-[12px] font-bold">Edit</span>
@@ -122,20 +122,20 @@ const MyInfoPage = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 text-[13px]">
                             <div className="flex flex-col gap-y-1">
-                                <span className="text-slate-400 font-medium">Name:</span>
-                                <span className="text-slate-700 font-bold">{user?.name || "N/A"}</span>
+                                <span className="text-slate-400 dark:text-slate-500 font-medium">Name:</span>
+                                <span className="text-slate-700 dark:text-slate-300 font-bold">{user?.name || "N/A"}</span>
                             </div>
                             <div className="flex flex-col gap-y-1">
-                                <span className="text-slate-400 font-medium">Email ID:</span>
-                                <span className="text-slate-700 font-bold">{user?.email}</span>
+                                <span className="text-slate-400 dark:text-slate-500 font-medium">Email ID:</span>
+                                <span className="text-slate-700 dark:text-slate-300 font-bold">{user?.email}</span>
                             </div>
                             <div className="flex flex-col gap-y-1">
-                                <span className="text-slate-400 font-medium">Mobile:</span>
-                                <span className="text-slate-700 font-bold">{user?.phone || "N/A"}</span>
+                                <span className="text-slate-400 dark:text-slate-500 font-medium">Mobile:</span>
+                                <span className="text-slate-700 dark:text-slate-300 font-bold">{user?.phone || "N/A"}</span>
                             </div>
                             <div className="flex flex-col gap-y-1 col-span-full">
-                                <span className="text-slate-400 font-medium">Address:</span>
-                                <span className="text-slate-700 font-bold max-w-md">
+                                <span className="text-slate-400 dark:text-slate-500 font-medium">Address:</span>
+                                <span className="text-slate-700 dark:text-slate-300 font-bold max-w-md">
                                     {user?.address || "No address provided."}
                                 </span>
                             </div>
@@ -156,8 +156,8 @@ const MyInfoPage = () => {
                                 name="name"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-[13px] font-bold text-slate-700">Full Name</FormLabel>
-                                        <FormControl><Input placeholder="John Doe" className="h-10 text-[13px]" {...field} /></FormControl>
+                                        <FormLabel className="text-[13px] font-bold text-slate-700 dark:text-slate-300">Full Name</FormLabel>
+                                        <FormControl><Input placeholder="John Doe" className="h-10 text-[13px] dark:bg-slate-950 dark:border-slate-800" {...field} /></FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -167,8 +167,8 @@ const MyInfoPage = () => {
                                 name="email"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-[13px] font-bold text-slate-700">Email Address</FormLabel>
-                                        <FormControl><Input placeholder="john@example.com" className="h-10 text-[13px]" {...field} /></FormControl>
+                                        <FormLabel className="text-[13px] font-bold text-slate-700 dark:text-slate-300">Email Address</FormLabel>
+                                        <FormControl><Input placeholder="john@example.com" className="h-10 text-[13px] dark:bg-slate-950 dark:border-slate-800" {...field} /></FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -178,8 +178,8 @@ const MyInfoPage = () => {
                                 name="phone"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-[13px] font-bold text-slate-700">Phone Number</FormLabel>
-                                        <FormControl><Input placeholder="+1 234 567 890" className="h-10 text-[13px]" {...field} /></FormControl>
+                                        <FormLabel className="text-[13px] font-bold text-slate-700 dark:text-slate-300">Phone Number</FormLabel>
+                                        <FormControl><Input placeholder="+1 234 567 890" className="h-10 text-[13px] dark:bg-slate-950 dark:border-slate-800" {...field} /></FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -189,13 +189,13 @@ const MyInfoPage = () => {
                                 name="address"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-[13px] font-bold text-slate-700">Address</FormLabel>
-                                        <FormControl><Input placeholder="123 Street Name, City" className="h-10 text-[13px]" {...field} /></FormControl>
+                                        <FormLabel className="text-[13px] font-bold text-slate-700 dark:text-slate-300">Address</FormLabel>
+                                        <FormControl><Input placeholder="123 Street Name, City" className="h-10 text-[13px] dark:bg-slate-950 dark:border-slate-800" {...field} /></FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit" className="w-full h-10 bg-slate-900 text-[13px] font-bold mt-6" disabled={form.formState.isSubmitting}>
+                            <Button type="submit" className="w-full h-10 bg-slate-900 text-[13px] font-bold mt-6 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200" disabled={form.formState.isSubmitting}>
                                 Save Changes
                             </Button>
                         </form>

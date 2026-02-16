@@ -7,6 +7,7 @@ import { ToastProvider } from "@/components/providers/toast-provider";
 import { NotificationProvider } from "@/components/providers/notification-provider";
 import { getSettings } from "@/actions/settings";
 import { SettingsProvider } from "@/components/providers/settings-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,9 +40,17 @@ export default async function RootLayout({
         <body className={inter.className}>
           <SettingsProvider settings={settings}>
             <ToastProvider />
-            <NotificationProvider>
-              {children}
-            </NotificationProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {/* Notification Provider wraps app */}
+              <NotificationProvider>
+                {children}
+              </NotificationProvider>
+            </ThemeProvider>
           </SettingsProvider>
         </body>
       </html>

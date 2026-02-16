@@ -110,26 +110,26 @@ const CertificatesPage = () => {
     );
 
     return (
-        <div className="space-y-6 font-sans p-6 text-black">
-            <h1 className="text-[15px] font-bold text-slate-800">Certificate Archive</h1>
+        <div className="space-y-6 font-sans text-slate-900 dark:text-slate-100">
+            <h1 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">Certificates</h1>
 
-            <Card className="border-none shadow-sm overflow-hidden">
-                <CardHeader className="bg-white px-6 py-4 border-b">
+            <Card className="border-none shadow-sm overflow-hidden bg-white dark:bg-slate-900">
+                <CardHeader className="bg-white dark:bg-slate-900 px-6 py-4 border-b border-slate-200 dark:border-slate-800">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-x-2">
                             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                                 <DialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900">
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200">
                                         <Plus className="h-4 w-4" />
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="font-sans">
+                                <DialogContent className="font-sans bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
                                     <DialogHeader>
                                         <DialogTitle className="text-[16px] font-bold">Issue Manual Certificate</DialogTitle>
                                     </DialogHeader>
                                     <div className="space-y-4 py-4">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">Select Student</label>
+                                            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Select Student</label>
                                             <Select onValueChange={setSelectedUserId} value={selectedUserId}>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select a student" />
@@ -144,7 +144,7 @@ const CertificatesPage = () => {
                                             </Select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">Select Course</label>
+                                            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Select Course</label>
                                             <Select onValueChange={setSelectedCourseId} value={selectedCourseId}>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select a course" />
@@ -159,7 +159,7 @@ const CertificatesPage = () => {
                                             </Select>
                                         </div>
                                         <Button
-                                            className="w-full h-10 bg-slate-900 text-[13px] font-bold mt-6"
+                                            className="w-full h-10 bg-slate-900 text-[13px] font-bold mt-6 dark:bg-slate-100 dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200"
                                             onClick={onIssue}
                                             disabled={isSubmitting || !selectedUserId || !selectedCourseId}
                                         >
@@ -176,12 +176,12 @@ const CertificatesPage = () => {
                             </Button>
                         </div>
                         <div className="relative group">
-                            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
+                            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600 dark:group-focus-within:text-slate-300 transition-colors" />
                             <Input
                                 placeholder="Search Certificates"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="h-8 w-64 pl-9 bg-slate-50 border-none text-[13px] focus-visible:ring-1 focus-visible:ring-slate-200"
+                                className="h-8 w-64 pl-9 bg-slate-50 dark:bg-slate-800 border-none text-[13px] focus-visible:ring-1 focus-visible:ring-slate-200 dark:focus-visible:ring-slate-700"
                             />
                         </div>
                     </div>
@@ -189,11 +189,11 @@ const CertificatesPage = () => {
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
-                            <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                                <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter pl-6">Recipient</TableHead>
-                                <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">Course</TableHead>
-                                <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">Verification Code</TableHead>
-                                <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">Issued At</TableHead>
+                            <TableRow className="bg-slate-50/50 dark:bg-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                                <TableHead className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter pl-6">Recipient</TableHead>
+                                <TableHead className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Course</TableHead>
+                                <TableHead className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Verification Code</TableHead>
+                                <TableHead className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Issued At</TableHead>
                                 <TableHead className="w-[50px]"></TableHead>
                             </TableRow>
                         </TableHeader>
@@ -208,7 +208,7 @@ const CertificatesPage = () => {
                                     </TableCell>
                                     <TableCell className="text-[12px] text-slate-500">{cert.course.title}</TableCell>
                                     <TableCell>
-                                        <code className="bg-slate-100 px-1 py-0.5 rounded text-[11px] font-mono text-slate-600">
+                                        <code className="bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded text-[11px] font-mono text-slate-600 dark:text-slate-300">
                                             {cert.certificateCode}
                                         </code>
                                     </TableCell>
@@ -241,7 +241,7 @@ const CertificatesPage = () => {
                                 <TableRow>
                                     <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                                         <div className="flex flex-col items-center justify-center gap-2">
-                                            <Award className="h-8 w-8 text-slate-300" />
+                                            <Award className="h-8 w-8 text-slate-300 dark:text-slate-600" />
                                             <p className="text-[13px]">No certificates found.</p>
                                         </div>
                                     </TableCell>
@@ -252,9 +252,9 @@ const CertificatesPage = () => {
                 </CardContent>
             </Card>
             <div className="flex items-center justify-center gap-x-2">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 border bg-white shadow-sm"><ChevronLeft className="h-4 w-4" /></Button>
-                <Button variant="default" className="h-8 w-10 text-[12px] font-bold border bg-slate-100 text-slate-900 shadow-sm">1</Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 border bg-white shadow-sm"><ChevronRight className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm"><ChevronLeft className="h-4 w-4" /></Button>
+                <Button variant="default" className="h-8 w-10 text-[12px] font-bold border bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm dark:border-slate-700">1</Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm"><ChevronRight className="h-4 w-4" /></Button>
             </div>
         </div>
     );

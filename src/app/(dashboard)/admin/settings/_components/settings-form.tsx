@@ -163,7 +163,7 @@ export const SettingsForm = ({ initialData }: SettingsFormProps) => {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
-                                    <div className="text-sm text-muted-foreground border-l-4 border-amber-500 p-4 bg-amber-50">
+                                    <div className="text-sm text-muted-foreground border-l-4 border-amber-500 p-4 bg-amber-50 dark:bg-amber-900/10">
                                         Email template editor implementation is coming in the next iteration.
                                         You can currently configure global mail settings.
                                     </div>

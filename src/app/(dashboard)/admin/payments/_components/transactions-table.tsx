@@ -93,8 +93,8 @@ export const TransactionsTable = ({
     });
 
     return (
-        <Card className="border-none shadow-sm overflow-hidden">
-            <CardHeader className="bg-white px-6 py-4 border-b">
+        <Card className="border-none shadow-sm overflow-hidden bg-white dark:bg-slate-900">
+            <CardHeader className="bg-white dark:bg-slate-900 px-6 py-4 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-x-2">
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900">
@@ -110,7 +110,7 @@ export const TransactionsTable = ({
                             placeholder="Search transactions..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="h-8 w-64 pl-9 bg-slate-50 border-none text-[13px] focus-visible:ring-1 focus-visible:ring-slate-200"
+                            className="h-8 w-64 pl-9 bg-slate-50 dark:bg-slate-800 border-none text-[13px] focus-visible:ring-1 focus-visible:ring-slate-200 dark:focus-visible:ring-slate-700 dark:text-slate-100 placeholder:text-slate-400"
                         />
                     </div>
                 </div>
@@ -118,14 +118,14 @@ export const TransactionsTable = ({
             <CardContent className="p-0">
                 <Table>
                     <TableHeader>
-                        <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                            <TableHead className="w-[100px] text-[11px] font-bold text-slate-400 uppercase tracking-tighter pl-6">ID#</TableHead>
-                            <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">Student</TableHead>
-                            <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">Course</TableHead>
-                            <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">Amount</TableHead>
-                            <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">Date</TableHead>
-                            <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">Method</TableHead>
-                            <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">Status</TableHead>
+                        <TableRow className="bg-slate-50/50 dark:bg-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                            <TableHead className="w-[100px] text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter pl-6">ID#</TableHead>
+                            <TableHead className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Student</TableHead>
+                            <TableHead className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Course</TableHead>
+                            <TableHead className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Amount</TableHead>
+                            <TableHead className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Date</TableHead>
+                            <TableHead className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Method</TableHead>
+                            <TableHead className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Status</TableHead>
                             <TableHead className="w-[50px]"></TableHead>
                         </TableRow>
                     </TableHeader>
@@ -138,7 +138,7 @@ export const TransactionsTable = ({
                             </TableRow>
                         )}
                         {filteredData.map((purchase, idx) => (
-                            <TableRow key={purchase.id} className="group hover:bg-slate-50/50 border-b last:border-0">
+                            <TableRow key={purchase.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 last:border-0 transition-colors">
                                 <TableCell className="text-[12px] font-medium text-slate-500 pl-6">
                                     #{purchase.id.substring(0, 8).toUpperCase()}
                                 </TableCell>
@@ -146,22 +146,22 @@ export const TransactionsTable = ({
                                     <div className="flex items-center gap-x-3">
                                         <Avatar className="h-7 w-7 border">
                                             <AvatarImage src={purchase.user?.image || ""} />
-                                            <AvatarFallback className="text-[10px] bg-slate-100 font-bold">
+                                            <AvatarFallback className="text-[10px] bg-slate-100 dark:bg-slate-800 font-bold text-slate-700 dark:text-slate-300">
                                                 {purchase.user?.name?.[0] || "?"}
                                             </AvatarFallback>
                                         </Avatar>
                                         <div className="flex flex-col">
-                                            <span className="text-[12px] font-medium text-slate-700">{purchase.user?.name || "N/A"}</span>
+                                            <span className="text-[12px] font-medium text-slate-700 dark:text-slate-200">{purchase.user?.name || "N/A"}</span>
                                             <span className="text-[10px] text-slate-400">{purchase.user?.email}</span>
                                         </div>
                                     </div>
                                 </TableCell>
                                 <TableCell>
-                                    <span className="text-[12px] text-slate-600 font-medium line-clamp-1">
+                                    <span className="text-[12px] text-slate-600 dark:text-slate-300 font-medium line-clamp-1">
                                         {purchase.course?.title}
                                     </span>
                                 </TableCell>
-                                <TableCell className="text-[12px] font-bold text-slate-700">
+                                <TableCell className="text-[12px] font-bold text-slate-700 dark:text-slate-200">
                                     {new Intl.NumberFormat("en-US", {
                                         style: "currency",
                                         currency: purchase.currency || "USD",
@@ -174,7 +174,7 @@ export const TransactionsTable = ({
                                     </div>
                                 </TableCell>
                                 <TableCell>
-                                    <Badge variant="outline" className="text-[10px] font-bold border-slate-200 text-slate-500 px-2 py-0 border-[1.5px]">
+                                    <Badge variant="outline" className="text-[10px] font-bold border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 px-2 py-0 border-[1.5px]">
                                         {purchase.type}
                                     </Badge>
                                 </TableCell>
@@ -216,10 +216,10 @@ export const TransactionsTable = ({
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                <MoreVertical className="h-4 w-4" />
+                                                <MoreVertical className="h-4 w-4 text-slate-500 dark:text-slate-400" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="text-[13px]">
+                                        <DropdownMenuContent align="end" className="text-[13px] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
                                             {purchase.status === "PENDING" && (
                                                 <>
                                                     <DropdownMenuItem

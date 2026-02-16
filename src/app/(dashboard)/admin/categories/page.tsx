@@ -101,11 +101,11 @@ const CategoriesPage = () => {
     return (
         <div className="p-6 text-black font-sans space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-[17px] font-bold text-slate-800">Course Category</h1>
+                <h1 className="text-[17px] font-bold text-slate-800 dark:text-slate-100">Course Category</h1>
             </div>
 
-            <Card className="border-none shadow-sm overflow-hidden bg-white">
-                <CardHeader className="px-6 py-4 border-b">
+            <Card className="border-none shadow-sm overflow-hidden bg-white dark:bg-slate-900">
+                <CardHeader className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-x-2">
                             <Dialog open={isDialogOpen} onOpenChange={(open) => {
@@ -119,51 +119,51 @@ const CategoriesPage = () => {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-8 w-8 text-slate-500 hover:text-slate-900"
+                                        className="h-8 w-8 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
                                     >
                                         <Plus className="h-4 w-4" />
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent>
+                                <DialogContent className="font-sans">
                                     <DialogHeader>
-                                        <DialogTitle>{editingCategory ? "Edit Category" : "Create Category"}</DialogTitle>
+                                        <DialogTitle className="text-[16px] font-bold">{editingCategory ? "Edit Category" : "Create Category"}</DialogTitle>
                                     </DialogHeader>
                                     <Form {...form}>
-                                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
                                             <FormField
                                                 control={form.control}
                                                 name="name"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Category Name</FormLabel>
+                                                        <FormLabel className="text-[13px] font-bold text-slate-700 dark:text-slate-300">Category Name</FormLabel>
                                                         <FormControl>
-                                                            <Input placeholder="e.g. Computer Science" {...field} />
+                                                            <Input placeholder="e.g. Computer Science" className="h-10 text-[13px] dark:bg-slate-950 dark:border-slate-800" {...field} />
                                                         </FormControl>
                                                         <FormMessage />
                                                     </FormItem>
                                                 )}
                                             />
-                                            <Button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 h-11 font-bold" disabled={form.formState.isSubmitting}>
+                                            <Button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 h-10 text-[13px] font-bold mt-2 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200" disabled={form.formState.isSubmitting}>
                                                 {editingCategory ? "Save Changes" : "Create Category"}
                                             </Button>
                                         </form>
                                     </Form>
                                 </DialogContent>
                             </Dialog>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200">
                                 <Filter className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200">
                                 <ArrowUpDown className="h-4 w-4" />
                             </Button>
                         </div>
                         <div className="relative group">
-                            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
+                            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-slate-600 dark:group-focus-within:text-slate-300 transition-colors" />
                             <Input
                                 placeholder="Search categories..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="h-8 w-64 pl-9 bg-slate-50 border-none text-[13px] focus-visible:ring-1 focus-visible:ring-slate-200"
+                                className="h-8 w-64 pl-9 bg-slate-50 dark:bg-slate-950 border-none dark:border-slate-800 text-[13px] dark:text-slate-200 focus-visible:ring-1 focus-visible:ring-slate-200 dark:focus-visible:ring-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                             />
                         </div>
                     </div>
@@ -171,25 +171,25 @@ const CategoriesPage = () => {
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
-                            <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                                <TableHead className="pl-6 font-bold text-slate-400 text-[11px] uppercase tracking-tighter">Name</TableHead>
-                                <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter text-center">Courses</TableHead>
-                                <TableHead className="text-right pr-6 font-bold text-slate-400 text-[11px] uppercase tracking-tighter">Options</TableHead>
+                            <TableRow className="bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-50/50 dark:hover:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800">
+                                <TableHead className="pl-6 font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter">Name</TableHead>
+                                <TableHead className="font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter text-center">Courses</TableHead>
+                                <TableHead className="text-right pr-6 font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter">Options</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {filteredCategories.map((category) => (
-                                <TableRow key={category.id} className="group hover:bg-slate-50/50 transition-colors border-b last:border-0">
-                                    <TableCell className="font-medium text-[13px] text-slate-700 pl-6 h-14">{category.name}</TableCell>
+                                <TableRow key={category.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-900/50 transition-colors border-b border-slate-200 dark:border-slate-800 last:border-0">
+                                    <TableCell className="font-medium text-[13px] text-slate-700 dark:text-slate-200 pl-6 h-14">{category.name}</TableCell>
                                     <TableCell className="text-center h-14">
-                                        <span className="text-[12px] text-slate-500 font-bold bg-slate-100 px-2 py-1 rounded-md">
+                                        <span className="text-[12px] text-slate-500 dark:text-slate-400 font-bold bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md">
                                             {category._count?.courses || 0}
                                         </span>
                                     </TableCell>
                                     <TableCell className="text-right pr-6 h-14">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:text-slate-500">
                                                     <MoreVertical className="h-4 w-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>
@@ -214,7 +214,7 @@ const CategoriesPage = () => {
                     </Table>
                     {(filteredCategories.length === 0 || isLoading) && (
                         <div className="text-center py-24 text-slate-400 flex flex-col items-center gap-y-2">
-                            <LayoutGrid className="h-10 w-10 text-slate-100" />
+                            <LayoutGrid className="h-10 w-10 text-slate-100 dark:text-slate-800" />
                             <p className="text-[13px] font-medium">{isLoading ? "Loading categories..." : "No categories found."}</p>
                         </div>
                     )}
@@ -222,11 +222,11 @@ const CategoriesPage = () => {
             </Card>
 
             <div className="flex items-center justify-center gap-x-2 pt-4">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 border bg-white shadow-sm"><ChevronLeft className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 dark:text-slate-500 border dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800"><ChevronLeft className="h-4 w-4" /></Button>
                 {[1, 2, 3, 4, 5].map(p => (
-                    <Button key={p} variant={p === 1 ? "default" : "ghost"} className={`h-8 w-10 text-[12px] font-bold border ${p === 1 ? "bg-slate-100 text-slate-900 shadow-sm" : "bg-white text-slate-400 shadow-sm"}`}>{p}</Button>
+                    <Button key={p} variant={p === 1 ? "default" : "ghost"} className={`h-8 w-10 text-[12px] font-bold border dark:border-slate-800 ${p === 1 ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm" : "bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800"}`}>{p}</Button>
                 ))}
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 border bg-white shadow-sm"><ChevronRight className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 dark:text-slate-500 border dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800"><ChevronRight className="h-4 w-4" /></Button>
             </div>
         </div>
     );

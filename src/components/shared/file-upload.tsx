@@ -18,7 +18,17 @@ export const FileUpload = ({
     value,
     endpoint
 }: FileUploadProps) => {
-    if (value) {
+    const isValidUrl = (url?: string) => {
+        if (!url) return false;
+        try {
+            new URL(url);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    };
+
+    if (value && isValidUrl(value)) {
         return (
             <div className="relative h-28 w-28">
                 <Image
@@ -57,11 +67,11 @@ export const FileUpload = ({
                 toast.error(`${error?.message}`);
             }}
             appearance={{
-                button: "bg-slate-900 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-slate-800 transition",
+                button: "bg-slate-900 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 transition",
                 allowedContent: "text-slate-400 text-xs mt-2",
-                label: "text-slate-600 font-semibold mb-2"
+                label: "text-slate-600 dark:text-slate-400 font-semibold mb-2"
             }}
-            className="border-2 border-dashed border-slate-300 bg-slate-50 rounded-xl p-8 hover:bg-slate-100/50 transition duration-200"
+            className="border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl p-8 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition duration-200"
         />
     );
 };

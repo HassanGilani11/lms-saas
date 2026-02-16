@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 type CourseWithProgress = {
     id: string;
     title: string;
+    description: string | null;
     imageUrl: string | null;
     price: number | null;
     progress: number | null;
@@ -95,6 +96,7 @@ export const getCoursesWithProgress = async (): Promise<CourseWithProgress[]> =>
                     return {
                         id: course.id,
                         title: course.title,
+                        description: course.description,
                         imageUrl: course.imageUrl,
                         price: course.price,
                         progress,

@@ -1,11 +1,13 @@
 import { db } from "@/lib/db";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { BookOpen, CheckCircle2, Clock, Globe, ShieldCheck } from "lucide-react";
+import { BookOpen, CheckCircle2, Clock, Globe, ShieldCheck, Award } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { EnrollButton } from "@/components/enroll-button";
+import { checkAndIssueCertificate } from "@/actions/certificate";
 
 interface CoursePageProps {
     params: Promise<{
@@ -59,6 +61,31 @@ const CoursePage = async ({
     const isPending = !!purchase && purchase.status === "PENDING";
 
     const firstTopicId = course.lessons[0]?.topics[0]?.id;
+
+    // Certificate Logic
+    let certificate = null;
+    let isCompleted = false;
+
+    if (userId && isEnrolled) {
+        const userProgress = await db.userProgress.findMany({
+            where: {
+                userId,
+                topic: {
+                    lesson: {
+                        courseId
+                    }
+                },
+                isCompleted: true
+            }
+        });
+
+        const totalTopicsCount = course.lessons.reduce((acc, lesson) => acc + lesson.topics.length, 0);
+        isCompleted = totalTopicsCount > 0 && userProgress.length === totalTopicsCount;
+
+        if (isCompleted) {
+            certificate = await checkAndIssueCertificate(courseId);
+        }
+    }
 
     return (
         <div className="bg-white">
@@ -179,7 +206,10 @@ const CoursePage = async ({
                             <div className="space-y-4">
                                 {course.lessons.map((lesson, idx) => (
                                     <div key={lesson.id} className="border border-slate-200 rounded-3xl overflow-hidden bg-white shadow-sm">
-                                        <div className="p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                                        <div className={cn(
+                                            "p-6 bg-slate-50 flex items-center justify-between",
+                                            lesson.topics.length > 0 && "border-b border-slate-100"
+                                        )}>
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-400">
                                                     {idx + 1}
@@ -188,19 +218,21 @@ const CoursePage = async ({
                                             </div>
                                             <span className="text-slate-400 text-sm font-medium">{lesson.topics.length} items</span>
                                         </div>
-                                        <div className="p-4 space-y-1">
-                                            {lesson.topics.map((topic) => (
-                                                <div key={topic.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors group">
-                                                    <div className="flex items-center gap-3">
-                                                        <BookOpen className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-                                                        <span className="text-slate-600 font-medium group-hover:text-slate-900 transition-colors">{topic.title}</span>
+                                        {lesson.topics.length > 0 && (
+                                            <div className="p-4 space-y-1">
+                                                {lesson.topics.map((topic) => (
+                                                    <div key={topic.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors group">
+                                                        <div className="flex items-center gap-3">
+                                                            <BookOpen className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
+                                                            <span className="text-slate-600 font-medium group-hover:text-slate-900 transition-colors">{topic.title}</span>
+                                                        </div>
+                                                        {topic.type === "QUIZ" && (
+                                                            <span className="px-2 py-0.5 rounded-md bg-violet-50 text-violet-600 text-[10px] font-bold uppercase letter-tracking-wider">Quiz</span>
+                                                        )}
                                                     </div>
-                                                    {topic.type === "QUIZ" && (
-                                                        <span className="px-2 py-0.5 rounded-md bg-violet-50 text-violet-600 text-[10px] font-bold uppercase letter-tracking-wider">Quiz</span>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -233,11 +265,21 @@ const CoursePage = async ({
                                     </div>
                                 </div>
 
-                                <div className="pt-4">
+                                <div className="pt-4 space-y-3">
                                     {isEnrolled ? (
-                                        <Button asChild size="lg" className="w-full h-14 text-lg font-bold bg-slate-900 hover:bg-slate-800 transition-all rounded-2xl">
-                                            <Link href={`/courses/${course.id}/topics/${firstTopicId}`}>Continue Learning</Link>
-                                        </Button>
+                                        <>
+                                            <Button asChild size="lg" className="w-full h-14 text-lg font-bold bg-slate-900 hover:bg-slate-800 transition-all rounded-2xl">
+                                                <Link href={`/courses/${course.id}/topics/${firstTopicId}`}>Continue Learning</Link>
+                                            </Button>
+                                            {certificate && (
+                                                <Button asChild variant="outline" size="lg" className="w-full h-14 text-lg font-bold border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 transition-all rounded-2xl">
+                                                    <Link href={`/certificates/${certificate.certificateCode}`} target="_blank">
+                                                        <Award className="h-5 w-5 mr-2" />
+                                                        View Certificate
+                                                    </Link>
+                                                </Button>
+                                            )}
+                                        </>
                                     ) : isPending ? (
                                         <Button disabled size="lg" className="w-full h-14 text-lg font-bold bg-amber-500 text-white rounded-2xl opacity-80">
                                             Approval Pending

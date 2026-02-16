@@ -614,7 +614,8 @@ exports.QuestionType = exports.$Enums.QuestionType = {
   MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',
   SINGLE_CHOICE: 'SINGLE_CHOICE',
   TRUE_FALSE: 'TRUE_FALSE',
-  ESSAY: 'ESSAY'
+  ESSAY: 'ESSAY',
+  SHORT_ANSWER: 'SHORT_ANSWER'
 };
 
 exports.AttemptStatus = exports.$Enums.AttemptStatus = {

@@ -193,11 +193,11 @@ const CouponsPage = () => {
     );
 
     return (
-        <div className="p-6 space-y-6 font-sans">
-            <h1 className="text-[15px] font-bold text-slate-800">Coupons Management</h1>
+        <div className="p-6 space-y-6 font-sans text-slate-900 dark:text-slate-100">
+            <h1 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">Coupons Management</h1>
 
-            <Card className="border-none shadow-sm overflow-hidden">
-                <CardHeader className="bg-white px-6 py-4 border-b">
+            <Card className="border-none shadow-sm overflow-hidden bg-white dark:bg-slate-900">
+                <CardHeader className="bg-white dark:bg-slate-900 px-6 py-4 border-b border-slate-200 dark:border-slate-800">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-x-2">
                             <Button
@@ -208,20 +208,20 @@ const CouponsPage = () => {
                             >
                                 <Plus className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200">
                                 <Filter className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200">
                                 <ArrowUpDown className="h-4 w-4" />
                             </Button>
                         </div>
                         <div className="relative group">
-                            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
+                            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600 dark:group-focus-within:text-slate-300 transition-colors" />
                             <Input
                                 placeholder="Search Coupons"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="h-8 w-64 pl-9 bg-slate-50 border-none text-[13px] focus-visible:ring-1 focus-visible:ring-slate-200"
+                                className="h-8 w-64 pl-9 bg-slate-50 dark:bg-slate-800 border-none text-[13px] focus-visible:ring-1 focus-visible:ring-slate-200 dark:focus-visible:ring-slate-700"
                             />
                         </div>
                     </div>
@@ -229,13 +229,13 @@ const CouponsPage = () => {
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
-                            <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                                <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter pl-6">Coupon</TableHead>
-                                <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">Type</TableHead>
-                                <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">Amount</TableHead>
-                                <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">Redemptions</TableHead>
-                                <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">Ends At</TableHead>
-                                <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">Status</TableHead>
+                            <TableRow className="bg-slate-50/50 dark:bg-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                                <TableHead className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter pl-6">Coupon</TableHead>
+                                <TableHead className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Type</TableHead>
+                                <TableHead className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Amount</TableHead>
+                                <TableHead className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Redemptions</TableHead>
+                                <TableHead className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Ends At</TableHead>
+                                <TableHead className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Status</TableHead>
                                 <TableHead className="w-[50px]"></TableHead>
                             </TableRow>
                         </TableHeader>
@@ -250,12 +250,12 @@ const CouponsPage = () => {
                                 </TableRow>
                             ) : (
                                 filteredCoupons.map((coupon) => (
-                                    <TableRow key={coupon.id} className="group hover:bg-slate-50/50 border-b last:border-0 transition-colors">
+                                    <TableRow key={coupon.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/50 border-b dark:border-slate-800 last:border-0 transition-colors">
                                         <TableCell className="pl-6">
                                             <div className="flex flex-col">
-                                                <span className="text-[12px] font-bold text-slate-700 leading-tight">{coupon.title}</span>
+                                                <span className="text-[12px] font-bold text-slate-700 dark:text-slate-200 leading-tight">{coupon.title}</span>
                                                 <div className="flex items-center gap-1.5 mt-0.5">
-                                                    <Badge variant="outline" className="text-[9px] h-4 bg-slate-50 font-mono text-slate-500 border-slate-200">
+                                                    <Badge variant="outline" className="text-[9px] h-4 bg-slate-50 dark:bg-slate-800 font-mono text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700">
                                                         {coupon.code}
                                                     </Badge>
                                                 </div>
@@ -268,13 +268,13 @@ const CouponsPage = () => {
                                                 ) : (
                                                     <DollarSign className="h-3 w-3 text-emerald-400" />
                                                 )}
-                                                <span className="text-[12px] text-slate-500 font-medium">
+                                                <span className="text-[12px] text-slate-500 dark:text-slate-400 font-medium">
                                                     {coupon.type === "PERCENTAGE" ? "Percentage Off" : "Flat Rate"}
                                                 </span>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <span className="text-[12px] font-bold text-slate-700">
+                                            <span className="text-[12px] font-bold text-slate-700 dark:text-slate-200">
                                                 {coupon.type === "PERCENTAGE" ? `${coupon.amount}%` : `$${coupon.amount}`}
                                             </span>
                                         </TableCell>
@@ -343,11 +343,11 @@ const CouponsPage = () => {
             </Card>
 
             <div className="flex items-center justify-center gap-x-2">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 border bg-white shadow-sm"><ChevronLeft className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm"><ChevronLeft className="h-4 w-4" /></Button>
                 {[1].map(p => (
-                    <Button key={p} variant="default" className="h-8 w-10 text-[12px] font-bold border bg-slate-100 text-slate-900 shadow-sm">{p}</Button>
+                    <Button key={p} variant="default" className="h-8 w-10 text-[12px] font-bold border bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm dark:border-slate-700">{p}</Button>
                 ))}
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 border bg-white shadow-sm"><ChevronRight className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 border bg-white dark:bg-slate-900 dark:border-slate-800 shadow-sm"><ChevronRight className="h-4 w-4" /></Button>
             </div>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

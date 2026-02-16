@@ -46,7 +46,7 @@ import { createQuestion, deleteQuestion, updateQuestion } from "@/actions/questi
 interface Question {
     id: string;
     text: string;
-    type: "MULTIPLE_CHOICE" | "SINGLE_CHOICE" | "TRUE_FALSE" | "ESSAY";
+    type: "MULTIPLE_CHOICE" | "SINGLE_CHOICE" | "TRUE_FALSE" | "ESSAY" | "SHORT_ANSWER";
     points: number;
     position: number;
     options: { id: string; text: string; isCorrect: boolean }[];
@@ -70,6 +70,7 @@ const QuizEditorPage = () => {
     const [qText, setQText] = useState("");
     const [qType, setQType] = useState<string>("MULTIPLE_CHOICE");
     const [qPoints, setQPoints] = useState(1);
+    const [qCorrectAnswer, setQCorrectAnswer] = useState("");
     const [qOptions, setQOptions] = useState<{ text: string; isCorrect: boolean }[]>([
         { text: "", isCorrect: false },
         { text: "", isCorrect: false }
@@ -119,7 +120,8 @@ const QuizEditorPage = () => {
                 text: qText,
                 type: qType as any,
                 points: qPoints,
-                options: qOptions
+                options: qOptions,
+                correctAnswer: qCorrectAnswer
             };
 
             if (editingQuestion) {
@@ -138,6 +140,7 @@ const QuizEditorPage = () => {
             resetQuestionForm();
 
         } catch (error) {
+            console.error("[SUBMIT_QUESTION_ERROR]", error);
             toast.error("Failed to save question");
         } finally {
             setIsSaving(false);
@@ -149,6 +152,7 @@ const QuizEditorPage = () => {
         setQText("");
         setQType("MULTIPLE_CHOICE");
         setQPoints(1);
+        setQCorrectAnswer("");
         setQOptions([{ text: "", isCorrect: false }, { text: "", isCorrect: false }]);
     };
 
@@ -162,6 +166,7 @@ const QuizEditorPage = () => {
         setQText(question.text);
         setQType(question.type);
         setQPoints(question.points);
+        setQCorrectAnswer(question.correctAnswer || "");
         // Map options simply
         setQOptions(question.options.map(o => ({ text: o.text, isCorrect: o.isCorrect })));
         setIsQuestionDialogOpen(true);
@@ -182,7 +187,7 @@ const QuizEditorPage = () => {
     if (isLoading) return <div className="p-6">Loading quiz editor...</div>;
 
     return (
-        <div className="p-6 space-y-6 pb-20">
+        <div className="space-y-6 pb-20">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-x-2">
@@ -319,7 +324,7 @@ const QuizEditorPage = () => {
             <Dialog open={isQuestionDialogOpen} onOpenChange={setIsQuestionDialogOpen}>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>{editingQuestion ? "Edit Question" : "New Question"}</DialogTitle>
+                        <DialogTitle>{editingQuestion ? "Edit Question (v2)" : "New Question (v2)"}</DialogTitle>
                         <DialogDescription>Configure question details and answers.</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-6 py-4">
@@ -340,6 +345,7 @@ const QuizEditorPage = () => {
                                         <SelectItem value="MULTIPLE_CHOICE">Multiple Choice</SelectItem>
                                         <SelectItem value="SINGLE_CHOICE">Single Choice</SelectItem>
                                         <SelectItem value="TRUE_FALSE">True / False</SelectItem>
+                                        <SelectItem value="SHORT_ANSWER">Short Answer</SelectItem>
                                         <SelectItem value="ESSAY">Essay</SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -355,7 +361,24 @@ const QuizEditorPage = () => {
                         </div>
 
                         {/* Options Logic */}
-                        {qType !== "ESSAY" && (
+                        {(qType === "SHORT_ANSWER" || qType === "ESSAY") && (
+                            <div className="space-y-2">
+                                <Label>Correct Answer (Internal reference / Validation)</Label>
+                                <Textarea
+                                    value={qCorrectAnswer}
+                                    onChange={(e) => setQCorrectAnswer(e.target.value)}
+                                    placeholder={qType === "SHORT_ANSWER" ? "Enter the correct answer..." : "Enter key points or grading criteria..."}
+                                    className="h-32"
+                                />
+                                <p className="text-xs text-slate-500">
+                                    {qType === "SHORT_ANSWER"
+                                        ? "The system will use this to validate student responses."
+                                        : "Grading criteria for the instructor."}
+                                </p>
+                            </div>
+                        )}
+
+                        {qType !== "ESSAY" && qType !== "SHORT_ANSWER" && (
                             <div className="space-y-3">
                                 <Label>Answer Options</Label>
                                 {qOptions.map((opt, idx) => (

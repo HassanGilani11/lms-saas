@@ -124,6 +124,10 @@ export const finishAttempt = async (attemptId: string) => {
                 if (correctOptionIds.includes(response.answer || "")) {
                     points = question.points;
                 }
+            } else if (question.type === "SHORT_ANSWER") {
+                if (question.correctAnswer && response.answer?.trim().toLowerCase() === question.correctAnswer.trim().toLowerCase()) {
+                    points = question.points;
+                }
             } else if (question.type === "ESSAY") {
                 requiresManualGrading = true;
             }

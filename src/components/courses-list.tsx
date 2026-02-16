@@ -9,6 +9,7 @@ type CourseWithProgress = {
     price: number | null;
     progress: number | null;
     category: { name: string } | null;
+    description: string | null;
     lessons: { id: string }[];
     isEnrolled: boolean;
     lastActivity?: Date | null;
@@ -29,6 +30,7 @@ export const CoursesList = ({
                         key={item.id}
                         id={item.id}
                         title={item.title}
+                        description={item.description}
                         imageUrl={item.imageUrl}
                         lessonsCount={item.lessons.length}
                         progress={item.progress}

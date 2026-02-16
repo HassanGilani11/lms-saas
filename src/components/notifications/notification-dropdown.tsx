@@ -43,14 +43,14 @@ export const NotificationDropdown = () => {
                     )}
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[380px] p-0 font-sans shadow-xl border-slate-100 rounded-xl">
-                <div className="flex items-center justify-between p-4 border-b">
-                    <h3 className="font-bold text-slate-900">Notifications</h3>
+            <DropdownMenuContent align="end" className="w-[380px] p-0 font-sans shadow-xl border-slate-100 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+                <div className="flex items-center justify-between p-4 border-b dark:border-slate-800">
+                    <h3 className="font-bold text-slate-900 dark:text-slate-100">Notifications</h3>
                     {unreadCount > 0 && (
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="text-xs text-blue-600 hover:text-blue-700 h-auto p-0"
+                            className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 h-auto p-0"
                             onClick={handleMarkAllRead}
                         >
                             Mark all as read
@@ -60,7 +60,7 @@ export const NotificationDropdown = () => {
 
                 <div className="max-h-[400px] overflow-y-auto">
                     {notifications.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center p-8 text-center text-slate-400">
+                        <div className="flex flex-col items-center justify-center p-8 text-center text-slate-400 dark:text-slate-500">
                             <Bell className="h-10 w-10 mb-2 opacity-20" />
                             <p className="text-sm">No notifications yet</p>
                         </div>
@@ -69,31 +69,31 @@ export const NotificationDropdown = () => {
                             <DropdownMenuItem
                                 key={notification.id}
                                 className={cn(
-                                    "flex flex-col items-start p-4 cursor-pointer border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors focus:bg-slate-50",
-                                    !notification.isRead && "bg-blue-50/30"
+                                    "flex flex-col items-start p-4 cursor-pointer border-b border-slate-50 dark:border-slate-800 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors focus:bg-slate-50 dark:focus:bg-slate-900",
+                                    !notification.isRead && "bg-blue-50/30 dark:bg-blue-900/10"
                                 )}
                                 onSelect={() => !notification.isRead && markAsRead([notification.id])}
                             >
                                 <div className="flex items-center justify-between w-full mb-1">
                                     <span className={cn(
                                         "text-xs font-bold uppercase tracking-wider",
-                                        notification.type === "ENROLLMENT" ? "text-emerald-600" :
-                                            notification.type === "COURSE_UPDATE" ? "text-amber-600" :
-                                                notification.type === "QUIZ_GRADED" ? "text-indigo-600" :
-                                                    "text-slate-500"
+                                        notification.type === "ENROLLMENT" ? "text-emerald-600 dark:text-emerald-400" :
+                                            notification.type === "COURSE_UPDATE" ? "text-amber-600 dark:text-amber-400" :
+                                                notification.type === "QUIZ_GRADED" ? "text-indigo-600 dark:text-indigo-400" :
+                                                    "text-slate-500 dark:text-slate-400"
                                     )}>
                                         {notification.type.replace("_", " ")}
                                     </span>
-                                    <span className="text-[10px] text-slate-400">
+                                    <span className="text-[10px] text-slate-400 dark:text-slate-500">
                                         {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                                     </span>
                                 </div>
-                                <h4 className="font-bold text-slate-900 text-sm mb-0.5">{notification.title}</h4>
-                                <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{notification.message}</p>
+                                <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm mb-0.5">{notification.title}</h4>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">{notification.message}</p>
                                 {notification.href && (
                                     <Link
                                         href={notification.href}
-                                        className="mt-2 text-[11px] font-bold text-blue-600 hover:underline flex items-center gap-1"
+                                        className="mt-2 text-[11px] font-bold text-blue-600 hover:underline flex items-center gap-1 dark:text-blue-400"
                                     >
                                         View Details
                                         <ExternalLink className="h-3 w-3" />
@@ -104,13 +104,10 @@ export const NotificationDropdown = () => {
                     )}
                 </div>
 
-                <DropdownMenuSeparator className="m-0" />
-                <div className="p-2 grid grid-cols-2 gap-2">
-                    <Button variant="ghost" size="sm" asChild className="text-xs text-slate-600 hover:bg-slate-50">
-                        <Link href={`/${dashboardPath}/notifications`}>View All</Link>
-                    </Button>
-                    <Button variant="ghost" size="sm" asChild className="text-xs text-slate-600 hover:bg-slate-50">
-                        <Link href={`/${dashboardPath}/notifications`}>Settings</Link>
+                <DropdownMenuSeparator className="m-0 dark:bg-slate-800" />
+                <div className="p-2">
+                    <Button variant="ghost" size="sm" asChild className="w-full text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900">
+                        <Link href={`/${dashboardPath}/notifications`}>View All Notifications</Link>
                     </Button>
                 </div>
             </DropdownMenuContent>

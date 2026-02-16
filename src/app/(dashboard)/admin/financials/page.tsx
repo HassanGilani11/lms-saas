@@ -10,8 +10,8 @@ const FinancialsPage = async () => {
     });
 
     return (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold mb-8">Financial Overview</h1>
+        <div className="p-6 text-slate-900 dark:text-slate-100">
+            <h1 className="text-2xl font-bold mb-8 text-slate-900 dark:text-slate-100">Financial Overview</h1>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <Card>
@@ -46,7 +46,7 @@ const FinancialsPage = async () => {
                 </Card>
             </div>
 
-            <Card className="p-20 text-center text-muted-foreground bg-slate-50 border-dashed">
+            <Card className="p-20 text-center text-muted-foreground bg-slate-50 dark:bg-slate-900 border-dashed dark:border-slate-800">
                 Detailed transaction logs and Stripe reports will appear here.
             </Card>
         </div>

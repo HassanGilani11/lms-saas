@@ -341,3 +341,90 @@ export const getGroupLevelAnalytics = async () => {
         return [];
     }
 };
+
+/**
+ * Get aggregated statistics for the admin dashboard.
+ */
+export const getAdminDashboardStats = async () => {
+    try {
+        const session = await auth();
+        // Check if user is admin
+        if (session?.user?.role !== "ADMIN") {
+            throw new Error("Unauthorized");
+        }
+
+        const [coursesCount, categoriesCount, instructorsCount, studentsCount] = await Promise.all([
+            db.course.count(),
+            db.category.count(),
+            db.user.count({ where: { role: "INSTRUCTOR" } }),
+            db.user.count({ where: { role: "STUDENT" } }),
+        ]);
+
+        return {
+            courses: coursesCount,
+            categories: categoriesCount,
+            instructors: instructorsCount,
+            students: studentsCount,
+        };
+    } catch (error) {
+        console.log("[GET_ADMIN_STATS]", error);
+        return {
+            courses: 0,
+            categories: 0,
+            instructors: 0,
+            students: 0,
+        };
+    }
+};
+
+/**
+ * Get performance data for charts in the admin dashboard.
+ * Simulates monthly data for this and last year for different categories.
+ */
+export const getAdminPerformanceData = async () => {
+    try {
+        const session = await auth();
+        if (session?.user?.role !== "ADMIN") {
+            throw new Error("Unauthorized");
+        }
+
+        const [totalUsers, totalCourses] = await Promise.all([
+            db.user.count(),
+            db.course.count()
+        ]);
+
+        const userMultiplier = Math.max(1, Math.floor(totalUsers / 100));
+        const courseMultiplier = Math.max(1, Math.floor(totalCourses / 10));
+
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        // Simulating organic data for each category
+        const data = {
+            users: {
+                thisYear: [30, 45, 35, 60, 50, 75, 90, 85, 100, 110, 125, 140].map(v => v * userMultiplier),
+                lastYear: [20, 30, 40, 35, 55, 45, 65, 60, 75, 80, 95, 105].map(v => v * userMultiplier)
+            },
+            projects: {
+                thisYear: [10, 15, 20, 25, 35, 40, 50, 55, 70, 85, 90, 110].map(v => v * courseMultiplier),
+                lastYear: [5, 12, 18, 22, 28, 35, 42, 48, 55, 60, 75, 85].map(v => v * courseMultiplier)
+            },
+            status: {
+                thisYear: [80, 85, 82, 90, 88, 92, 95, 94, 96, 97, 98, 99],
+                lastYear: [70, 75, 72, 80, 78, 85, 88, 86, 90, 92, 93, 95]
+            }
+        };
+
+        return {
+            months,
+            ...data
+        };
+    } catch (error) {
+        console.log("[GET_PERFORMANCE_DATA]", error);
+        return {
+            months: [],
+            users: { thisYear: [], lastYear: [] },
+            projects: { thisYear: [], lastYear: [] },
+            status: { thisYear: [], lastYear: [] }
+        };
+    }
+};

@@ -5,6 +5,7 @@ import { QuizPlayer } from "@/components/quiz-player";
 import { FileText, Lock, Video as VideoIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { CourseProgressButton } from "@/components/course-progress-button";
 
 const TopicIdPage = async ({
     params
@@ -68,21 +69,64 @@ const TopicIdPage = async ({
         where: { id: topicId },
         include: {
             quiz: true,
+            lesson: {
+                include: {
+                    course: {
+                        include: {
+                            lessons: {
+                                where: isAdmin ? {} : { isPublished: true },
+                                include: {
+                                    topics: {
+                                        where: isAdmin ? {} : { isPublished: true },
+                                        orderBy: { position: "asc" }
+                                    }
+                                },
+                                orderBy: { position: "asc" }
+                            }
+                        }
+                    }
+                }
+            }
         }
     });
 
     if (!topic) return <div>Topic not found</div>;
+
+    const userProgress = userId ? await db.userProgress.findUnique({
+        where: {
+            userId_topicId: {
+                userId,
+                topicId,
+            }
+        }
+    }) : null;
+
+    const isCompleted = !!userProgress?.isCompleted;
+
+    // Calculate Next Topic
+    const allTopics = topic.lesson.course.lessons.flatMap(l => l.topics);
+    const currentTopicIndex = allTopics.findIndex(t => t.id === topicId);
+    const nextTopic = allTopics[currentTopicIndex + 1];
 
     if (topic.type === "QUIZ") {
         if (!topic.quizId && !topic.quiz) return <div>Quiz configuration missing</div>;
 
         return (
             <div className="h-full w-full bg-white overflow-y-auto">
-                <div className="max-w-4xl mx-auto py-10 px-6">
+                <div className="max-w-4xl mx-auto py-10 px-6 space-y-10">
                     <QuizPlayer
                         quizId={topic.quizId || topic.quiz?.id!}
                         userId={userId || ""}
                     />
+
+                    <div className="flex justify-end pt-8 border-t">
+                        <CourseProgressButton
+                            courseId={courseId}
+                            topicId={topicId}
+                            nextTopicId={nextTopic?.id}
+                            isCompleted={isCompleted}
+                        />
+                    </div>
                 </div>
             </div>
         );
@@ -90,7 +134,7 @@ const TopicIdPage = async ({
 
     return (
         <div className="h-full p-8 lg:p-12 overflow-y-auto">
-            <div className="max-w-5xl mx-auto space-y-8">
+            <div className="max-w-5xl mx-auto space-y-12 pb-20">
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 text-indigo-600 font-bold uppercase tracking-widest text-xs">
                         {topic.type === "VIDEO" && <VideoIcon className="h-4 w-4" />}
@@ -124,6 +168,21 @@ const TopicIdPage = async ({
                         dangerouslySetInnerHTML={{ __html: topic.content }}
                     />
                 )}
+
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-12 border-t">
+                    <div className="space-y-1">
+                        <h4 className="font-bold text-slate-900">Finish this lesson</h4>
+                        <p className="text-sm text-slate-500 font-medium tracking-tight whitespace-nowrap">
+                            Mark as completed to track your progress and unlock the next topic.
+                        </p>
+                    </div>
+                    <CourseProgressButton
+                        courseId={courseId}
+                        topicId={topicId}
+                        nextTopicId={nextTopic?.id}
+                        isCompleted={isCompleted}
+                    />
+                </div>
             </div>
         </div>
     );

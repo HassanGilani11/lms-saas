@@ -58,7 +58,8 @@ export const updateCurrentUser = async (values: {
     name?: string;
     email?: string;
     phone?: string;
-    address?: string
+    address?: string;
+    image?: string;
 }) => {
     try {
         const session = await auth();
@@ -72,6 +73,7 @@ export const updateCurrentUser = async (values: {
         });
 
         revalidatePath("/admin/users/my-info");
+        revalidatePath("/student/settings");
         return updatedUser;
     } catch (error) {
         console.log("[UPDATE_CURRENT_USER]", error);

@@ -111,16 +111,16 @@ const UserTypesPage = () => {
     };
 
     return (
-        <div className="p-6 space-y-6 font-sans max-w-[1200px]">
-            <div className="flex items-center gap-x-2 text-[13px] text-slate-400 font-medium">
+        <div className="p-6 space-y-6 font-sans max-w-[1200px] text-slate-900 dark:text-slate-100">
+            <div className="flex items-center gap-x-2 text-[13px] text-slate-400 dark:text-slate-500 font-medium">
                 <span>Dashboards</span>
                 <ChevronRight size={14} />
                 <span>User Types</span>
                 <ChevronRight size={14} />
-                <span className="text-slate-900">Add User Types</span>
+                <span className="text-slate-900 dark:text-slate-100">Add User Types</span>
             </div>
 
-            <h1 className="text-[15px] font-bold text-slate-800">Add User Types</h1>
+            <h1 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">Add User Types</h1>
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -135,7 +135,7 @@ const UserTypesPage = () => {
                                             <FormControl>
                                                 <Input
                                                     placeholder="First Name"
-                                                    className="h-12 bg-white border-slate-100 rounded-xl px-4 text-[14px] focus-visible:ring-1 focus-visible:ring-slate-200"
+                                                    className="h-12 bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-800 rounded-xl px-4 text-[14px] focus-visible:ring-1 focus-visible:ring-slate-200 dark:focus-visible:ring-slate-700"
                                                     {...field}
                                                 />
                                             </FormControl>
@@ -151,7 +151,7 @@ const UserTypesPage = () => {
                                             <FormControl>
                                                 <Input
                                                     placeholder="Last Name"
-                                                    className="h-12 bg-white border-slate-100 rounded-xl px-4 text-[14px] focus-visible:ring-1 focus-visible:ring-slate-200"
+                                                    className="h-12 bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-800 rounded-xl px-4 text-[14px] focus-visible:ring-1 focus-visible:ring-slate-200 dark:focus-visible:ring-slate-700"
                                                     {...field}
                                                 />
                                             </FormControl>
@@ -164,13 +164,13 @@ const UserTypesPage = () => {
                                     name="role"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[13px] text-slate-400 font-medium mb-2 block">User Type</FormLabel>
+                                            <FormLabel className="text-[13px] text-slate-400 dark:text-slate-500 font-medium mb-2 block">User Type</FormLabel>
                                             <Select
                                                 onValueChange={field.onChange}
                                                 defaultValue={field.value}
                                             >
                                                 <FormControl>
-                                                    <SelectTrigger className="h-12 bg-white border-slate-100 rounded-xl px-4 text-[14px] font-medium text-slate-700">
+                                                    <SelectTrigger className="h-12 bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-800 rounded-xl px-4 text-[14px] font-medium text-slate-700 dark:text-slate-200">
                                                         <SelectValue placeholder="Select type" />
                                                     </SelectTrigger>
                                                 </FormControl>
@@ -189,7 +189,7 @@ const UserTypesPage = () => {
                     </Card>
 
                     <div className="space-y-6">
-                        <h3 className="text-[15px] font-bold text-slate-800">Permissions</h3>
+                        <h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">Permissions</h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                             {Object.entries(PERMISSIONS).map(([category, items]) => (
@@ -199,26 +199,26 @@ const UserTypesPage = () => {
                                             id={category}
                                             checked={selectedPermissions[category]?.length === items.length}
                                             onCheckedChange={() => toggleCategory(category)}
-                                            className="h-5 w-5 border-slate-200 rounded-[4px] data-[state=checked]:bg-slate-900"
+                                            className="h-5 w-5 border-slate-200 dark:border-slate-700 rounded-[4px] data-[state=checked]:bg-slate-900 dark:data-[state=checked]:bg-slate-100 dark:data-[state=checked]:text-slate-900"
                                         />
-                                        <label htmlFor={category} className="text-[14px] font-medium text-slate-500 cursor-pointer flex items-center gap-x-1">
+                                        <label htmlFor={category} className="text-[14px] font-medium text-slate-500 dark:text-slate-400 cursor-pointer flex items-center gap-x-1">
                                             {category}
-                                            <ChevronRight size={14} className="rotate-90 text-slate-300" />
+                                            <ChevronRight size={14} className="rotate-90 text-slate-300 dark:text-slate-600" />
                                         </label>
                                     </div>
 
                                     <div className="space-y-4 pl-8">
                                         {items.map((item) => (
-                                            <div key={item} className="flex items-center gap-x-3 transition-colors hover:bg-slate-50/50 p-1 rounded-md cursor-pointer group">
+                                            <div key={item} className="flex items-center gap-x-3 transition-colors hover:bg-slate-50/50 dark:hover:bg-slate-800/50 p-1 rounded-md cursor-pointer group">
                                                 <Checkbox
                                                     id={`${category}-${item}`}
                                                     checked={selectedPermissions[category]?.includes(item)}
                                                     onCheckedChange={() => togglePermission(category, item)}
-                                                    className="h-4 w-4 border-slate-200 rounded-[3px] data-[state=checked]:bg-slate-900"
+                                                    className="h-4 w-4 border-slate-200 dark:border-slate-700 rounded-[3px] data-[state=checked]:bg-slate-900 dark:data-[state=checked]:bg-slate-100 dark:data-[state=checked]:text-slate-900"
                                                 />
                                                 <label
                                                     htmlFor={`${category}-${item}`}
-                                                    className="text-[13px] text-slate-400 group-hover:text-slate-600 cursor-pointer font-medium leading-none"
+                                                    className="text-[13px] text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 cursor-pointer font-medium leading-none"
                                                 >
                                                     {item}
                                                 </label>
@@ -234,7 +234,7 @@ const UserTypesPage = () => {
                         <Button
                             type="button"
                             variant="ghost"
-                            className="h-12 px-10 rounded-xl bg-slate-50 text-slate-600 font-bold text-[14px] hover:bg-slate-100 transition-all"
+                            className="h-12 px-10 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-[14px] hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
                             onClick={() => router.back()}
                         >
                             Cancel

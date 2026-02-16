@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { LogoutButton } from "./logout-button";
-import { Search, Compass, Layout, BookOpen, ShoppingBag } from "lucide-react";
+import { Search, Compass, Layout, BookOpen, ShoppingBag, Settings } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSession } from "next-auth/react";
 import { useSettings } from "@/components/providers/settings-provider";
@@ -28,6 +28,11 @@ const routes = [
         label: "My Orders",
         href: "/student/orders",
     },
+    {
+        icon: Settings,
+        label: "Settings",
+        href: "/student/settings",
+    },
 ];
 
 export const StudentSidebar = () => {
@@ -37,7 +42,7 @@ export const StudentSidebar = () => {
     return (
         <div className="h-full border-r flex flex-col overflow-y-auto bg-white shadow-sm">
             <Link
-                href="/student"
+                href="/student/settings"
                 className="p-4 flex items-center gap-x-3 mb-2 hover:bg-slate-50 transition-colors group cursor-pointer"
             >
                 <Avatar className="h-10 w-10 border transition-transform group-hover:scale-105">

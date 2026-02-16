@@ -11,8 +11,8 @@ const handleAuth = async () => {
 
         console.log("[UPLOADTHING_AUTH] Session User:", session?.user?.email, "Role:", session?.user?.role);
 
-        if (!userId || session.user.role !== "ADMIN") {
-            console.log("[UPLOADTHING_AUTH] Unauthorized access:", { userId, role: session?.user?.role });
+        if (!userId) {
+            console.log("[UPLOADTHING_AUTH] No userId found");
             throw new UploadThingError("Unauthorized");
         }
         return { userId };

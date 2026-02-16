@@ -86,23 +86,24 @@ export const AdminNotificationsList = () => {
                         key={notif.id}
                         className={cn(
                             "flex gap-x-3 group cursor-pointer p-0.5 rounded-lg transition-all",
-                            !notif.isRead && "hover:bg-slate-50"
+                            !notif.isRead && "hover:bg-slate-50 dark:hover:bg-slate-900"
                         )}
                     >
                         <div className={cn(
-                            "h-8 w-8 rounded-full flex items-center justify-center shrink-0 border border-white shadow-sm",
-                            config.bg
+                            "h-8 w-8 rounded-full flex items-center justify-center shrink-0 border border-white dark:border-slate-800 shadow-sm",
+                            config.bg,
+                            "dark:bg-opacity-10" // Make backgrounds subtle in dark mode
                         )}>
                             <Icon className={cn("h-4 w-4", config.color)} />
                         </div>
                         <div className="flex flex-col min-w-0">
                             <span className={cn(
                                 "text-[11px] font-medium truncate transition-colors",
-                                notif.isRead ? "text-slate-500" : "text-slate-700 font-bold group-hover:text-blue-600"
+                                notif.isRead ? "text-slate-500 dark:text-slate-500" : "text-slate-700 dark:text-slate-300 font-bold group-hover:text-blue-600 dark:group-hover:text-blue-400"
                             )}>
                                 {notif.title}
                             </span>
-                            <span className="text-[10px] text-slate-400">
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500">
                                 {formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })}
                             </span>
                         </div>

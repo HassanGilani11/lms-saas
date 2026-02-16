@@ -1,11 +1,40 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { db } from "@/lib/db";
+import { CoursesList } from "@/components/courses-list";
+import { ArrowRight } from "lucide-react";
 
-export default function Home() {
+export default async function Home() {
+  const courses = await db.course.findMany({
+    where: {
+      isPublished: true,
+      hideFromCatalog: false,
+    },
+    include: {
+      category: true,
+      lessons: {
+        where: {
+          isPublished: true,
+        },
+        select: { id: true }
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 3,
+  });
+
+  const formattedCourses = courses.map((course) => ({
+    ...course,
+    progress: null,
+    isEnrolled: false,
+  }));
+
   return (
     <div className="selection:bg-indigo-100 selection:text-indigo-900">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden text-black">
         <div className="absolute top-0 right-0 -z-10 w-1/2 h-screen bg-gradient-to-l from-indigo-50/50 to-transparent blur-3xl opacity-60" />
         <div className="absolute bottom-0 left-0 -z-10 w-1/2 h-1/2 bg-gradient-to-t from-slate-50 to-transparent blur-3xl opacity-60" />
 
@@ -68,6 +97,28 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Courses Showcase Section */}
+      {courses.length > 0 && (
+        <section className="py-24 bg-white relative overflow-hidden">
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+              <div className="max-w-2xl">
+                <h2 className="text-base font-bold text-indigo-600 tracking-wider uppercase mb-4">Featured Courses</h2>
+                <h3 className="text-4xl font-bold text-slate-900">Level up your skills with our expert-led programs</h3>
+              </div>
+              <Button asChild variant="outline" className="rounded-2xl h-12 px-6 border-slate-200 hover:bg-slate-50 group font-bold">
+                <Link href="/courses" className="flex items-center gap-2">
+                  View All Courses
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </Button>
+            </div>
+
+            <CoursesList items={formattedCourses as any} />
+          </div>
+        </section>
+      )}
 
       {/* Features Section */}
       <section id="features" className="py-24 bg-slate-50">

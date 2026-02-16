@@ -120,13 +120,13 @@ const GroupCategoriesPage = () => {
     );
 
     return (
-        <div className="p-6 text-black font-sans space-y-6">
+        <div className="p-6 text-slate-900 dark:text-slate-100 font-sans space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-[17px] font-bold text-slate-800">Group Categories</h1>
+                <h1 className="text-[17px] font-bold text-slate-800 dark:text-slate-100">Group Categories</h1>
             </div>
 
-            <Card className="border-none shadow-sm overflow-hidden bg-white">
-                <CardHeader className="px-6 py-4 border-b">
+            <Card className="border-none shadow-sm overflow-hidden bg-white dark:bg-slate-900">
+                <CardHeader className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-x-2">
                             <Button
@@ -148,7 +148,7 @@ const GroupCategoriesPage = () => {
                                 placeholder="Search categories..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="h-8 w-64 pl-9 bg-slate-50 border-none text-[13px] focus-visible:ring-1 focus-visible:ring-slate-200"
+                                className="h-8 w-64 pl-9 bg-slate-50 dark:bg-slate-800 border-none text-[13px] focus-visible:ring-1 focus-visible:ring-slate-200 dark:focus-visible:ring-slate-700 dark:text-slate-100 placeholder:text-slate-400"
                             />
                         </div>
                     </div>
@@ -156,18 +156,18 @@ const GroupCategoriesPage = () => {
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
-                            <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                                <TableHead className="pl-6 font-bold text-slate-400 text-[11px] uppercase tracking-tighter">Category Name</TableHead>
-                                <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter text-center">Groups Count</TableHead>
-                                <TableHead className="font-bold text-slate-400 text-[11px] uppercase tracking-tighter text-center">Created At</TableHead>
-                                <TableHead className="text-right pr-6 font-bold text-slate-400 text-[11px] uppercase tracking-tighter">Options</TableHead>
+                            <TableRow className="bg-slate-50/50 dark:bg-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                                <TableHead className="pl-6 font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter">Category Name</TableHead>
+                                <TableHead className="font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter text-center">Groups Count</TableHead>
+                                <TableHead className="font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter text-center">Created At</TableHead>
+                                <TableHead className="text-right pr-6 font-bold text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-tighter">Options</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {filteredCategories.map((category) => (
                                 <TableRow
                                     key={category.id}
-                                    className="group hover:bg-slate-50/50 border-b last:border-0 cursor-pointer transition-colors"
+                                    className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 last:border-0 cursor-pointer transition-colors"
                                 >
                                     <TableCell className="pl-6 py-4">
                                         <div className="flex items-center gap-3">
@@ -175,12 +175,12 @@ const GroupCategoriesPage = () => {
                                                 <Folder className="h-4 w-4 text-orange-500" />
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="text-[13px] font-bold text-slate-900">{category.name}</span>
+                                                <span className="text-[13px] font-bold text-slate-900 dark:text-slate-100">{category.name}</span>
                                             </div>
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-center">
-                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
                                             {category._count?.groups || 0} Groups
                                         </span>
                                     </TableCell>
@@ -217,7 +217,7 @@ const GroupCategoriesPage = () => {
                     </Table>
                     {(filteredCategories.length === 0 || isLoading) && (
                         <div className="text-center py-24 text-slate-400 flex flex-col items-center gap-y-2">
-                            <Folder className="h-10 w-10 text-slate-100" />
+                            <Folder className="h-10 w-10 text-slate-100 dark:text-slate-800" />
                             <p className="text-[13px] font-medium">{isLoading ? "Loading categories..." : "No categories found."}</p>
                         </div>
                     )}
@@ -225,7 +225,7 @@ const GroupCategoriesPage = () => {
             </Card>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent>
+                <DialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-bold">{editingCategory ? "Edit Category" : "Create Category"}</DialogTitle>
                     </DialogHeader>
@@ -236,7 +236,7 @@ const GroupCategoriesPage = () => {
                                 name="name"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-[13px] font-bold text-slate-700">Category Name</FormLabel>
+                                        <FormLabel className="text-[13px] font-bold text-slate-700 dark:text-slate-300">Category Name</FormLabel>
                                         <FormControl>
                                             <Input placeholder="e.g. Development, Marketing" className="h-10 text-[13px]" {...field} />
                                         </FormControl>

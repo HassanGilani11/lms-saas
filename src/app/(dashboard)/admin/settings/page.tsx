@@ -15,7 +15,7 @@ const SettingsPage = async () => {
     const settings = await getSettings();
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 text-slate-900 dark:text-slate-100">
             <SettingsHeader />
             <div className="grid gap-6">
                 <SettingsForm initialData={settings} />

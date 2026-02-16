@@ -156,22 +156,22 @@ export const AdminSidebar = () => {
     }, [pathname]); // Refresh on navigation to catch updates
 
     return (
-        <div className="h-full border-r flex flex-col overflow-y-auto bg-white shadow-sm font-sans">
+        <div className="h-full border-r border-slate-200 dark:border-slate-800 flex flex-col overflow-y-auto bg-white dark:bg-slate-950 shadow-sm font-sans transition-colors duration-300">
             <Link
                 href="/admin/users/my-info"
-                className="p-4 flex items-center gap-x-3 mb-2 hover:bg-slate-50 transition-colors group cursor-pointer"
+                className="p-4 flex items-center gap-x-3 mb-2 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors group cursor-pointer"
             >
-                <Avatar className="h-10 w-10 border transition-transform group-hover:scale-105">
+                <Avatar className="h-10 w-10 border border-slate-200 dark:border-slate-700 transition-transform group-hover:scale-105">
                     <AvatarImage src={dbUser?.image || session?.user?.image || ""} />
-                    <AvatarFallback className="bg-slate-100 text-slate-600 font-semibold italic text-lg">
+                    <AvatarFallback className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold italic text-lg">
                         {dbUser?.name?.[0] || (session?.user as any)?.username?.[0] || session?.user?.name?.[0] || session?.user?.email?.[0] || "U"}
                     </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-slate-700 leading-tight group-hover:text-slate-900 transition-colors">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 leading-tight group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
                         {dbUser?.name || (session?.user as any)?.username || session?.user?.name || session?.user?.email || "User Name"}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-medium tracking-wide uppercase">
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium tracking-wide uppercase">
                         {dbUser?.role?.toLowerCase() || session?.user?.role?.toLowerCase() || "User"} Account
                     </span>
                 </div>
@@ -195,12 +195,12 @@ export const AdminSidebar = () => {
                                     <button
                                         onClick={() => toggleMenu(route.label)}
                                         className={cn(
-                                            "flex items-center justify-between w-full text-slate-500 text-[13px] font-[500] pl-6 transition-all hover:text-slate-900 hover:bg-slate-100/50 py-2.5 group mr-2 rounded-r-full",
-                                            isActive && "text-slate-900 bg-slate-100/50"
+                                            "flex items-center justify-between w-full text-slate-500 dark:text-slate-400 text-[13px] font-[500] pl-6 transition-all hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100/50 dark:hover:bg-slate-900/50 py-2.5 group mr-2 rounded-r-full",
+                                            isActive && "text-slate-900 dark:text-slate-100 bg-slate-100/50 dark:bg-slate-900/50"
                                         )}
                                     >
                                         <div className="flex items-center gap-x-3">
-                                            <route.icon size={18} className={cn("text-slate-400 group-hover:text-slate-900 transition-colors", isActive && "text-slate-900")} />
+                                            <route.icon size={18} className={cn("text-slate-400 dark:text-slate-500 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors", isActive && "text-slate-900 dark:text-slate-200")} />
                                             {route.label}
                                         </div>
                                         <div className="pr-4">
@@ -216,8 +216,8 @@ export const AdminSidebar = () => {
                                                         key={sub.href}
                                                         href={sub.href}
                                                         className={cn(
-                                                            "flex items-center pl-16 py-2 text-[12px] font-medium text-slate-500 hover:text-slate-900 transition-colors",
-                                                            isSubActive && "text-slate-900 font-bold"
+                                                            "flex items-center pl-16 py-2 text-[12px] font-medium text-slate-500 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-300 transition-colors",
+                                                            isSubActive && "text-slate-900 dark:text-slate-200 font-bold"
                                                         )}
                                                     >
                                                         {sub.label}
@@ -231,11 +231,11 @@ export const AdminSidebar = () => {
                                 <Link
                                     href={route.href}
                                     className={cn(
-                                        "flex items-center gap-x-3 text-slate-500 text-[13px] font-[500] pl-6 transition-all hover:text-slate-900 hover:bg-slate-100/50 py-2.5 group mr-2 rounded-r-full",
-                                        isActive && "text-slate-900 bg-slate-100/50 font-bold"
+                                        "flex items-center gap-x-3 text-slate-500 dark:text-slate-400 text-[13px] font-[500] pl-6 transition-all hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100/50 dark:hover:bg-slate-900/50 py-2.5 group mr-2 rounded-r-full",
+                                        isActive && "text-slate-900 dark:text-slate-100 bg-slate-100/50 dark:bg-slate-900/50 font-bold"
                                     )}
                                 >
-                                    <route.icon size={18} className={cn("text-slate-400 group-hover:text-slate-900 transition-colors", isActive && "text-slate-900")} />
+                                    <route.icon size={18} className={cn("text-slate-400 dark:text-slate-500 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors", isActive && "text-slate-900 dark:text-slate-200")} />
                                     {route.label}
                                 </Link>
                             )}
@@ -261,12 +261,12 @@ export const AdminSidebar = () => {
                         </span>
                     </div>
                 )}
-                <span className="text-xl font-bold tracking-tighter text-slate-900">
+                <span className="text-xl font-bold tracking-tighter text-slate-900 dark:text-white">
                     {settings?.siteName || "LMS"}
                 </span>
             </div>
 
-            <div className="p-4 border-t">
+            <div className="p-4 border-t border-slate-200 dark:border-slate-800">
                 <LogoutButton />
             </div>
         </div>

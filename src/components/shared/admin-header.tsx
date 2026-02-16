@@ -1,47 +1,39 @@
 "use client";
 
 import {
-    Search, Layout, Star, Sun,
-    History, Bell, PanelLeft,
-    Search as SearchIcon
+    Layout,
+    PanelLeft
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/hooks/use-sidebar";
 import { NotificationDropdown } from "@/components/notifications/notification-dropdown";
+import { ModeToggle } from "@/components/shared/mode-toggle";
+import { SearchCommand } from "@/components/shared/search-command";
+import { HistoryPopover } from "@/components/shared/history-popover";
+import { FavoritesPopover } from "@/components/shared/favorites-popover";
 
 export const AdminHeader = () => {
     const { toggle } = useSidebar();
 
     return (
-        <div className="h-16 border-b bg-white flex items-center justify-between px-6 sticky top-0 z-40">
+        <div className="h-16 border-b bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 sticky top-0 z-40 transition-colors duration-300">
             <div className="flex items-center gap-x-4">
                 <PanelLeft
-                    className="h-4 w-4 text-slate-400 cursor-pointer hover:text-slate-600 transition-colors"
+                    className="h-4 w-4 text-slate-400 cursor-pointer hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
                     onClick={toggle}
                 />
-                <Star className="h-4 w-4 text-slate-400 cursor-pointer hover:text-slate-600" />
-                <span className="text-sm font-medium text-slate-500 flex items-center gap-x-2">
+                <FavoritesPopover />
+                <span className="text-sm font-medium text-slate-500 dark:text-slate-400 flex items-center gap-x-2">
                     <Layout className="h-4 w-4" />
                     Dashboards
                 </span>
             </div>
 
             <div className="flex items-center gap-x-6">
-                <div className="relative w-64 group">
-                    <SearchIcon className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
-                    <Input
-                        placeholder="Search"
-                        className="h-9 w-full bg-slate-100 border-none pl-9 focus-visible:ring-1 focus-visible:ring-slate-200 transition-all text-sm"
-                    />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-mono">
-                        /
-                    </div>
-                </div>
+                <SearchCommand />
 
                 <div className="flex items-center gap-x-4">
-                    <Sun className="h-4 w-4 text-slate-400 hover:text-slate-600 cursor-pointer" />
-                    <History className="h-4 w-4 text-slate-400 hover:text-slate-600 cursor-pointer" />
+                    <ModeToggle />
+                    <HistoryPopover />
                     <NotificationDropdown />
                 </div>
             </div>

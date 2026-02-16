@@ -36,12 +36,14 @@ import { UserRole } from "@/lib/prisma";
 import { getCourseTags } from "@/actions/course-tags";
 import { Checkbox } from "@/components/ui/checkbox";
 import { LessonsForm } from "../_components/lessons-form";
+import { FileUpload } from "@/components/shared/file-upload";
 
 const formSchema = z.object({
     title: z.string().min(1, "Title is required"),
     courseCode: z.string().default(""),
     categoryId: z.string().min(1, "Category is required"),
     description: z.string().default(""),
+    imageUrl: z.string().default(""),
     price: z.coerce.number().min(0).default(0),
     priceType: z.enum(["FREE", "PAID"]).default("FREE"),
     introVideoUrl: z.string().default(""),
@@ -73,6 +75,7 @@ const EditCoursePage = () => {
             courseCode: "",
             categoryId: "",
             description: "",
+            imageUrl: "",
             price: 0,
             priceType: "FREE",
             introVideoUrl: "",
@@ -101,6 +104,7 @@ const EditCoursePage = () => {
                 courseCode: (courseData as any).courseCode || "",
                 categoryId: courseData.categoryId || "",
                 description: (courseData as any).description || "",
+                imageUrl: courseData.imageUrl || "",
                 price: (courseData as any).price || 0,
                 priceType: (courseData as any).price > 0 ? "PAID" : "FREE",
                 introVideoUrl: (courseData as any).introVideoUrl || "",
@@ -183,33 +187,57 @@ const EditCoursePage = () => {
                 <form className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
                     <Card className="border-none shadow-sm md:col-span-2">
                         <CardContent className="p-6 space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <FormField
-                                    control={form.control}
-                                    name="title"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-[13px] font-bold text-slate-700 uppercase tracking-wider">Course Title</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="Enter course title" className="h-11 bg-slate-50 border-none text-[14px]" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="courseCode"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-[13px] font-bold text-slate-700 uppercase tracking-wider">Course Code</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="e.g. CS101" className="h-11 bg-slate-50 border-none text-[14px]" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                                <div className="space-y-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="title"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[13px] font-bold text-slate-700 uppercase tracking-wider">Course Title</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="Enter course title" className="h-11 bg-slate-50 border-none text-[14px]" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="courseCode"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[13px] font-bold text-slate-700 uppercase tracking-wider">Course Code</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="e.g. CS101" className="h-11 bg-slate-50 border-none text-[14px]" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <FormLabel className="text-[13px] font-bold text-slate-700 uppercase tracking-wider">Featured Image</FormLabel>
+                                    <FormField
+                                        control={form.control}
+                                        name="imageUrl"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <FileUpload
+                                                        endpoint="courseImage"
+                                                        value={field.value}
+                                                        onChange={(url) => field.onChange(url)}
+                                                    />
+                                                </FormControl>
+                                                <FormDescription className="text-xs">
+                                                    This image will be shown on the course catalog and landing page.
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -18,6 +18,7 @@ export const createQuestion = async (
     try {
         const session = await auth();
         // Console log for debugging
+        console.log("[CREATE_QUESTION] quizId:", quizId, "values:", values);
         console.log("[CREATE_QUESTION] User:", session?.user?.id, session?.user?.role);
 
         if (!session?.user || session.user.role !== "ADMIN") {
@@ -64,8 +65,9 @@ export const createQuestion = async (
 
         revalidatePath(`/admin/quizzes/${quizId}`);
         return question;
-    } catch (error) {
+    } catch (error: any) {
         console.log("[CREATE_QUESTION_ERROR]", error);
+        if (error.stack) console.log(error.stack);
         // Rethrow so UI catches it
         throw error;
     }
@@ -83,6 +85,7 @@ export const updateQuestion = async (
     }
 ) => {
     try {
+        console.log("[UPDATE_QUESTION] questionId:", questionId, "quizId:", quizId, "values:", values);
         const session = await auth();
         if (!session?.user || session.user.role !== "ADMIN") {
             if (session?.user?.role !== "INSTRUCTOR") {
@@ -124,8 +127,9 @@ export const updateQuestion = async (
         revalidatePath(`/admin/quizzes/${quizId}`);
         return question;
 
-    } catch (error) {
+    } catch (error: any) {
         console.log("[UPDATE_QUESTION_ERROR]", error);
+        if (error.stack) console.log(error.stack);
         throw error;
     }
 };

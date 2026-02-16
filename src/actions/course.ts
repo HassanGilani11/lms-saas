@@ -29,6 +29,7 @@ export const createCourse = async (title: string, values?: { price?: number; use
                 categoryId: values?.categoryId,
                 // @ts-ignore
                 courseCode: values?.courseCode,
+                imageUrl: (values as any)?.imageUrl,
                 tags: values?.tagIds ? {
                     connect: values.tagIds.map((id: string) => ({ id })),
                 } : undefined,
@@ -66,6 +67,7 @@ export const updateCourse = async (courseId: string, values: any) => {
                 courseCode: values.courseCode,
                 categoryId: values.categoryId,
                 description: values.description,
+                imageUrl: values.imageUrl,
                 introVideoUrl: values.introVideoUrl,
                 level: values.level,
                 isActive: values.isActive,

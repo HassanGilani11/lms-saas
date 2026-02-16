@@ -22,10 +22,14 @@ interface NotificationContextType {
     fetchNotifications: () => Promise<void>;
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
+export const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
+
+    useEffect(() => {
+        console.log("NotificationProvider Mounted");
+    }, []);
 
     const fetchNotifications = useCallback(async () => {
         const data = await getNotifications();
