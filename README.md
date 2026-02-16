@@ -1,6 +1,6 @@
 # 🎓 Premium LMS SaaS Platform
 
-A state-of-the-art, scalable, and feature-rich Learning Management System built with the modern Next.js 15+ stack. This platform delivers a premium, high-performance experience for Administrators, Instructors, and Students alike.
+A state-of-the-art, scalable, and feature-rich Learning Management System built with the modern Next.js 16+ stack. This platform delivers a premium, high-performance experience for Administrators, Instructors, and Students alike.
 
 ---
 
@@ -21,6 +21,8 @@ A state-of-the-art, scalable, and feature-rich Learning Management System built 
 
 ### 📝 Student Experience
 - **Sleek Learning Interface**: Distraction-free content delivery with progress persistence and Search UI enhancements.
+- **Premium Checkout Flow**: Dedicated checkout pages for a professional, distraction-free enrollment experience.
+- **Billing Details Modal**: Large, centered modal for Cash on Delivery (COD) orders with intelligent grid-aligned form fields.
 - **Guest Checkout**: Seamless enrollment process for non-registered users via secure guest flows.
 - **Gamification**: Earn achievements and track learning milestones.
 - **Interactive Discussions**: Peer-to-peer and instructor engagement within lessons.
@@ -30,7 +32,7 @@ A state-of-the-art, scalable, and feature-rich Learning Management System built 
 
 ## 🚀 Tech Stack
 
-- **Core Framework**: [Next.js 15.x](https://nextjs.org/) (App Router, Turbopack)
+- **Core Framework**: [Next.js 16.x](https://nextjs.org/) (App Router, Turbopack)
 - **UI Library**: [React 19](https://react.dev/)
 - **Styling Engine**: [Tailwind CSS 4.0](https://tailwindcss.com/)
 - **Database ORM**: [Prisma 7.3](https://www.prisma.io/)
@@ -98,7 +100,7 @@ npm run dev
 src/
 ├── actions/      # Type-safe Server Actions (DB Logic, Auth, Settings, Notifications)
 ├── app/          # Next.js App Router (Layouts & Page Views)
-├── components/   # Atomic UI Components & Providers (Real-time Notif Hooks)
+├── components/   # Atomic UI Components & Providers (Consolidated Provider Layer)
 ├── hooks/        # Custom React Hooks
 ├── lib/          # Core utilities (Prisma client, Stripe, Events, Mail)
 └── prisma/       # Database Schema & Migrations
@@ -111,10 +113,12 @@ src/
 - [x] Multi-role Authentication
 - [x] Course & Lesson Management (Default Publishing)
 - [x] Global Branding & System Settings
-- [x] Payment Gateway Integration (Stripe & COD)
+- [x] Standardized Checkout Flow & Redirection
+- [x] Payment Gateway Integration (Stripe & COD Modal)
 - [x] Student Module & Guest Checkout
 - [x] Advanced Quiz Module & Grading
 - [x] Real-time Admin Notifications
+- [x] Architecture Stability (Consolidated Providers & Hydration Fixes)
 - [ ] Mobile-First Progressive Web App (PWA)
 - [ ] AI-Powered Course Recommendations
 - [ ] Live Video Streaming Sessions
