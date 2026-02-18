@@ -9,19 +9,21 @@ A state-of-the-art, scalable, and feature-rich Learning Management System built 
 ### 🛡️ Admin Powerhouse
 - **Real-time Notifications**: Instant system-wide notifications for new registrations, enrollments, and updates, synchronized across the dashboard.
 - **Dynamic System Settings**: Global branding management including site name, logo, and contact email with real-time synchronization.
+- **Multilingual Currency Converter**: Integrated exchange rate API support with dynamic site-wide currency switching and base currency management.
 - **Dynamic Dashboard**: Real-time analytics on platform growth, revenue, and engagement with interactive charts.
 - **Granular User Management**: Full control over users, roles, and permissions.
 - **System Activity Logs**: Audit-ready tracking of all major platform events.
 
 ### 👨‍🏫 Instructor Excellence
 - **Intuitive Course Builder**: Drag-and-drop hierarchy for sections (Lessons) and content (Topics).
+- **Revenue Normalization**: Earnings tracked and normalized across multiple currencies for accurate financial reporting.
 - **Rich Media Support**: Integrate Videos, PDFs, and interactive Text lessons.
 - **Advanced Quizzing**: Comprehensive quiz engine with multiple question types, automated grading, and real-time performance tracking.
 - **Student Progress Tracking**: Monitor individual and group learning paths in real-time.
 
 ### 📝 Student Experience
 - **Sleek Learning Interface**: Distraction-free content delivery with progress persistence and Search UI enhancements.
-- **Premium Checkout Flow**: Dedicated checkout pages for a professional, distraction-free enrollment experience.
+- **Premium Checkout Flow**: Fully integrated Stripe checkout and dedicated pages for a professional, distraction-free enrollment experience.
 - **Billing Details Modal**: Large, centered modal for Cash on Delivery (COD) orders with intelligent grid-aligned form fields.
 - **Guest Checkout**: Seamless enrollment process for non-registered users via secure guest flows.
 - **Gamification**: Earn achievements and track learning milestones.
@@ -39,7 +41,8 @@ A state-of-the-art, scalable, and feature-rich Learning Management System built 
 - **File Storage**: [UploadThing](https://uploadthing.com/)
 - **Database**: PostgreSQL (Supabase / Local)
 - **Authentication**: [NextAuth.js v5](https://authjs.dev/)
-- **Payment Processing**: [Stripe](https://stripe.com/) & **Cash on Delivery (COD)**
+- **Payment Processing**: [Stripe API](https://stripe.com/) (Checkout & Webhooks) & **Cash on Delivery (COD)**
+- **Currency Sync**: [ExchangeRate-API](https://www.exchangerate-api.com/) Integration
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **State & Forms**: [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
 
@@ -109,12 +112,12 @@ src/
 ---
 
 ## 🗺️ Roadmap
-- [x] Core LMS Architecture
-- [x] Multi-role Authentication
+- [x] Core LMS Architecture & Multi-role Auth
 - [x] Course & Lesson Management (Default Publishing)
 - [x] Global Branding & System Settings
-- [x] Standardized Checkout Flow & Redirection
-- [x] Payment Gateway Integration (Stripe & COD Modal)
+- [x] Payment Gateway Integration (**Stripe Integration Complete**)
+- [x] **Multilingual Currency Converter** (Dynamic rates & site-wide display)
+- [x] **Premium UI/UX Enhancements** (Checkout flows, Modals, & Dark Mode)
 - [x] Student Module & Guest Checkout
 - [x] Advanced Quiz Module & Grading
 - [x] Real-time Admin Notifications
@@ -122,6 +125,7 @@ src/
 - [ ] Mobile-First Progressive Web App (PWA)
 - [ ] AI-Powered Course Recommendations
 - [ ] Live Video Streaming Sessions
+
 
 ---
 
