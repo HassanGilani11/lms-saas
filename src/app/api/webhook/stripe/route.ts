@@ -8,8 +8,12 @@ import Stripe from "stripe";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
+    console.log("[STRIPE_WEBHOOK] Received request");
     const body = await req.text();
     const signature = (await headers()).get("Stripe-Signature") as string;
+
+    console.log("[STRIPE_WEBHOOK] Secret exists:", !!process.env.STRIPE_WEBHOOK_SECRET);
+    console.log("[STRIPE_WEBHOOK] Signature exists:", !!signature);
 
     let event: Stripe.Event;
 
@@ -19,22 +23,24 @@ export async function POST(req: Request) {
             signature,
             process.env.STRIPE_WEBHOOK_SECRET!
         );
+        console.log("[STRIPE_WEBHOOK] Event constructed:", event.type);
     } catch (error: any) {
+        console.log("[STRIPE_WEBHOOK] Construction Error:", error.message);
         return new NextResponse(`Webhook Error: ${error.message}`, { status: 400 });
     }
 
     const session = event.data.object as Stripe.Checkout.Session;
 
     if (event.type === "checkout.session.completed") {
-        const subscription = await stripe.subscriptions.retrieve(
-            session.subscription as string
-        );
-
-        if (!session?.metadata?.userId) {
-            return new NextResponse("User id is required", { status: 400 });
-        }
-
         if (session.mode === "subscription") {
+            const subscription = await stripe.subscriptions.retrieve(
+                session.subscription as string
+            );
+
+            if (!session?.metadata?.userId) {
+                return new NextResponse("User id is required for subscriptions", { status: 400 });
+            }
+
             await db.stripeSubscription.create({
                 data: {
                     userId: session.metadata.userId,
@@ -47,70 +53,9 @@ export async function POST(req: Request) {
             });
         } else {
             // One-time purchase completion
-            let userId = session?.metadata?.userId;
-            const courseId = session?.metadata?.courseId;
-
-            if (!courseId) {
-                return new NextResponse("Course id is required", { status: 400 });
-            }
-
-            // Handle Guest Checkout (missing userId)
-            if (!userId) {
-                const email = session.customer_details?.email || session.customer_email;
-                if (!email) {
-                    return new NextResponse("Email is required for guest checkout", { status: 400 });
-                }
-
-                // Ensure user exists (idempotent)
-                const userKey = await db.user.findUnique({ where: { email } });
-                if (userKey) {
-                    userId = userKey.id;
-                } else {
-                    const newUser = await db.user.create({
-                        data: {
-                            email,
-                            role: "STUDENT",
-                        }
-                    });
-                    userId = newUser.id;
-                }
-            }
-
-            // Ensure purchase (idempotent check)
-            const existingPurchase = await db.purchase.findUnique({
-                where: {
-                    userId_courseId: {
-                        userId: userId!,
-                        courseId,
-                    }
-                }
-            });
-
-            if (!existingPurchase) {
-                await db.purchase.create({
-                    data: {
-                        courseId: courseId,
-                        userId: userId!,
-                        amount: session.amount_total ? session.amount_total / 100 : 0,
-                        currency: session.currency?.toUpperCase() || "USD",
-                        stripeSessionId: session.id,
-                        stripePaymentIntentId: session.payment_intent as string,
-                        status: "COMPLETED",
-                        type: "STRIPE",
-                    },
-                });
-
-                // Send email
-                const userEmail = session.customer_details?.email || session.customer_email;
-                if (userEmail) {
-                    await sendEnrollmentEmail(
-                        userEmail,
-                        session.metadata?.courseTitle || "your course",
-                        session.amount_total ? session.amount_total / 100 : 0,
-                        session.id
-                    );
-                }
-            }
+            console.log("[STRIPE_WEBHOOK] Delegating fulfillment to action");
+            const result = await fulfillStripeCheckout(session.id);
+            console.log("[STRIPE_WEBHOOK] Fulfillment action outcome:", result);
         }
     }
 

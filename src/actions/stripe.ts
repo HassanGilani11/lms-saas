@@ -4,15 +4,20 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { redirect } from "next/navigation";
+import { getSettings } from "@/actions/settings";
 
 /**
  * Create a Stripe Checkout Session for a one-time course purchase.
  */
-/**
- * Create a Stripe Checkout Session for a one-time course purchase.
- */
 export const createCheckoutSession = async (courseId: string) => {
+    console.log("[STRIPE_CHECKOUT] Starting session creation for courseId:", courseId);
+    console.log("[STRIPE_CHECKOUT] STRIPE_SECRET_KEY starts with:", process.env.STRIPE_SECRET_KEY?.slice(0, 7) || "MISSING");
+    console.log("[STRIPE_CHECKOUT] NEXT_PUBLIC_APP_URL:", process.env.NEXT_PUBLIC_APP_URL || "MISSING");
+
     try {
+        const settings = await getSettings();
+        const currency = settings?.stripeCurrency || "USD";
+
         const session = await auth();
         const user = session?.user;
         const userId = user?.id;
@@ -40,8 +45,11 @@ export const createCheckoutSession = async (courseId: string) => {
         });
 
         if (!course) {
+            console.log("[STRIPE_CHECKOUT] Course not found or not published:", courseId);
             throw new Error("Course not found");
         }
+
+        console.log("[STRIPE_CHECKOUT] Creating session for course:", course.title);
 
         let customerId: string | undefined;
 
@@ -71,16 +79,25 @@ export const createCheckoutSession = async (courseId: string) => {
             }
         }
 
+        const exchangeRates = settings?.exchangeRates as any || {};
+        const baseCurrency = settings?.baseCurrency || "USD";
+
+        let unitAmount = Math.round(course.price! * 100);
+        if (currency !== baseCurrency && exchangeRates[currency]) {
+            const rate = exchangeRates[currency];
+            unitAmount = Math.round((course.price! * rate) * 100);
+        }
+
         const line_items = [
             {
                 quantity: 1,
                 price_data: {
-                    currency: "USD",
+                    currency: currency.toLowerCase(),
                     product_data: {
                         name: course.title,
-                        description: course.description!,
+                        description: course.description || "No description provided",
                     },
-                    unit_amount: Math.round(course.price! * 100),
+                    unit_amount: unitAmount,
                 },
             },
         ];
@@ -118,8 +135,8 @@ export const createCheckoutSession = async (courseId: string) => {
         }
 
         return { url: stripeSession.url };
-    } catch (error) {
-        console.log("[STRIPE_CHECKOUT]", error);
+    } catch (error: any) {
+        console.log("[STRIPE_CHECKOUT] ERROR:", error.message || error);
         return null;
     }
 };

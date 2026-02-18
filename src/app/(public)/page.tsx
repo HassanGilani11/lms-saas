@@ -4,11 +4,13 @@ import { db } from "@/lib/db";
 import { CoursesList } from "@/components/courses-list";
 import { ArrowRight } from "lucide-react";
 import { auth } from "@/auth";
+import { getSettings } from "@/actions/settings";
 
 export default async function Home() {
   const session = await auth();
   const userId = session?.user?.id;
   const isAdmin = session?.user?.role === "ADMIN";
+  const settings = await getSettings();
 
   const courses = await db.course.findMany({
     where: {
@@ -125,7 +127,12 @@ export default async function Home() {
               </Button>
             </div>
 
-            <CoursesList items={formattedCourses as any} />
+            <CoursesList
+              items={formattedCourses as any}
+              currency={settings?.stripeCurrency || "USD"}
+              exchangeRates={settings?.exchangeRates}
+              baseCurrency={settings?.baseCurrency}
+            />
           </div>
         </section>
       )}

@@ -17,6 +17,9 @@ interface CourseCardProps {
     progress: number | null;
     category: string;
     price: number | null;
+    currency?: string;
+    exchangeRates?: any;
+    baseCurrency?: string;
     isEnrolled: boolean;
     lastActivity?: Date | null;
 }
@@ -30,6 +33,9 @@ export const CourseCard = ({
     progress,
     category,
     price,
+    currency,
+    exchangeRates,
+    baseCurrency,
     isEnrolled,
     lastActivity,
 }: CourseCardProps) => {
@@ -55,6 +61,9 @@ export const CourseCard = ({
                     <div className="flex items-center justify-between mb-1.5">
                         <span className="text-[10px] font-bold text-slate-400 capitalize bg-slate-50 px-2 py-0.5 rounded-md tracking-wider">
                             {category}
+                        </span>
+                        <span className="text-[13px] font-extrabold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">
+                            {formatPrice(price || 0, currency || "USD", exchangeRates, baseCurrency)}
                         </span>
                     </div>
 

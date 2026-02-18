@@ -22,6 +22,8 @@ interface EnrollButtonProps {
     fullWidth?: boolean;
     checkoutMode?: boolean;
     initiallyShowOptions?: boolean;
+    stripeEnabled?: boolean;
+    codEnabled?: boolean;
 }
 
 export const EnrollButton = ({
@@ -30,7 +32,9 @@ export const EnrollButton = ({
     isFree,
     fullWidth,
     initiallyShowOptions = false,
-    checkoutMode = false
+    checkoutMode = false,
+    stripeEnabled = true,
+    codEnabled = true,
 }: EnrollButtonProps) => {
     const { data: session } = useSession();
     const router = useRouter();
@@ -145,35 +149,45 @@ export const EnrollButton = ({
                 </DialogContent>
             </Dialog>
 
+            {(!stripeEnabled && !codEnabled && !isFree) && (
+                <div className="p-4 bg-slate-100 border border-slate-200 rounded-2xl text-slate-500 font-semibold text-center w-full">
+                    Enrollment currently disabled by administrator.
+                </div>
+            )}
+
             <div className={cn("grid gap-4", fullWidth && "w-full")}>
-                <Button
-                    onClick={() => onClick("stripe")}
-                    disabled={isLoading}
-                    size="lg"
-                    className="h-14 px-8 text-base font-bold bg-white text-slate-900 border-2 border-indigo-600/20 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-600/40 transition-all rounded-2xl flex items-center justify-between shadow-lg shadow-indigo-500/5 group"
-                >
-                    <div className="flex items-center gap-3">
-                        <CreditCard className="h-5 w-5 text-indigo-600 group-hover:scale-110 transition-transform" />
-                        Pay with Card
-                    </div>
-                    {isLoading ? (
-                        <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />
-                    ) : (
-                        <Sparkles className="h-4 w-4 text-indigo-400 group-hover:rotate-12 transition-transform" />
-                    )}
-                </Button>
-                <Button
-                    onClick={() => onClick("cod")}
-                    disabled={isLoading}
-                    size="lg"
-                    className="h-14 px-8 text-base font-bold bg-white text-slate-900 border-2 border-slate-200 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 transition-all rounded-2xl flex items-center justify-between shadow-lg shadow-slate-500/5 group"
-                >
-                    <div className="flex items-center gap-3">
-                        <Banknote className="h-5 w-5 text-green-600 group-hover:scale-110 transition-transform" />
-                        Cash on Delivery
-                    </div>
-                    {isLoading && <Loader2 className="h-4 w-4 animate-spin text-slate-500" />}
-                </Button>
+                {stripeEnabled && (
+                    <Button
+                        onClick={() => onClick("stripe")}
+                        disabled={isLoading}
+                        size="lg"
+                        className="h-14 px-8 text-base font-bold bg-white text-slate-900 border-2 border-indigo-600/20 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-600/40 transition-all rounded-2xl flex items-center justify-between shadow-lg shadow-indigo-500/5 group"
+                    >
+                        <div className="flex items-center gap-3">
+                            <CreditCard className="h-5 w-5 text-indigo-600 group-hover:scale-110 transition-transform" />
+                            Pay with Card
+                        </div>
+                        {isLoading ? (
+                            <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />
+                        ) : (
+                            <Sparkles className="h-4 w-4 text-indigo-400 group-hover:rotate-12 transition-transform" />
+                        )}
+                    </Button>
+                )}
+                {codEnabled && (
+                    <Button
+                        onClick={() => onClick("cod")}
+                        disabled={isLoading}
+                        size="lg"
+                        className="h-14 px-8 text-base font-bold bg-white text-slate-900 border-2 border-slate-200 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 transition-all rounded-2xl flex items-center justify-between shadow-lg shadow-slate-500/5 group"
+                    >
+                        <div className="flex items-center gap-3">
+                            <Banknote className="h-5 w-5 text-green-600 group-hover:scale-110 transition-transform" />
+                            Cash on Delivery
+                        </div>
+                        {isLoading && <Loader2 className="h-4 w-4 animate-spin text-slate-500" />}
+                    </Button>
+                )}
                 <button
                     onClick={() => setShowOptions(false)}
                     className="text-sm text-slate-400 font-bold hover:text-white transition-colors text-center w-full"

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { formatPrice } from "@/lib/format";
+import { getSettings } from "@/actions/settings";
 
 const CourseDetailPage = () => {
     const params = useParams();
@@ -16,14 +17,20 @@ const CourseDetailPage = () => {
     const [course, setCourse] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    const [settings, setSettings] = useState<any>(null);
+
     useEffect(() => {
-        const fetchCourse = async () => {
+        const fetchCourseAndSettings = async () => {
             setIsLoading(true);
-            const data = await getCourseById(courseId);
-            setCourse(data);
+            const [courseData, settingsData] = await Promise.all([
+                getCourseById(courseId),
+                getSettings()
+            ]);
+            setCourse(courseData);
+            setSettings(settingsData);
             setIsLoading(false);
         };
-        fetchCourse();
+        fetchCourseAndSettings();
     }, [courseId]);
 
     if (isLoading) return <div className="p-6 text-slate-400">Loading course details...</div>;
@@ -82,7 +89,12 @@ const CourseDetailPage = () => {
                                     <div className="p-4 bg-slate-50 rounded-xl space-y-1">
                                         <span className="text-[10px] font-bold text-slate-400 uppercase">Price</span>
                                         <div className="text-[13px] font-bold text-slate-700">
-                                            {formatPrice(course.price || 0)}
+                                            {formatPrice(
+                                                course.price || 0,
+                                                settings?.stripeCurrency || "USD",
+                                                settings?.exchangeRates,
+                                                settings?.baseCurrency
+                                            )}
                                         </div>
                                     </div>
                                     <div className="p-4 bg-slate-50 rounded-xl space-y-1">

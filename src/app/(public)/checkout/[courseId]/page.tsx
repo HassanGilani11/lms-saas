@@ -5,6 +5,7 @@ import { BookOpen, CheckCircle2, ShieldCheck, CreditCard, Banknote, ArrowLeft } 
 import { formatPrice } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { getSettings } from "@/actions/settings";
 import { EnrollButton } from "@/components/enroll-button";
 
 interface CheckoutPageProps {
@@ -19,6 +20,7 @@ const CheckoutPage = async ({
     const { courseId } = await params;
     const session = await auth();
     const userId = session?.user?.id;
+    const settings = await getSettings();
 
     // Allow guest access to checkout page
     // if (!userId) {
@@ -152,11 +154,11 @@ const CheckoutPage = async ({
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
                                     <span className="text-slate-500 font-medium">Course Price</span>
-                                    <span className="text-xl font-bold text-slate-900">{formatPrice(course.price || 0)}</span>
+                                    <span className="text-xl font-bold text-slate-900">{formatPrice(course.price || 0, settings?.stripeCurrency || "USD", settings?.exchangeRates, settings?.baseCurrency)}</span>
                                 </div>
                                 <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                                     <span className="text-slate-900 font-bold">Total Investment</span>
-                                    <span className="text-3xl font-extrabold text-indigo-600">{formatPrice(course.price || 0)}</span>
+                                    <span className="text-3xl font-extrabold text-indigo-600">{formatPrice(course.price || 0, settings?.stripeCurrency || "USD", settings?.exchangeRates, settings?.baseCurrency)}</span>
                                 </div>
                             </div>
 
@@ -169,6 +171,9 @@ const CheckoutPage = async ({
                                     fullWidth
                                     initiallyShowOptions={true}
                                     checkoutMode={true}
+                                    stripeEnabled={settings?.stripeEnabled ?? true}
+                                    codEnabled={settings?.codEnabled ?? true}
+                                    currency={settings?.stripeCurrency || "USD"}
                                 />
                             </div>
 

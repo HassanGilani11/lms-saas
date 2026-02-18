@@ -1,8 +1,3 @@
-generator client {
-  provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
-}
-
 generator client_local {
   provider = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
@@ -684,6 +679,11 @@ model SystemSettings {
   contactEmail   String?
   emailTemplates Json?    @default("{}")
   stripeCurrency String   @default("USD")
+  baseCurrency   String   @default("USD")
+  exchangeRates  Json?    @default("{}")
+  ratesUpdatedAt DateTime?
+  stripeEnabled  Boolean  @default(true)
+  codEnabled     Boolean  @default(true)
   updatedAt      DateTime @updatedAt
 }
 

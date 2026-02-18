@@ -220,7 +220,7 @@ export const TransactionsTable = ({
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end" className="text-[13px] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-                                            {purchase.status === "PENDING" && (
+                                            {purchase.status === "PENDING" ? (
                                                 <>
                                                     <DropdownMenuItem
                                                         onClick={() => onApprove(purchase.id)}
@@ -239,6 +239,15 @@ export const TransactionsTable = ({
                                                         Reject Enrollment
                                                     </DropdownMenuItem>
                                                 </>
+                                            ) : (
+                                                <DropdownMenuItem
+                                                    onClick={() => onReject(purchase.id)}
+                                                    className="text-destructive focus:text-destructive font-medium cursor-pointer"
+                                                    disabled={isLoading === purchase.id}
+                                                >
+                                                    <XCircle className="h-3.5 w-3.5 mr-2" />
+                                                    Revoke Access
+                                                </DropdownMenuItem>
                                             )}
                                         </DropdownMenuContent>
                                     </DropdownMenu>

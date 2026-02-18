@@ -1,8 +1,10 @@
 import { getCoursesWithProgress } from "@/actions/get-courses";
 import { CoursesList } from "@/components/courses-list";
+import { getSettings } from "@/actions/settings";
 
 const CoursesPage = async () => {
     const courses = await getCoursesWithProgress();
+    const settings = await getSettings();
 
     return (
         <div className="pt-32 pb-20 relative overflow-hidden selection:bg-indigo-100 selection:text-indigo-900">
@@ -28,7 +30,12 @@ const CoursesPage = async () => {
                     </p>
                 </div>
 
-                <CoursesList items={courses} />
+                <CoursesList
+                    items={courses}
+                    currency={settings?.stripeCurrency || "USD"}
+                    exchangeRates={settings?.exchangeRates}
+                    baseCurrency={settings?.baseCurrency}
+                />
             </div>
         </div>
     );

@@ -94,12 +94,23 @@ export const enrollWithCod = async (courseId: string, details: { email: string; 
             throw new Error("You are already enrolled in this course");
         }
 
+        const settings = await getSettings();
+        const displayCurrency = settings?.stripeCurrency || "USD";
+        const exchangeRates = settings?.exchangeRates as any || {};
+        const baseCurrency = settings?.baseCurrency || "USD";
+
+        let finalAmount = course.price || 0;
+        if (displayCurrency !== baseCurrency && exchangeRates[displayCurrency]) {
+            finalAmount = course.price! * exchangeRates[displayCurrency];
+        }
+
         const purchase = await db.purchase.create({
             data: {
                 userId,
                 courseId,
                 status: "PENDING",
-                amount: course.price || 0,
+                amount: finalAmount,
+                currency: displayCurrency,
                 type: "COD",
             },
         });

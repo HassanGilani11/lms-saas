@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getInstructorRevenue } from "@/actions/analytics";
 import { formatPrice } from "@/lib/format";
+import { getSettings } from "@/actions/settings";
 import {
     Card,
     CardContent,
@@ -27,6 +28,8 @@ const RevenuePage = async () => {
     }
 
     const { totalRevenue, totalSales, revenueByCourse } = await getInstructorRevenue();
+    const settings = await getSettings();
+    const currency = settings?.stripeCurrency || "USD";
 
     return (
         <div className="p-6 space-y-8 max-w-7xl mx-auto">
@@ -48,7 +51,7 @@ const RevenuePage = async () => {
                     </CardHeader>
                     <CardContent className="pt-6">
                         <div className="text-3xl font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                            {formatPrice(totalRevenue)}
+                            {formatPrice(totalRevenue, currency, settings?.exchangeRates, settings?.baseCurrency)}
                         </div>
                         <p className="text-xs text-slate-500 font-medium mt-1">Lifetime revenue across all courses</p>
                     </CardContent>
@@ -72,7 +75,7 @@ const RevenuePage = async () => {
                     </CardHeader>
                     <CardContent className="pt-6">
                         <div className="text-3xl font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                            {totalSales > 0 ? formatPrice(totalRevenue / totalSales) : formatPrice(0)}
+                            {totalSales > 0 ? formatPrice(totalRevenue / totalSales, currency, settings?.exchangeRates, settings?.baseCurrency) : formatPrice(0, currency, settings?.exchangeRates, settings?.baseCurrency)}
                         </div>
                         <p className="text-xs text-slate-500 font-medium mt-1">Average revenue generated per student</p>
                     </CardContent>
@@ -113,7 +116,7 @@ const RevenuePage = async () => {
                                             </div>
                                         </TableCell>
                                         <TableCell className="py-5 text-right pr-6 font-extrabold text-indigo-600">
-                                            {formatPrice(course.amount)}
+                                            {formatPrice(course.amount, currency, settings?.exchangeRates, settings?.baseCurrency)}
                                         </TableCell>
                                     </TableRow>
                                 ))}

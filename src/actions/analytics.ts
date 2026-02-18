@@ -64,25 +64,39 @@ export const getInstructorRevenue = async (): Promise<{
             }
         });
 
-        const totalRevenue = purchases.reduce((acc, purchase) => acc + (purchase.amount || 0), 0);
-        const totalSales = purchases.length;
+        const settings = await db.systemSettings.findUnique({ where: { id: "default" } });
+        const baseCurrency = settings?.baseCurrency || "USD";
+        const exchangeRates = (settings?.exchangeRates as Record<string, number>) || {};
 
-        // Group by course
-        const revenueByCourse = purchases.reduce((acc: Record<string, number>, purchase) => {
-            const courseTitle = purchase.course.title;
-            if (!acc[courseTitle]) {
-                acc[courseTitle] = 0;
+        let totalRevenue = 0;
+        const revenueByCourse: Record<string, number> = {};
+
+        purchases.forEach((purchase) => {
+            let normalizedAmount = purchase.amount || 0;
+            const purchaseCurrency = purchase.currency || "USD";
+
+            if (purchaseCurrency !== baseCurrency) {
+                const rate = exchangeRates[purchaseCurrency] || 1;
+                normalizedAmount = normalizedAmount / rate;
             }
-            acc[courseTitle] += purchase.amount || 0;
-            return acc;
-        }, {});
+
+            totalRevenue += normalizedAmount;
+
+            const courseTitle = purchase.course.title;
+            if (!revenueByCourse[courseTitle]) {
+                revenueByCourse[courseTitle] = 0;
+            }
+            revenueByCourse[courseTitle] += normalizedAmount;
+        });
+
+        const totalSales = purchases.length;
 
         return {
             totalRevenue,
             totalSales,
             revenueByCourse: Object.entries(revenueByCourse).map(([title, amount]) => ({
                 title,
-                amount: amount as number
+                amount
             }))
         };
     } catch (error) {

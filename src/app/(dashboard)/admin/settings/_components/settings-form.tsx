@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { SystemSettings } from "@prisma/client";
+import { Switch } from "@/components/ui/switch";
 import {
     Form,
     FormControl,
@@ -16,6 +17,13 @@ import {
     FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,11 +31,15 @@ import { FileUpload } from "@/components/shared/file-upload";
 import { updateSettings } from "@/actions/settings";
 import { Loader2, Palette, Mail, CreditCard, Save } from "lucide-react";
 
-const formSchema = z.z.object({
+const formSchema = z.object({
     siteName: z.string().min(1, "Site name is required"),
     siteLogo: z.string().optional(),
     contactEmail: z.string().email("Invalid email address").optional().or(z.literal("")),
-    stripeCurrency: z.string().min(1, "Currency is required"),
+    stripeCurrency: z.string().min(1, "Currency is required").max(3, "Currency code should be 3 letters (e.g., USD)"),
+    baseCurrency: z.string().min(1, "Base currency is required").max(3),
+    exchangeRates: z.any().optional(),
+    stripeEnabled: z.boolean().default(true),
+    codEnabled: z.boolean().default(true),
     emailTemplates: z.any().optional(),
 });
 
@@ -50,6 +62,10 @@ export const SettingsForm = ({ initialData }: SettingsFormProps) => {
             siteLogo: initialData?.siteLogo || "",
             contactEmail: initialData?.contactEmail || "",
             stripeCurrency: initialData?.stripeCurrency || "USD",
+            baseCurrency: initialData?.baseCurrency || "USD",
+            exchangeRates: initialData?.exchangeRates || {},
+            stripeEnabled: initialData?.stripeEnabled ?? true,
+            codEnabled: initialData?.codEnabled ?? true,
             emailTemplates: initialData?.emailTemplates || {},
         },
     });
@@ -63,8 +79,9 @@ export const SettingsForm = ({ initialData }: SettingsFormProps) => {
             } else {
                 toast.error(result.error || "Failed to update settings");
             }
-        } catch (error) {
-            toast.error("Something went wrong");
+        } catch (error: any) {
+            console.error(error);
+            toast.error(error?.message || "Something went wrong");
         } finally {
             setIsLoading(false);
         }
@@ -181,20 +198,177 @@ export const SettingsForm = ({ initialData }: SettingsFormProps) => {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
-                                    <FormField
-                                        control={form.control}
-                                        name="stripeCurrency"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Default Currency (ISO)</FormLabel>
-                                                <FormControl>
-                                                    <Input disabled={isLoading} placeholder="USD, EUR, GBP..." {...field} />
-                                                </FormControl>
-                                                <FormDescription>The primary currency used for course purchases.</FormDescription>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <FormField
+                                            control={form.control}
+                                            name="baseCurrency"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Base Currency (Authoring)</FormLabel>
+                                                    <Select
+                                                        disabled={isLoading}
+                                                        onValueChange={field.onChange}
+                                                        defaultValue={field.value}
+                                                    >
+                                                        <FormControl>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select base currency" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            <SelectItem value="USD">USD - US Dollar</SelectItem>
+                                                            <SelectItem value="AUD">AUD - Australian Dollar</SelectItem>
+                                                            <SelectItem value="CAD">CAD - Canadian Dollar</SelectItem>
+                                                            <SelectItem value="EUR">EUR - Euro</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormDescription>The currency used when setting course prices.</FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="stripeCurrency"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Display Currency (Site-wide)</FormLabel>
+                                                    <Select
+                                                        disabled={isLoading}
+                                                        onValueChange={field.onChange}
+                                                        defaultValue={field.value}
+                                                    >
+                                                        <FormControl>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select a currency" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            <SelectItem value="USD">USD - US Dollar</SelectItem>
+                                                            <SelectItem value="AUD">AUD - Australian Dollar</SelectItem>
+                                                            <SelectItem value="CAD">CAD - Canadian Dollar</SelectItem>
+                                                            <SelectItem value="EUR">EUR - Euro</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormDescription>The primary currency shown to students.</FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+
+                                    <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div>
+                                                <h3 className="text-lg font-bold text-slate-800">Exchange Rates</h3>
+                                                <p className="text-sm text-slate-500">Define rates relative to your base currency ({form.watch("baseCurrency") || "USD"}).</p>
+                                                {initialData?.ratesUpdatedAt && (
+                                                    <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-bold">
+                                                        Last synced: {new Date(initialData.ratesUpdatedAt).toLocaleString()}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={async () => {
+                                                    try {
+                                                        setIsLoading(true);
+                                                        const base = form.getValues("baseCurrency");
+                                                        const response = await fetch(`https://api.exchangerate-api.com/v4/latest/${base}`);
+                                                        const data = await response.json();
+                                                        if (data.rates) {
+                                                            const newRates = {
+                                                                AUD: data.rates.AUD,
+                                                                CAD: data.rates.CAD,
+                                                                EUR: data.rates.EUR,
+                                                                USD: data.rates.USD,
+                                                            };
+                                                            form.setValue("exchangeRates", newRates);
+                                                            toast.success(`Exchange rates synced relative to ${base}`);
+                                                        }
+                                                    } catch (error) {
+                                                        toast.error("Failed to sync exchange rates");
+                                                    } finally {
+                                                        setIsLoading(false);
+                                                    }
+                                                }}
+                                                disabled={isLoading}
+                                                className="font-bold uppercase tracking-widest text-[10px] h-8"
+                                            >
+                                                Sync Rates
+                                            </Button>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                            {["USD", "AUD", "CAD", "EUR"].map((code) => (
+                                                code !== form.watch("baseCurrency") && (
+                                                    <div key={code} className="space-y-1">
+                                                        <FormLabel className="text-[10px] font-bold uppercase text-slate-400">{code} Rate</FormLabel>
+                                                        <Input
+                                                            type="number"
+                                                            step="0.0001"
+                                                            placeholder="1.0"
+                                                            value={form.watch(`exchangeRates.${code}`) || ""}
+                                                            onChange={(e) => {
+                                                                const val = e.target.value === "" ? 0 : parseFloat(e.target.value);
+                                                                form.setValue(`exchangeRates.${code}`, isNaN(val) ? 0 : val, { shouldDirty: true });
+                                                            }}
+                                                            className="h-9 text-sm font-bold"
+                                                        />
+                                                    </div>
+                                                )
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                        <FormField
+                                            control={form.control}
+                                            name="stripeEnabled"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-center justify-between rounded-2xl border p-4 shadow-sm bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800">
+                                                    <div className="space-y-0.5">
+                                                        <FormLabel className="text-base font-bold text-slate-900 dark:text-slate-100 italic">Stripe Payments</FormLabel>
+                                                        <FormDescription className="text-xs italic">
+                                                            Enable credit/debit card payments via Stripe.
+                                                        </FormDescription>
+                                                    </div>
+                                                    <FormControl>
+                                                        <Switch
+                                                            disabled={isLoading}
+                                                            checked={field.value}
+                                                            onCheckedChange={field.onChange}
+                                                        />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="codEnabled"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-center justify-between rounded-2xl border p-4 shadow-sm bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800">
+                                                    <div className="space-y-0.5">
+                                                        <FormLabel className="text-base font-bold text-slate-900 dark:text-slate-100 italic">Cash on Delivery</FormLabel>
+                                                        <FormDescription className="text-xs italic">
+                                                            Allow students to enroll and pay manually.
+                                                        </FormDescription>
+                                                    </div>
+                                                    <FormControl>
+                                                        <Switch
+                                                            disabled={isLoading}
+                                                            checked={field.value}
+                                                            onCheckedChange={field.onChange}
+                                                        />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
                                 </CardContent>
                             </Card>
                         </TabsContent>
@@ -207,7 +381,7 @@ export const SettingsForm = ({ initialData }: SettingsFormProps) => {
                         Save Changes
                     </Button>
                 </div>
-            </form>
-        </Form>
+            </form >
+        </Form >
     );
 };

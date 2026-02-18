@@ -6,8 +6,10 @@ import { sendEnrollmentEmail } from "@/lib/mail";
 import bcrypt from "bcryptjs";
 
 export const ensureGuestUser = async (sessionId: string) => {
+    console.log("[GUEST_ACTION] Processing sessionId:", sessionId);
     try {
         const session = await stripe.checkout.sessions.retrieve(sessionId);
+        console.log("[GUEST_ACTION] Retrieved session for email:", session.customer_details?.email);
 
         if (!session || session.payment_status !== "paid") {
             return { error: "Payment not verified" };
@@ -25,17 +27,25 @@ export const ensureGuestUser = async (sessionId: string) => {
 
         let generatedPassword = "";
 
-        if (!user) {
+        if (!user || (user && !user.password)) {
             generatedPassword = Math.random().toString(36).slice(-10);
             const hashedPassword = await bcrypt.hash(generatedPassword, 10);
 
-            user = await db.user.create({
-                data: {
-                    email,
-                    password: hashedPassword,
-                    role: "STUDENT",
-                },
-            });
+            if (!user) {
+                user = await db.user.create({
+                    data: {
+                        email,
+                        password: hashedPassword,
+                        role: "STUDENT",
+                    },
+                });
+            } else {
+                // User existed (maybe via webhook) but has no password
+                user = await db.user.update({
+                    where: { id: user.id },
+                    data: { password: hashedPassword }
+                });
+            }
         }
 
         // 2. Ensure Purchase Exists

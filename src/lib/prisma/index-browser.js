@@ -541,6 +541,11 @@ exports.Prisma.SystemSettingsScalarFieldEnum = {
   contactEmail: 'contactEmail',
   emailTemplates: 'emailTemplates',
   stripeCurrency: 'stripeCurrency',
+  baseCurrency: 'baseCurrency',
+  exchangeRates: 'exchangeRates',
+  ratesUpdatedAt: 'ratesUpdatedAt',
+  stripeEnabled: 'stripeEnabled',
+  codEnabled: 'codEnabled',
   updatedAt: 'updatedAt'
 };
 

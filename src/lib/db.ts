@@ -14,6 +14,9 @@ const getPrisma = () => {
     return new PrismaClient({ adapter });
   }
 
+  // Force clear the global cached instance to pickup schema changes
+  globalThis.prismaDb = undefined;
+
   if (!globalThis.prismaDb) {
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
     const adapter = new PrismaPg(pool);

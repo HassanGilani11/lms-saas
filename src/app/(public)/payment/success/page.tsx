@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
-import { ensureGuestUser } from "@/actions/guest-checkout";
+import { fulfillStripeCheckout } from "@/actions/fulfillment";
 import { Loader2, CheckCircle2, PartyPopper, BookOpen, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -20,42 +20,49 @@ const SuccessContent = () => {
     const isGuest = searchParams.get("is_guest");
 
     useEffect(() => {
-        const processGuest = async () => {
-            if (isGuest && sessionId && status === "unauthenticated" && !isProcessing) {
+        const processFulfillment = async () => {
+            if (sessionId && !isProcessing) {
                 setIsProcessing(true);
                 try {
-                    // 1. Ensure user/purchase exists
-                    const result = await ensureGuestUser(sessionId);
+                    console.log("[SUCCESS_PAGE] Triggering fulfillment for session:", sessionId);
+
+                    // 1. Ensure user/purchase exists (fallback for webhook)
+                    const result = await fulfillStripeCheckout(sessionId);
+                    console.log("[SUCCESS_PAGE] Fulfillment result:", result);
 
                     if (result.error) {
                         toast.error(result.error);
                         return;
                     }
 
-                    // 2. Auto-login
-                    const loginResult = await signIn("credentials", {
-                        stripeSessionId: sessionId,
-                        redirect: false,
-                    });
+                    // 2. Auto-login ONLY if was guest and unauthenticated
+                    if (isGuest && status === "unauthenticated") {
+                        const loginResult = await signIn("credentials", {
+                            stripeSessionId: sessionId,
+                            redirect: false,
+                        });
 
-                    if (loginResult?.ok) {
-                        toast.success("Account created & logged in!");
+                        if (loginResult?.ok) {
+                            toast.success("Account created & logged in!");
+                            router.refresh();
+                        } else {
+                            toast.error("Auto-login failed. Please log in manually.");
+                        }
+                    } else if (status === "authenticated") {
+                        // Just refresh to show the course in portal
                         router.refresh();
-                    } else {
-                        toast.error("Auto-login failed. Please log in manually.");
-                        router.push("/auth/login");
                     }
                 } catch (error) {
                     console.error(error);
-                    toast.error("Something went wrong setting up your account");
+                    toast.error("Something went wrong verifying your purchase");
                 } finally {
                     setIsProcessing(false);
                 }
             }
         };
 
-        processGuest();
-    }, [isGuest, sessionId, status, isProcessing, router]);
+        processFulfillment();
+    }, [sessionId, isGuest, status, isProcessing, router]);
 
     if (isProcessing) {
         return (
@@ -129,9 +136,11 @@ const SuccessContent = () => {
 const SuccessPage = () => {
     return (
         <div className="min-h-screen bg-white flex items-center justify-center pt-24 pb-12">
-            <Suspense fallback={<Loader2 className="h-10 w-10 animate-spin text-indigo-600" />}>
-                <SuccessContent />
-            </Suspense>
+            <NotificationProvider>
+                <Suspense fallback={<Loader2 className="h-10 w-10 animate-spin text-indigo-600" />}>
+                    <SuccessContent />
+                </Suspense>
+            </NotificationProvider>
         </div>
     );
 };

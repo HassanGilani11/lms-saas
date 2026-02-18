@@ -1,11 +1,12 @@
 import { db } from "@/lib/db";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { BookOpen, CheckCircle2, Clock, Globe, ShieldCheck, Award } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { getSettings } from "@/actions/settings";
 import { EnrollButton } from "@/components/enroll-button";
 import { checkAndIssueCertificate } from "@/actions/certificate";
 
@@ -23,6 +24,7 @@ const CoursePage = async ({
     const userId = session?.user?.id;
 
     const isAdmin = session?.user?.role === "ADMIN";
+    const settings = await getSettings();
 
     const course = await db.course.findUnique({
         where: {
@@ -130,6 +132,9 @@ const CoursePage = async ({
                                         courseId={course.id}
                                         price={course.price || 0}
                                         isFree={!course.price || course.price === 0}
+                                        stripeEnabled={settings?.stripeEnabled ?? true}
+                                        codEnabled={settings?.codEnabled ?? true}
+                                        currency={settings?.stripeCurrency || "USD"}
                                     />
                                 )}
 
@@ -246,7 +251,12 @@ const CoursePage = async ({
                                 <div className="space-y-2">
                                     <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Total Investment</p>
                                     <p className="text-4xl font-extrabold text-slate-900">
-                                        {formatPrice(course.price || 0)}
+                                        {formatPrice(
+                                            course.price || 0,
+                                            settings?.stripeCurrency || "USD",
+                                            settings?.exchangeRates,
+                                            settings?.baseCurrency
+                                        )}
                                     </p>
                                 </div>
 
@@ -290,6 +300,9 @@ const CoursePage = async ({
                                             price={course.price || 0}
                                             isFree={!course.price || course.price === 0}
                                             fullWidth
+                                            stripeEnabled={settings?.stripeEnabled ?? true}
+                                            codEnabled={settings?.codEnabled ?? true}
+                                            currency={settings?.stripeCurrency || "USD"}
                                         />
                                     )}
                                 </div>

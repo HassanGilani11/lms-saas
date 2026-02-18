@@ -4,6 +4,7 @@ import { CoursesList } from "@/components/courses-list";
 import { Categories } from "./_components/categories";
 import { SearchInput } from "./_components/search-input";
 import { getCoursesWithProgress } from "@/actions/get-courses";
+import { getSettings } from "@/actions/settings";
 
 interface SearchPageProps {
     searchParams: Promise<{
@@ -18,6 +19,7 @@ const SearchPage = async ({
     const { title, categoryId } = await searchParams;
 
     const categories = await getCategories();
+    const settings = await getSettings();
 
     // Enhancement: We can filter getCoursesWithProgress if we modify it, 
     // but for now let's do a direct fetch since getCoursesWithProgress 
@@ -89,7 +91,12 @@ const SearchPage = async ({
                 </div>
 
                 <div className="mt-12">
-                    <CoursesList items={formattedCourses as any} />
+                    <CoursesList
+                        items={formattedCourses as any}
+                        currency={settings?.stripeCurrency || "USD"}
+                        exchangeRates={settings?.exchangeRates}
+                        baseCurrency={settings?.baseCurrency}
+                    />
                 </div>
             </div>
         </div>

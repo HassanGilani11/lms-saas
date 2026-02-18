@@ -51515,6 +51515,10 @@ export namespace Prisma {
     siteLogo: string | null
     contactEmail: string | null
     stripeCurrency: string | null
+    baseCurrency: string | null
+    ratesUpdatedAt: Date | null
+    stripeEnabled: boolean | null
+    codEnabled: boolean | null
     updatedAt: Date | null
   }
 
@@ -51524,6 +51528,10 @@ export namespace Prisma {
     siteLogo: string | null
     contactEmail: string | null
     stripeCurrency: string | null
+    baseCurrency: string | null
+    ratesUpdatedAt: Date | null
+    stripeEnabled: boolean | null
+    codEnabled: boolean | null
     updatedAt: Date | null
   }
 
@@ -51534,6 +51542,11 @@ export namespace Prisma {
     contactEmail: number
     emailTemplates: number
     stripeCurrency: number
+    baseCurrency: number
+    exchangeRates: number
+    ratesUpdatedAt: number
+    stripeEnabled: number
+    codEnabled: number
     updatedAt: number
     _all: number
   }
@@ -51545,6 +51558,10 @@ export namespace Prisma {
     siteLogo?: true
     contactEmail?: true
     stripeCurrency?: true
+    baseCurrency?: true
+    ratesUpdatedAt?: true
+    stripeEnabled?: true
+    codEnabled?: true
     updatedAt?: true
   }
 
@@ -51554,6 +51571,10 @@ export namespace Prisma {
     siteLogo?: true
     contactEmail?: true
     stripeCurrency?: true
+    baseCurrency?: true
+    ratesUpdatedAt?: true
+    stripeEnabled?: true
+    codEnabled?: true
     updatedAt?: true
   }
 
@@ -51564,6 +51585,11 @@ export namespace Prisma {
     contactEmail?: true
     emailTemplates?: true
     stripeCurrency?: true
+    baseCurrency?: true
+    exchangeRates?: true
+    ratesUpdatedAt?: true
+    stripeEnabled?: true
+    codEnabled?: true
     updatedAt?: true
     _all?: true
   }
@@ -51647,6 +51673,11 @@ export namespace Prisma {
     contactEmail: string | null
     emailTemplates: JsonValue | null
     stripeCurrency: string
+    baseCurrency: string
+    exchangeRates: JsonValue | null
+    ratesUpdatedAt: Date | null
+    stripeEnabled: boolean
+    codEnabled: boolean
     updatedAt: Date
     _count: SystemSettingsCountAggregateOutputType | null
     _min: SystemSettingsMinAggregateOutputType | null
@@ -51674,6 +51705,11 @@ export namespace Prisma {
     contactEmail?: boolean
     emailTemplates?: boolean
     stripeCurrency?: boolean
+    baseCurrency?: boolean
+    exchangeRates?: boolean
+    ratesUpdatedAt?: boolean
+    stripeEnabled?: boolean
+    codEnabled?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["systemSettings"]>
 
@@ -51684,6 +51720,11 @@ export namespace Prisma {
     contactEmail?: boolean
     emailTemplates?: boolean
     stripeCurrency?: boolean
+    baseCurrency?: boolean
+    exchangeRates?: boolean
+    ratesUpdatedAt?: boolean
+    stripeEnabled?: boolean
+    codEnabled?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["systemSettings"]>
 
@@ -51694,6 +51735,11 @@ export namespace Prisma {
     contactEmail?: boolean
     emailTemplates?: boolean
     stripeCurrency?: boolean
+    baseCurrency?: boolean
+    exchangeRates?: boolean
+    ratesUpdatedAt?: boolean
+    stripeEnabled?: boolean
+    codEnabled?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["systemSettings"]>
 
@@ -51704,10 +51750,15 @@ export namespace Prisma {
     contactEmail?: boolean
     emailTemplates?: boolean
     stripeCurrency?: boolean
+    baseCurrency?: boolean
+    exchangeRates?: boolean
+    ratesUpdatedAt?: boolean
+    stripeEnabled?: boolean
+    codEnabled?: boolean
     updatedAt?: boolean
   }
 
-  export type SystemSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "siteName" | "siteLogo" | "contactEmail" | "emailTemplates" | "stripeCurrency" | "updatedAt", ExtArgs["result"]["systemSettings"]>
+  export type SystemSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "siteName" | "siteLogo" | "contactEmail" | "emailTemplates" | "stripeCurrency" | "baseCurrency" | "exchangeRates" | "ratesUpdatedAt" | "stripeEnabled" | "codEnabled" | "updatedAt", ExtArgs["result"]["systemSettings"]>
 
   export type $SystemSettingsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "SystemSettings"
@@ -51719,6 +51770,11 @@ export namespace Prisma {
       contactEmail: string | null
       emailTemplates: Prisma.JsonValue | null
       stripeCurrency: string
+      baseCurrency: string
+      exchangeRates: Prisma.JsonValue | null
+      ratesUpdatedAt: Date | null
+      stripeEnabled: boolean
+      codEnabled: boolean
       updatedAt: Date
     }, ExtArgs["result"]["systemSettings"]>
     composites: {}
@@ -52149,6 +52205,11 @@ export namespace Prisma {
     readonly contactEmail: FieldRef<"SystemSettings", 'String'>
     readonly emailTemplates: FieldRef<"SystemSettings", 'Json'>
     readonly stripeCurrency: FieldRef<"SystemSettings", 'String'>
+    readonly baseCurrency: FieldRef<"SystemSettings", 'String'>
+    readonly exchangeRates: FieldRef<"SystemSettings", 'Json'>
+    readonly ratesUpdatedAt: FieldRef<"SystemSettings", 'DateTime'>
+    readonly stripeEnabled: FieldRef<"SystemSettings", 'Boolean'>
+    readonly codEnabled: FieldRef<"SystemSettings", 'Boolean'>
     readonly updatedAt: FieldRef<"SystemSettings", 'DateTime'>
   }
     
@@ -55207,6 +55268,11 @@ export namespace Prisma {
     contactEmail: 'contactEmail',
     emailTemplates: 'emailTemplates',
     stripeCurrency: 'stripeCurrency',
+    baseCurrency: 'baseCurrency',
+    exchangeRates: 'exchangeRates',
+    ratesUpdatedAt: 'ratesUpdatedAt',
+    stripeEnabled: 'stripeEnabled',
+    codEnabled: 'codEnabled',
     updatedAt: 'updatedAt'
   };
 
@@ -58436,6 +58502,11 @@ export namespace Prisma {
     contactEmail?: StringNullableFilter<"SystemSettings"> | string | null
     emailTemplates?: JsonNullableFilter<"SystemSettings">
     stripeCurrency?: StringFilter<"SystemSettings"> | string
+    baseCurrency?: StringFilter<"SystemSettings"> | string
+    exchangeRates?: JsonNullableFilter<"SystemSettings">
+    ratesUpdatedAt?: DateTimeNullableFilter<"SystemSettings"> | Date | string | null
+    stripeEnabled?: BoolFilter<"SystemSettings"> | boolean
+    codEnabled?: BoolFilter<"SystemSettings"> | boolean
     updatedAt?: DateTimeFilter<"SystemSettings"> | Date | string
   }
 
@@ -58446,6 +58517,11 @@ export namespace Prisma {
     contactEmail?: SortOrderInput | SortOrder
     emailTemplates?: SortOrderInput | SortOrder
     stripeCurrency?: SortOrder
+    baseCurrency?: SortOrder
+    exchangeRates?: SortOrderInput | SortOrder
+    ratesUpdatedAt?: SortOrderInput | SortOrder
+    stripeEnabled?: SortOrder
+    codEnabled?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -58459,6 +58535,11 @@ export namespace Prisma {
     contactEmail?: StringNullableFilter<"SystemSettings"> | string | null
     emailTemplates?: JsonNullableFilter<"SystemSettings">
     stripeCurrency?: StringFilter<"SystemSettings"> | string
+    baseCurrency?: StringFilter<"SystemSettings"> | string
+    exchangeRates?: JsonNullableFilter<"SystemSettings">
+    ratesUpdatedAt?: DateTimeNullableFilter<"SystemSettings"> | Date | string | null
+    stripeEnabled?: BoolFilter<"SystemSettings"> | boolean
+    codEnabled?: BoolFilter<"SystemSettings"> | boolean
     updatedAt?: DateTimeFilter<"SystemSettings"> | Date | string
   }, "id">
 
@@ -58469,6 +58550,11 @@ export namespace Prisma {
     contactEmail?: SortOrderInput | SortOrder
     emailTemplates?: SortOrderInput | SortOrder
     stripeCurrency?: SortOrder
+    baseCurrency?: SortOrder
+    exchangeRates?: SortOrderInput | SortOrder
+    ratesUpdatedAt?: SortOrderInput | SortOrder
+    stripeEnabled?: SortOrder
+    codEnabled?: SortOrder
     updatedAt?: SortOrder
     _count?: SystemSettingsCountOrderByAggregateInput
     _max?: SystemSettingsMaxOrderByAggregateInput
@@ -58485,6 +58571,11 @@ export namespace Prisma {
     contactEmail?: StringNullableWithAggregatesFilter<"SystemSettings"> | string | null
     emailTemplates?: JsonNullableWithAggregatesFilter<"SystemSettings">
     stripeCurrency?: StringWithAggregatesFilter<"SystemSettings"> | string
+    baseCurrency?: StringWithAggregatesFilter<"SystemSettings"> | string
+    exchangeRates?: JsonNullableWithAggregatesFilter<"SystemSettings">
+    ratesUpdatedAt?: DateTimeNullableWithAggregatesFilter<"SystemSettings"> | Date | string | null
+    stripeEnabled?: BoolWithAggregatesFilter<"SystemSettings"> | boolean
+    codEnabled?: BoolWithAggregatesFilter<"SystemSettings"> | boolean
     updatedAt?: DateTimeWithAggregatesFilter<"SystemSettings"> | Date | string
   }
 
@@ -61727,6 +61818,11 @@ export namespace Prisma {
     contactEmail?: string | null
     emailTemplates?: NullableJsonNullValueInput | InputJsonValue
     stripeCurrency?: string
+    baseCurrency?: string
+    exchangeRates?: NullableJsonNullValueInput | InputJsonValue
+    ratesUpdatedAt?: Date | string | null
+    stripeEnabled?: boolean
+    codEnabled?: boolean
     updatedAt?: Date | string
   }
 
@@ -61737,6 +61833,11 @@ export namespace Prisma {
     contactEmail?: string | null
     emailTemplates?: NullableJsonNullValueInput | InputJsonValue
     stripeCurrency?: string
+    baseCurrency?: string
+    exchangeRates?: NullableJsonNullValueInput | InputJsonValue
+    ratesUpdatedAt?: Date | string | null
+    stripeEnabled?: boolean
+    codEnabled?: boolean
     updatedAt?: Date | string
   }
 
@@ -61747,6 +61848,11 @@ export namespace Prisma {
     contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
     emailTemplates?: NullableJsonNullValueInput | InputJsonValue
     stripeCurrency?: StringFieldUpdateOperationsInput | string
+    baseCurrency?: StringFieldUpdateOperationsInput | string
+    exchangeRates?: NullableJsonNullValueInput | InputJsonValue
+    ratesUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    stripeEnabled?: BoolFieldUpdateOperationsInput | boolean
+    codEnabled?: BoolFieldUpdateOperationsInput | boolean
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -61757,6 +61863,11 @@ export namespace Prisma {
     contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
     emailTemplates?: NullableJsonNullValueInput | InputJsonValue
     stripeCurrency?: StringFieldUpdateOperationsInput | string
+    baseCurrency?: StringFieldUpdateOperationsInput | string
+    exchangeRates?: NullableJsonNullValueInput | InputJsonValue
+    ratesUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    stripeEnabled?: BoolFieldUpdateOperationsInput | boolean
+    codEnabled?: BoolFieldUpdateOperationsInput | boolean
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -61767,6 +61878,11 @@ export namespace Prisma {
     contactEmail?: string | null
     emailTemplates?: NullableJsonNullValueInput | InputJsonValue
     stripeCurrency?: string
+    baseCurrency?: string
+    exchangeRates?: NullableJsonNullValueInput | InputJsonValue
+    ratesUpdatedAt?: Date | string | null
+    stripeEnabled?: boolean
+    codEnabled?: boolean
     updatedAt?: Date | string
   }
 
@@ -61777,6 +61893,11 @@ export namespace Prisma {
     contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
     emailTemplates?: NullableJsonNullValueInput | InputJsonValue
     stripeCurrency?: StringFieldUpdateOperationsInput | string
+    baseCurrency?: StringFieldUpdateOperationsInput | string
+    exchangeRates?: NullableJsonNullValueInput | InputJsonValue
+    ratesUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    stripeEnabled?: BoolFieldUpdateOperationsInput | boolean
+    codEnabled?: BoolFieldUpdateOperationsInput | boolean
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -61787,6 +61908,11 @@ export namespace Prisma {
     contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
     emailTemplates?: NullableJsonNullValueInput | InputJsonValue
     stripeCurrency?: StringFieldUpdateOperationsInput | string
+    baseCurrency?: StringFieldUpdateOperationsInput | string
+    exchangeRates?: NullableJsonNullValueInput | InputJsonValue
+    ratesUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    stripeEnabled?: BoolFieldUpdateOperationsInput | boolean
+    codEnabled?: BoolFieldUpdateOperationsInput | boolean
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -64281,6 +64407,11 @@ export namespace Prisma {
     contactEmail?: SortOrder
     emailTemplates?: SortOrder
     stripeCurrency?: SortOrder
+    baseCurrency?: SortOrder
+    exchangeRates?: SortOrder
+    ratesUpdatedAt?: SortOrder
+    stripeEnabled?: SortOrder
+    codEnabled?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -64290,6 +64421,10 @@ export namespace Prisma {
     siteLogo?: SortOrder
     contactEmail?: SortOrder
     stripeCurrency?: SortOrder
+    baseCurrency?: SortOrder
+    ratesUpdatedAt?: SortOrder
+    stripeEnabled?: SortOrder
+    codEnabled?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -64299,6 +64434,10 @@ export namespace Prisma {
     siteLogo?: SortOrder
     contactEmail?: SortOrder
     stripeCurrency?: SortOrder
+    baseCurrency?: SortOrder
+    ratesUpdatedAt?: SortOrder
+    stripeEnabled?: SortOrder
+    codEnabled?: SortOrder
     updatedAt?: SortOrder
   }
 
