@@ -3,10 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
-import { format } from "date-fns";
+import { format as formatDate } from "date-fns";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/format";
+import { useFormatPrice } from "@/hooks/use-format-price";
 
 interface CourseCardProps {
     id: string;
@@ -17,9 +17,6 @@ interface CourseCardProps {
     progress: number | null;
     category: string;
     price: number | null;
-    currency?: string;
-    exchangeRates?: any;
-    baseCurrency?: string;
     isEnrolled: boolean;
     lastActivity?: Date | null;
 }
@@ -33,12 +30,11 @@ export const CourseCard = ({
     progress,
     category,
     price,
-    currency,
-    exchangeRates,
-    baseCurrency,
     isEnrolled,
     lastActivity,
 }: CourseCardProps) => {
+    const { format } = useFormatPrice();
+
     return (
         <Link href={`/courses/${id}`} className="block h-full group">
             <div className="h-full hover:shadow-xl transition-all duration-300 overflow-hidden border rounded-[2rem] p-0 flex flex-col bg-white hover:-translate-y-1 relative">
@@ -63,7 +59,7 @@ export const CourseCard = ({
                             {category}
                         </span>
                         <span className="text-[13px] font-extrabold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">
-                            {formatPrice(price || 0, currency || "USD", exchangeRates, baseCurrency)}
+                            {format(price || 0)}
                         </span>
                     </div>
 
@@ -90,7 +86,6 @@ export const CourseCard = ({
                             </span>
                         </div>
 
-                        {/* Progress Bar - Full width of the content area */}
                         <div className="relative h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-gradient-to-r from-indigo-500 to-violet-600 transition-all duration-1000 ease-in-out"
@@ -100,7 +95,7 @@ export const CourseCard = ({
 
                         {lastActivity && (
                             <p className="text-[9px] text-slate-400 font-medium px-0.5">
-                                Last activity on {format(lastActivity, "MMM d, yyyy")}
+                                Last activity on {formatDate(lastActivity, "MMM d, yyyy")}
                             </p>
                         )}
 

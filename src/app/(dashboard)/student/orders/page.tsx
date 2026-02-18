@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getMyOrders } from "@/actions/analytics";
 import { formatPrice } from "@/lib/format";
 import { getSettings } from "@/actions/settings";
+import { CoursePrice } from "@/components/course-price";
 import {
     Table,
     TableBody,
@@ -88,7 +89,7 @@ const OrdersPage = async () => {
                                         {format(new Date(order.createdAt), "MMM dd, yyyy")}
                                     </TableCell>
                                     <TableCell className="py-5 font-bold text-slate-900">
-                                        {formatPrice(order.amount || 0, order.currency || "USD")}
+                                        <CoursePrice price={order.amount || 0} />
                                     </TableCell>
                                     <TableCell className="py-5">
                                         <Badge

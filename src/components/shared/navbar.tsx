@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useSettings } from "@/components/providers/settings-provider";
+import { CurrencySwitcher } from "./currency-switcher";
 import Image from "next/image";
 
 export const Navbar = () => {
@@ -75,6 +76,7 @@ export const Navbar = () => {
                 </nav>
 
                 <div className="flex items-center gap-x-4">
+                    <CurrencySwitcher />
                     {status === "loading" ? (
                         <div className="h-9 w-24 bg-slate-100 animate-pulse rounded-full" />
                     ) : session ? (

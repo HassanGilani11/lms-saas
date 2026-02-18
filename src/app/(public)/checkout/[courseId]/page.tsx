@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getSettings } from "@/actions/settings";
 import { EnrollButton } from "@/components/enroll-button";
+import { CoursePrice } from "@/components/course-price";
 
 interface CheckoutPageProps {
     params: Promise<{
@@ -154,11 +155,15 @@ const CheckoutPage = async ({
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
                                     <span className="text-slate-500 font-medium">Course Price</span>
-                                    <span className="text-xl font-bold text-slate-900">{formatPrice(course.price || 0, settings?.stripeCurrency || "USD", settings?.exchangeRates, settings?.baseCurrency)}</span>
+                                    <span className="text-xl font-bold text-slate-900">
+                                        <CoursePrice price={course.price || 0} />
+                                    </span>
                                 </div>
                                 <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                                     <span className="text-slate-900 font-bold">Total Investment</span>
-                                    <span className="text-3xl font-extrabold text-indigo-600">{formatPrice(course.price || 0, settings?.stripeCurrency || "USD", settings?.exchangeRates, settings?.baseCurrency)}</span>
+                                    <span className="text-3xl font-extrabold text-indigo-600">
+                                        <CoursePrice price={course.price || 0} />
+                                    </span>
                                 </div>
                             </div>
 

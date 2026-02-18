@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getSettings } from "@/actions/settings";
 import { EnrollButton } from "@/components/enroll-button";
+import { CoursePrice } from "@/components/course-price";
 import { checkAndIssueCertificate } from "@/actions/certificate";
 
 interface CoursePageProps {
@@ -250,12 +251,7 @@ const CoursePage = async ({
                                 <div className="space-y-2">
                                     <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Total Investment</p>
                                     <p className="text-4xl font-extrabold text-slate-900">
-                                        {formatPrice(
-                                            course.price || 0,
-                                            settings?.stripeCurrency || "USD",
-                                            settings?.exchangeRates,
-                                            settings?.baseCurrency
-                                        )}
+                                        <CoursePrice price={course.price || 0} />
                                     </p>
                                 </div>
 

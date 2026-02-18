@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getInstructorRevenue } from "@/actions/analytics";
 import { formatPrice } from "@/lib/format";
 import { getSettings } from "@/actions/settings";
+import { CoursePrice } from "@/components/course-price";
 import {
     Card,
     CardContent,
@@ -51,7 +52,7 @@ const RevenuePage = async () => {
                     </CardHeader>
                     <CardContent className="pt-6">
                         <div className="text-3xl font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                            {formatPrice(totalRevenue, currency, settings?.exchangeRates, settings?.baseCurrency)}
+                            <CoursePrice price={totalRevenue} />
                         </div>
                         <p className="text-xs text-slate-500 font-medium mt-1">Lifetime revenue across all courses</p>
                     </CardContent>
@@ -75,7 +76,7 @@ const RevenuePage = async () => {
                     </CardHeader>
                     <CardContent className="pt-6">
                         <div className="text-3xl font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                            {totalSales > 0 ? formatPrice(totalRevenue / totalSales, currency, settings?.exchangeRates, settings?.baseCurrency) : formatPrice(0, currency, settings?.exchangeRates, settings?.baseCurrency)}
+                            <CoursePrice price={totalSales > 0 ? (totalRevenue / totalSales) : 0} />
                         </div>
                         <p className="text-xs text-slate-500 font-medium mt-1">Average revenue generated per student</p>
                     </CardContent>
@@ -116,7 +117,7 @@ const RevenuePage = async () => {
                                             </div>
                                         </TableCell>
                                         <TableCell className="py-5 text-right pr-6 font-extrabold text-indigo-600">
-                                            {formatPrice(course.amount, currency, settings?.exchangeRates, settings?.baseCurrency)}
+                                            <CoursePrice price={course.amount} />
                                         </TableCell>
                                     </TableRow>
                                 ))}

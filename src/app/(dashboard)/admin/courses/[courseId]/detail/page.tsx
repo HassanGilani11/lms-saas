@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { formatPrice } from "@/lib/format";
+import { CoursePrice } from "@/components/course-price";
 import { getSettings } from "@/actions/settings";
 
 const CourseDetailPage = () => {
@@ -89,12 +90,7 @@ const CourseDetailPage = () => {
                                     <div className="p-4 bg-slate-50 rounded-xl space-y-1">
                                         <span className="text-[10px] font-bold text-slate-400 uppercase">Price</span>
                                         <div className="text-[13px] font-bold text-slate-700">
-                                            {formatPrice(
-                                                course.price || 0,
-                                                settings?.stripeCurrency || "USD",
-                                                settings?.exchangeRates,
-                                                settings?.baseCurrency
-                                            )}
+                                            <CoursePrice price={course.price || 0} />
                                         </div>
                                     </div>
                                     <div className="p-4 bg-slate-50 rounded-xl space-y-1">
