@@ -129,9 +129,6 @@ export default async function Home() {
 
             <CoursesList
               items={formattedCourses as any}
-              currency={settings?.stripeCurrency || "USD"}
-              exchangeRates={settings?.exchangeRates}
-              baseCurrency={settings?.baseCurrency}
             />
           </div>
         </section>

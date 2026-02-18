@@ -93,9 +93,6 @@ const SearchPage = async ({
                 <div className="mt-12">
                     <CoursesList
                         items={formattedCourses as any}
-                        currency={settings?.stripeCurrency || "USD"}
-                        exchangeRates={settings?.exchangeRates}
-                        baseCurrency={settings?.baseCurrency}
                     />
                 </div>
             </div>

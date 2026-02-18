@@ -17,16 +17,10 @@ type CourseWithProgress = {
 
 interface CoursesListProps {
     items: CourseWithProgress[];
-    currency?: string;
-    exchangeRates?: any;
-    baseCurrency?: string;
 }
 
 export const CoursesList = ({
     items,
-    currency,
-    exchangeRates,
-    baseCurrency
 }: CoursesListProps) => {
     return (
         <div>
@@ -42,9 +36,6 @@ export const CoursesList = ({
                         progress={item.progress}
                         category={item?.category?.name || "Uncategorized"}
                         price={item.price}
-                        currency={currency}
-                        exchangeRates={exchangeRates}
-                        baseCurrency={baseCurrency}
                         isEnrolled={item.isEnrolled}
                         lastActivity={item.lastActivity}
                     />
