@@ -134,7 +134,6 @@ const CoursePage = async ({
                                         isFree={!course.price || course.price === 0}
                                         stripeEnabled={settings?.stripeEnabled ?? true}
                                         codEnabled={settings?.codEnabled ?? true}
-                                        currency={settings?.stripeCurrency || "USD"}
                                     />
                                 )}
 
@@ -302,8 +301,8 @@ const CoursePage = async ({
                                             fullWidth
                                             stripeEnabled={settings?.stripeEnabled ?? true}
                                             codEnabled={settings?.codEnabled ?? true}
-                                            currency={settings?.stripeCurrency || "USD"}
                                         />
+
                                     )}
                                 </div>
 

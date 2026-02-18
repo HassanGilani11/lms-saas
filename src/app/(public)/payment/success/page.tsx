@@ -8,6 +8,8 @@ import { Loader2, CheckCircle2, PartyPopper, BookOpen, ArrowRight, Sparkles } fr
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
+import { NotificationProvider } from "@/components/providers/notification-provider";
+
 
 const SuccessContent = () => {
     const searchParams = useSearchParams();

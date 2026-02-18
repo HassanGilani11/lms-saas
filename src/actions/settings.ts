@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { revalidatePath, unstable_cache, revalidateTag } from "next/cache";
 
+
 export const getSettings = unstable_cache(
     async () => {
         try {
@@ -94,8 +95,9 @@ export const updateSettings = async (data: any) => {
 
         revalidatePath("/admin/settings");
         revalidatePath("/", "layout"); // Revalidate all pages to reflect branding changes
-        revalidateTag("settings"); // Invalidate the unstable_cache tag
+        // revalidateTag("settings"); // Invalidate the unstable_cache tag
         return { success: true, data: settings };
+
     } catch (error: any) {
         console.error("[UPDATE_SETTINGS] Error object:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
         return { success: false, error: error?.message || "Something went wrong" };

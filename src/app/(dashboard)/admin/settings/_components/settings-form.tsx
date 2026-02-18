@@ -38,10 +38,14 @@ const formSchema = z.object({
     stripeCurrency: z.string().min(1, "Currency is required").max(3, "Currency code should be 3 letters (e.g., USD)"),
     baseCurrency: z.string().min(1, "Base currency is required").max(3),
     exchangeRates: z.any().optional(),
-    stripeEnabled: z.boolean().default(true),
-    codEnabled: z.boolean().default(true),
+    stripeEnabled: z.boolean(),
+    codEnabled: z.boolean(),
     emailTemplates: z.any().optional(),
 });
+
+
+
+
 
 interface SettingsFormProps {
     initialData: any; // Using any for ease of initial implementation, should refine

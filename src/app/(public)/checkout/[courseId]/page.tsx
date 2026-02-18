@@ -173,8 +173,8 @@ const CheckoutPage = async ({
                                     checkoutMode={true}
                                     stripeEnabled={settings?.stripeEnabled ?? true}
                                     codEnabled={settings?.codEnabled ?? true}
-                                    currency={settings?.stripeCurrency || "USD"}
                                 />
+
                             </div>
 
                             <div className="pt-6 border-t border-slate-100 space-y-4 text-center">

@@ -7,6 +7,8 @@ import { createNotification } from "@/actions/notifications";
 import { NotificationType } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { sendEnrollmentEmail } from "@/lib/mail";
+import { getSettings } from "@/actions/settings";
+
 
 /**
  * Handle Cash on Delivery (COD) enrollment.
