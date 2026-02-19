@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
 import { fulfillStripeCheckout } from "@/actions/fulfillment";
@@ -16,6 +16,9 @@ const SuccessContent = () => {
     const router = useRouter();
     const { status } = useSession();
     const [isProcessing, setIsProcessing] = useState(false);
+    const [completed, setCompleted] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const triggered = useRef(false);
 
     const sessionId = searchParams.get("session_id");
     const courseId = searchParams.get("courseId");
@@ -23,48 +26,53 @@ const SuccessContent = () => {
 
     useEffect(() => {
         const processFulfillment = async () => {
-            if (sessionId && !isProcessing) {
-                setIsProcessing(true);
-                try {
-                    console.log("[SUCCESS_PAGE] Triggering fulfillment for session:", sessionId);
+            if (!sessionId || triggered.current) return;
+            triggered.current = true;
 
-                    // 1. Ensure user/purchase exists (fallback for webhook)
-                    const result = await fulfillStripeCheckout(sessionId);
-                    console.log("[SUCCESS_PAGE] Fulfillment result:", result);
+            setIsProcessing(true);
+            try {
+                console.log("[SUCCESS_PAGE] Triggering fulfillment for session:", sessionId);
 
-                    if (result.error) {
-                        toast.error(result.error);
-                        return;
-                    }
+                const result = await fulfillStripeCheckout(sessionId);
+                console.log("[SUCCESS_PAGE] Fulfillment result:", result);
 
-                    // 2. Auto-login ONLY if was guest and unauthenticated
-                    if (isGuest && status === "unauthenticated") {
-                        const loginResult = await signIn("credentials", {
-                            stripeSessionId: sessionId,
-                            redirect: false,
-                        });
-
-                        if (loginResult?.ok) {
-                            toast.success("Account created & logged in!");
-                            router.refresh();
-                        } else {
-                            toast.error("Auto-login failed. Please log in manually.");
-                        }
-                    } else if (status === "authenticated") {
-                        // Just refresh to show the course in portal
-                        router.refresh();
-                    }
-                } catch (error) {
-                    console.error(error);
-                    toast.error("Something went wrong verifying your purchase");
-                } finally {
+                if (result.error) {
+                    setError(result.error);
+                    toast.error(result.error);
                     setIsProcessing(false);
+                    return;
                 }
+
+                if (isGuest && status === "unauthenticated") {
+                    const loginResult = await signIn("credentials", {
+                        stripeSessionId: sessionId,
+                        redirect: false,
+                    });
+
+                    if (loginResult?.ok) {
+                        toast.success("Account created & logged in!");
+                        router.refresh();
+                    } else {
+                        toast.error("Auto-login failed. Please log in manually.");
+                    }
+                } else if (status === "authenticated") {
+                    router.refresh();
+                }
+
+                setCompleted(true);
+                // Clear the URL params to prevent loops on refresh
+                router.replace("/payment/success", { scroll: false });
+            } catch (error) {
+                console.error(error);
+                setError("Something went wrong verifying your purchase");
+                toast.error("Something went wrong verifying your purchase");
+            } finally {
+                setIsProcessing(false);
             }
         };
 
         processFulfillment();
-    }, [sessionId, isGuest, status, isProcessing, router]);
+    }, [sessionId, isGuest, status, router]);
 
     if (isProcessing) {
         return (

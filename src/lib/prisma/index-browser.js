@@ -129,6 +129,9 @@ exports.Prisma.UserScalarFieldEnum = {
   image: 'image',
   password: 'password',
   role: 'role',
+  title: 'title',
+  bio: 'bio',
+  socialLinks: 'socialLinks',
   phone: 'phone',
   address: 'address',
   createdAt: 'createdAt',
@@ -546,6 +549,7 @@ exports.Prisma.SystemSettingsScalarFieldEnum = {
   ratesUpdatedAt: 'ratesUpdatedAt',
   stripeEnabled: 'stripeEnabled',
   codEnabled: 'codEnabled',
+  instructorCommission: 'instructorCommission',
   updatedAt: 'updatedAt'
 };
 
@@ -578,12 +582,12 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
-exports.Prisma.JsonNullValueInput = {
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
 };
 
-exports.Prisma.NullableJsonNullValueInput = {
-  DbNull: Prisma.DbNull,
+exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
@@ -592,15 +596,15 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
-};
-
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
 };
 exports.UserRole = exports.$Enums.UserRole = {
   ADMIN: 'ADMIN',

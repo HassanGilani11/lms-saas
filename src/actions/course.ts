@@ -339,3 +339,36 @@ export const getCourses = async () => {
     }
 };
 
+export const getInstructorCourses = async () => {
+    try {
+        const session = await auth();
+        const userId = session?.user?.id;
+
+        if (!userId) {
+            throw new Error("Unauthorized");
+        }
+
+        const courses = await db.course.findMany({
+            where: {
+                userId,
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+            include: {
+                category: true,
+                _count: {
+                    select: {
+                        lessons: true,
+                    },
+                },
+            },
+        });
+
+        return courses;
+    } catch (error) {
+        console.log("[GET_INSTRUCTOR_COURSES]", error);
+        return [];
+    }
+};
+

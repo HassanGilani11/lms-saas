@@ -17,6 +17,9 @@ model User {
   image              String?
   password           String?
   role               UserRole            @default(STUDENT)
+  title              String?
+  bio                String?             @db.Text
+  socialLinks        Json?               @default("{}")
   phone              String?
   address            String?
   createdAt          DateTime            @default(now())
@@ -682,9 +685,10 @@ model SystemSettings {
   baseCurrency   String   @default("USD")
   exchangeRates  Json?    @default("{}")
   ratesUpdatedAt DateTime?
-  stripeEnabled  Boolean  @default(true)
-  codEnabled     Boolean  @default(true)
-  updatedAt      DateTime @updatedAt
+  stripeEnabled        Boolean  @default(true)
+  codEnabled           Boolean  @default(true)
+  instructorCommission Float    @default(70.0)
+  updatedAt            DateTime @updatedAt
 }
 
 model Coupon {

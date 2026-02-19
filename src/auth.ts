@@ -18,27 +18,40 @@ export const {
     trustHost: true,
     session: { strategy: "jwt" },
     callbacks: {
-        async jwt({ token, user }: any) {
+        async jwt({ token, user, trigger, session }: any) {
             // Initial sign in
             if (user) {
-                token.role = (user as any).role;
                 token.id = user.id;
+                token.role = (user as any).role;
                 token.username = (user as any).username;
                 token.name = user.name;
+                token.email = user.email;
+                token.picture = user.image;
                 return token;
             }
 
-            // Subsequent checks - fetch from DB if fields are missing or if we want to sync
-            if (!token.name || !token.role) {
+            // Handle session update trigger
+            if (trigger === "update" && session) {
+                if (session.name !== undefined) token.name = session.name;
+                if (session.image !== undefined) token.picture = session.image;
+                if (session.username !== undefined) token.username = session.username;
+                if (session.role !== undefined) token.role = session.role;
+                return token;
+            }
+
+            // Subsequent checks - fetch from DB if fields are missing
+            if (!token.role || !token.email) {
                 try {
                     const dbUser = await db.user.findUnique({
-                        where: { id: token.sub }
+                        where: { id: token.sub || token.id }
                     });
 
                     if (dbUser) {
                         token.role = dbUser.role;
                         token.username = dbUser.username;
                         token.name = dbUser.name;
+                        token.email = dbUser.email;
+                        token.picture = dbUser.image;
                     }
                 } catch {
                     return token;
@@ -49,8 +62,8 @@ export const {
         },
         async session({ session, token }: any) {
             if (session.user) {
-                if (token.sub) {
-                    session.user.id = token.sub;
+                if (token.sub || token.id) {
+                    session.user.id = token.sub || token.id;
                 }
 
                 if (token.role) {
@@ -61,8 +74,16 @@ export const {
                     session.user.username = token.username as string;
                 }
 
-                if (token.name) {
+                if (token.name !== undefined) {
                     session.user.name = token.name as string;
+                }
+
+                if (token.picture !== undefined) {
+                    session.user.image = token.picture as string;
+                }
+
+                if (token.email !== undefined) {
+                    session.user.email = token.email as string;
                 }
             }
 

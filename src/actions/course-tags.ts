@@ -1,5 +1,6 @@
 "use server";
 
+import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 
@@ -21,6 +22,11 @@ export const getCourseTags = async () => {
 
 export const createCourseTag = async (values: { name: string; color?: string }) => {
     try {
+        const session = await auth();
+        if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "INSTRUCTOR")) {
+            throw new Error("Unauthorized");
+        }
+
         const tag = await db.courseTag.create({
             data: {
                 name: values.name,
@@ -28,6 +34,7 @@ export const createCourseTag = async (values: { name: string; color?: string }) 
             },
         });
         revalidatePath("/admin/courses/tags");
+        revalidatePath("/instructor/courses/tags");
         return tag;
     } catch (error) {
         console.error("[CREATE_COURSE_TAG]", error);
@@ -37,6 +44,11 @@ export const createCourseTag = async (values: { name: string; color?: string }) 
 
 export const updateCourseTag = async (id: string, values: { name: string; color?: string }) => {
     try {
+        const session = await auth();
+        if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "INSTRUCTOR")) {
+            throw new Error("Unauthorized");
+        }
+
         const tag = await db.courseTag.update({
             where: { id },
             data: {
@@ -45,6 +57,7 @@ export const updateCourseTag = async (id: string, values: { name: string; color?
             },
         });
         revalidatePath("/admin/courses/tags");
+        revalidatePath("/instructor/courses/tags");
         return tag;
     } catch (error) {
         console.error("[UPDATE_COURSE_TAG]", error);
@@ -54,10 +67,16 @@ export const updateCourseTag = async (id: string, values: { name: string; color?
 
 export const deleteCourseTag = async (id: string) => {
     try {
+        const session = await auth();
+        if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "INSTRUCTOR")) {
+            throw new Error("Unauthorized");
+        }
+
         await db.courseTag.delete({
             where: { id },
         });
         revalidatePath("/admin/courses/tags");
+        revalidatePath("/instructor/courses/tags");
         return true;
     } catch (error) {
         console.error("[DELETE_COURSE_TAG]", error);

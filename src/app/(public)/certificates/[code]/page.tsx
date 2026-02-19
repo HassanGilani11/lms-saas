@@ -48,27 +48,41 @@ const CertificateVerificationPage = async ({ params }: Props) => {
     });
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-slate-100 p-4">
-            <div className="max-w-4xl w-full space-y-8">
-                <div className="text-center space-y-2">
-                    <h1 className="text-2xl font-bold text-slate-800">
+        <div className="min-h-screen bg-slate-50/50 relative overflow-hidden flex flex-col items-center pt-32 pb-20 px-6">
+            {/* Background Decorative Circles */}
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-50/50 rounded-full blur-3xl -z-10" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-50/50 rounded-full blur-3xl -z-10" />
+
+            <div className="max-w-4xl w-full space-y-10 relative z-10 flex flex-col items-center">
+                <div className="text-center space-y-4 max-w-2xl">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-[11px] font-bold uppercase tracking-wider mb-2">
+                        Official Verification
+                    </div>
+                    <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
                         Certificate Verification
                     </h1>
-                    <p className="text-slate-500">
-                        This certificate was issued to <span className="font-semibold text-slate-700">{recipientName}</span> on {issueDate}.
+                    <p className="text-slate-500 text-sm md:text-base leading-relaxed">
+                        This document confirms that <span className="font-bold text-slate-800 underline decoration-indigo-200 decoration-2 underline-offset-4">{recipientName}</span> has successfully fulfilled the requirements for the course <span className="text-slate-800 font-medium italic">"{courseTitle}"</span> on {issueDate}.
                     </p>
                 </div>
 
-                <CertificateTemplate
-                    recipientName={recipientName}
-                    courseName={courseTitle}
-                    issueDate={issueDate}
-                    certificateCode={code}
-                    className="shadow-xl"
-                />
+                <div className="w-full transform transition-all duration-500 hover:scale-[1.01]">
+                    <CertificateTemplate
+                        recipientName={recipientName}
+                        courseName={courseTitle}
+                        issueDate={issueDate}
+                        certificateCode={code}
+                        className="shadow-[0_20px_50px_rgba(8,_112,_184,_0.15)] rounded-2xl"
+                    />
+                </div>
 
-                <div className="text-center text-sm text-slate-400">
-                    <p>Lumina Learning Management System</p>
+                <div className="text-center space-y-4 pt-8 border-t border-slate-200 w-full max-w-md">
+                    <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest">
+                        Validated by Lumina LMS
+                    </p>
+                    <p className="text-xs text-slate-400 leading-normal">
+                        This digital certificate is a permanent record of achievement. For any inquiries regarding the authenticity of this document, please contact our support team.
+                    </p>
                 </div>
             </div>
         </div>

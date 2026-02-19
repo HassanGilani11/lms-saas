@@ -145,6 +145,16 @@ export const enrollWithCod = async (courseId: string, details: { email: string; 
                     metadata: { purchaseId: purchase.id }
                 });
             }
+
+            // Notify Instructor
+            await createNotification({
+                userId: course.userId,
+                title: "New Enrollment Request",
+                message: `${details.name} requested enrollment in your course "${course.title}".`,
+                type: NotificationType.ENROLLMENT,
+                href: "/instructor/courses",
+                metadata: { courseId: course.id, purchaseId: purchase.id }
+            });
         } catch (notifError) {
             console.log("[ENROLL_COD_NOTIF_ERROR]", notifError);
             // Don't fail the whole enrollment if notification fails

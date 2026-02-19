@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 export const createCategory = async (name: string) => {
     try {
         const session = await auth();
-        if (!session?.user || session.user.role !== "ADMIN") {
+        if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "INSTRUCTOR")) {
             throw new Error("Unauthorized");
         }
 
@@ -26,7 +26,7 @@ export const createCategory = async (name: string) => {
 export const updateCategory = async (id: string, name: string) => {
     try {
         const session = await auth();
-        if (!session?.user || session.user.role !== "ADMIN") {
+        if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "INSTRUCTOR")) {
             throw new Error("Unauthorized");
         }
 
@@ -46,7 +46,7 @@ export const updateCategory = async (id: string, name: string) => {
 export const deleteCategory = async (id: string) => {
     try {
         const session = await auth();
-        if (!session?.user || session.user.role !== "ADMIN") {
+        if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "INSTRUCTOR")) {
             throw new Error("Unauthorized");
         }
 

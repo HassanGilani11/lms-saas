@@ -21,6 +21,7 @@ export const getSettings = unstable_cache(
                         siteName: "LMS SaaS",
                         stripeEnabled: true,
                         codEnabled: true,
+                        instructorCommission: 70.0,
                     },
                 });
             }

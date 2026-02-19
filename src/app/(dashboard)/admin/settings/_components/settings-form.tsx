@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { SystemSettings } from "@prisma/client";
+import { SystemSettings } from "@/lib/prisma";
 import { Switch } from "@/components/ui/switch";
 import {
     Form,
@@ -40,15 +40,12 @@ const formSchema = z.object({
     exchangeRates: z.any().optional(),
     stripeEnabled: z.boolean(),
     codEnabled: z.boolean(),
+    instructorCommission: z.number().min(0, "Commission cannot be negative").max(100, "Commission cannot exceed 100%"),
     emailTemplates: z.any().optional(),
 });
 
-
-
-
-
 interface SettingsFormProps {
-    initialData: any; // Using any for ease of initial implementation, should refine
+    initialData: SystemSettings | null;
 }
 
 export const SettingsForm = ({ initialData }: SettingsFormProps) => {
@@ -70,6 +67,7 @@ export const SettingsForm = ({ initialData }: SettingsFormProps) => {
             exchangeRates: initialData?.exchangeRates || {},
             stripeEnabled: initialData?.stripeEnabled ?? true,
             codEnabled: initialData?.codEnabled ?? true,
+            instructorCommission: initialData?.instructorCommission ?? 70,
             emailTemplates: initialData?.emailTemplates || {},
         },
     });
@@ -260,6 +258,36 @@ export const SettingsForm = ({ initialData }: SettingsFormProps) => {
                                                 </FormItem>
                                             )}
                                         />
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <FormField
+                                                control={form.control}
+                                                name="instructorCommission"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Instructor Commission (%)</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                disabled={isLoading}
+                                                                type="number"
+                                                                step="0.1"
+                                                                placeholder="70"
+                                                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                                            />
+                                                        </FormControl>
+                                                        <FormDescription>Instructor's share of sales.</FormDescription>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <div className="space-y-2">
+                                                <FormLabel className="text-slate-500">Platform Share (%)</FormLabel>
+                                                <div className="h-10 px-3 py-2 rounded-md border border-slate-200 bg-slate-50 text-slate-500 font-bold flex items-center">
+                                                    {Math.max(0, 100 - (form.watch("instructorCommission") || 0)).toFixed(1)}%
+                                                </div>
+                                                <p className="text-[0.8rem] text-muted-foreground">Your earnings per sale.</p>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">

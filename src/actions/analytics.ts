@@ -40,7 +40,7 @@ export const getMyOrders = async () => {
 export const getInstructorRevenue = async (): Promise<{
     totalRevenue: number;
     totalSales: number;
-    revenueByCourse: { title: string; amount: number }[];
+    revenueByCourse: { id: string; title: string; amount: number; sales: number }[];
 }> => {
     try {
         const session = await auth();
@@ -48,28 +48,32 @@ export const getInstructorRevenue = async (): Promise<{
 
         if (!userId) throw new Error("Unauthorized");
 
-        const purchases = await db.purchase.findMany({
-            where: {
-                course: {
-                    userId: userId // Only courses owned by this instructor
+        const [courses, purchases] = await Promise.all([
+            db.course.findMany({
+                where: { userId },
+                select: { id: true, title: true }
+            }),
+            db.purchase.findMany({
+                where: {
+                    course: { userId },
+                    status: "COMPLETED"
                 },
-                status: "COMPLETED"
-            },
-            include: {
-                course: {
-                    select: {
-                        title: true,
-                    }
-                }
-            }
-        });
+                select: { courseId: true, amount: true, currency: true }
+            })
+        ]);
 
         const settings = await db.systemSettings.findUnique({ where: { id: "default" } });
         const baseCurrency = settings?.baseCurrency || "USD";
         const exchangeRates = (settings?.exchangeRates as Record<string, number>) || {};
+        const commissionRate = (settings?.instructorCommission || 70) / 100;
 
         let totalRevenue = 0;
-        const revenueByCourse: Record<string, number> = {};
+        const revenueMap: Record<string, { amount: number, sales: number }> = {};
+
+        // Initialize map with all courses
+        courses.forEach(course => {
+            revenueMap[course.id] = { amount: 0, sales: 0 };
+        });
 
         purchases.forEach((purchase) => {
             let normalizedAmount = purchase.amount || 0;
@@ -80,24 +84,25 @@ export const getInstructorRevenue = async (): Promise<{
                 normalizedAmount = normalizedAmount / rate;
             }
 
-            totalRevenue += normalizedAmount;
+            totalRevenue += (normalizedAmount * commissionRate);
 
-            const courseTitle = purchase.course.title;
-            if (!revenueByCourse[courseTitle]) {
-                revenueByCourse[courseTitle] = 0;
+            if (purchase.courseId in revenueMap) {
+                revenueMap[purchase.courseId].amount += (normalizedAmount * commissionRate);
+                revenueMap[purchase.courseId].sales += 1;
             }
-            revenueByCourse[courseTitle] += normalizedAmount;
         });
 
-        const totalSales = purchases.length;
+        const revenueByCourse = courses.map(course => ({
+            id: course.id,
+            title: course.title,
+            amount: revenueMap[course.id].amount,
+            sales: revenueMap[course.id].sales
+        })).sort((a, b) => b.amount - a.amount);
 
         return {
             totalRevenue,
-            totalSales,
-            revenueByCourse: Object.entries(revenueByCourse).map(([title, amount]) => ({
-                title,
-                amount
-            }))
+            totalSales: purchases.length,
+            revenueByCourse
         };
     } catch (error) {
         console.log("[GET_REVENUE]", error);
@@ -105,6 +110,191 @@ export const getInstructorRevenue = async (): Promise<{
             totalRevenue: 0,
             totalSales: 0,
             revenueByCourse: []
+        };
+    }
+};
+
+/**
+ * Get aggregated statistics for the instructor dashboard.
+ */
+export const getInstructorDashboardStats = async () => {
+    try {
+        const session = await auth();
+        const userId = session?.user?.id;
+
+        if (!userId) throw new Error("Unauthorized");
+
+        const [coursesCount, studentPurchases] = await Promise.all([
+            db.course.count({ where: { userId } }),
+            db.purchase.findMany({
+                where: {
+                    course: { userId },
+                    status: "COMPLETED"
+                },
+                select: { userId: true, amount: true, currency: true }
+            })
+        ]);
+
+        const uniqueStudents = new Set(studentPurchases.map(p => p.userId)).size;
+
+        const settings = await db.systemSettings.findUnique({ where: { id: "default" } });
+        const baseCurrency = settings?.baseCurrency || "USD";
+        const exchangeRates = (settings?.exchangeRates as Record<string, number>) || {};
+        const commissionRate = (settings?.instructorCommission || 70) / 100;
+
+        let totalRevenue = 0;
+        studentPurchases.forEach((purchase) => {
+            let normalizedAmount = purchase.amount || 0;
+            const purchaseCurrency = purchase.currency || "USD";
+
+            if (purchaseCurrency !== baseCurrency) {
+                const rate = exchangeRates[purchaseCurrency] || 1;
+                normalizedAmount = normalizedAmount / rate;
+            }
+            totalRevenue += (normalizedAmount * commissionRate);
+        });
+
+        return {
+            courses: coursesCount,
+            students: uniqueStudents,
+            revenue: totalRevenue,
+        };
+    } catch (error) {
+        console.log("[GET_INSTRUCTOR_STATS]", error);
+        return {
+            courses: 0,
+            students: 0,
+            revenue: 0,
+        };
+    }
+};
+
+/**
+ * Get detailed analytics for the instructor.
+ */
+export const getInstructorAnalytics = async () => {
+    try {
+        const session = await auth();
+        const userId = session?.user?.id;
+
+        if (!userId) throw new Error("Unauthorized");
+
+        const instructorCourses = await db.course.findMany({
+            where: { userId },
+            include: {
+                purchases: {
+                    where: { status: "COMPLETED" },
+                    select: { createdAt: true, userId: true }
+                },
+                lessons: {
+                    where: { isPublished: true },
+                    include: {
+                        topics: {
+                            where: { isPublished: true },
+                            select: { id: true }
+                        }
+                    }
+                }
+            }
+        });
+
+        const activeCourses = instructorCourses.filter(c => c.isPublished).length;
+        const totalEnrollments = instructorCourses.reduce((acc, c) => acc + c.purchases.length, 0);
+
+        // Calculate Completion Rate
+        let totalStudentTopicsPossible = 0;
+        let totalStudentTopicsCompleted = 0;
+
+        for (const course of instructorCourses) {
+            const totalTopicsInCourse = course.lessons.reduce((acc, l) => acc + l.topics.length, 0);
+            const enrolledUserIds = course.purchases.map(p => p.userId);
+
+            if (totalTopicsInCourse > 0 && enrolledUserIds.length > 0) {
+                totalStudentTopicsPossible += enrolledUserIds.length * totalTopicsInCourse;
+
+                const completedProgress = await db.userProgress.count({
+                    where: {
+                        userId: { in: enrolledUserIds },
+                        topic: { lesson: { courseId: course.id } },
+                        isCompleted: true
+                    }
+                });
+                totalStudentTopicsCompleted += completedProgress;
+            }
+        }
+
+        const avgCompletionRate = totalStudentTopicsPossible > 0
+            ? Math.round((totalStudentTopicsCompleted / totalStudentTopicsPossible) * 100)
+            : 0;
+
+        // Calculate Avg Watch Time (Seconds to Minutes)
+        const totalDurationResult = await db.timeLog.aggregate({
+            where: {
+                course: { userId }
+            },
+            _sum: {
+                duration: true
+            }
+        });
+
+        const totalSeconds = totalDurationResult._sum.duration || 0;
+        const totalEngagements = await db.timeLog.count({
+            where: { course: { userId } }
+        });
+
+        const avgWatchTime = totalEngagements > 0
+            ? Math.round((totalSeconds / totalEngagements) / 60)
+            : 0;
+
+        // Enrollment Trends (Last 6 months)
+        const enrollmentTrends = [];
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        for (let i = 5; i >= 0; i--) {
+            const date = new Date();
+            date.setMonth(date.getMonth() - i);
+            const month = date.getMonth();
+            const year = date.getFullYear();
+
+            const count = instructorCourses.reduce((acc, course) => {
+                return acc + course.purchases.filter(p => {
+                    const pDate = new Date(p.createdAt);
+                    return pDate.getMonth() === month && pDate.getFullYear() === year;
+                }).length;
+            }, 0);
+
+            enrollmentTrends.push({
+                name: monthNames[month],
+                count
+            });
+        }
+
+        // Lesson Engagement Heatmap (Simplified: Top courses by progress)
+        const courseEngagement = instructorCourses.map(course => {
+            const completions = course.purchases.length; // Basic engagement proxy
+            return {
+                name: course.title.length > 20 ? course.title.substring(0, 20) + "..." : course.title,
+                value: completions
+            };
+        }).sort((a, b) => b.value - a.value).slice(0, 6);
+
+        return {
+            totalEnrollments,
+            avgCompletionRate,
+            activeCourses,
+            avgWatchTime,
+            enrollmentTrends,
+            courseEngagement
+        };
+    } catch (error) {
+        console.log("[GET_INSTRUCTOR_ANALYTICS]", error);
+        return {
+            totalEnrollments: 0,
+            avgCompletionRate: 0,
+            activeCourses: 0,
+            avgWatchTime: 0,
+            enrollmentTrends: [],
+            courseEngagement: []
         };
     }
 };
@@ -367,18 +557,40 @@ export const getAdminDashboardStats = async () => {
             throw new Error("Unauthorized");
         }
 
-        const [coursesCount, categoriesCount, instructorsCount, studentsCount] = await Promise.all([
+        const [coursesCount, categoriesCount, instructorsCount, studentsCount, purchases, settings] = await Promise.all([
             db.course.count(),
             db.category.count(),
             db.user.count({ where: { role: "INSTRUCTOR" } }),
             db.user.count({ where: { role: "STUDENT" } }),
+            db.purchase.findMany({
+                where: { status: "COMPLETED" },
+                select: { amount: true, currency: true }
+            }),
+            db.systemSettings.findUnique({ where: { id: "default" } })
         ]);
+
+        const baseCurrency = settings?.baseCurrency || "USD";
+        const exchangeRates = (settings?.exchangeRates as Record<string, number>) || {};
+        const platformRate = (100 - (settings?.instructorCommission || 70)) / 100;
+
+        let totalPlatformRevenue = 0;
+        purchases.forEach((purchase) => {
+            let normalizedAmount = purchase.amount || 0;
+            const purchaseCurrency = purchase.currency || "USD";
+
+            if (purchaseCurrency !== baseCurrency) {
+                const rate = exchangeRates[purchaseCurrency] || 1;
+                normalizedAmount = normalizedAmount / rate;
+            }
+            totalPlatformRevenue += (normalizedAmount * platformRate);
+        });
 
         return {
             courses: coursesCount,
             categories: categoriesCount,
             instructors: instructorsCount,
             students: studentsCount,
+            revenue: totalPlatformRevenue,
         };
     } catch (error) {
         console.log("[GET_ADMIN_STATS]", error);

@@ -60,6 +60,9 @@ export const updateCurrentUser = async (values: {
     phone?: string;
     address?: string;
     image?: string;
+    title?: string;
+    bio?: string;
+    socialLinks?: any;
 }) => {
     try {
         const session = await auth();
@@ -74,6 +77,8 @@ export const updateCurrentUser = async (values: {
 
         revalidatePath("/admin/users/my-info");
         revalidatePath("/student/settings");
+        revalidatePath("/instructor/profile");
+        revalidatePath("/instructor/settings");
         return updatedUser;
     } catch (error) {
         console.log("[UPDATE_CURRENT_USER]", error);
@@ -252,5 +257,47 @@ export const resendVerificationAction = async (email: string) => {
     } catch (error) {
         console.log("[RESEND_VERIFICATION]", error);
         return { success: false, error: "Failed to resend email" };
+    }
+};
+
+/**
+ * Change current user password.
+ */
+export const changePassword = async (values: {
+    currentPassword?: string;
+    newPassword: string;
+}) => {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            throw new Error("Unauthorized");
+        }
+
+        const user = await db.user.findUnique({
+            where: { id: session.user.id }
+        });
+
+        if (!user || !user.password) {
+            throw new Error("User not found or has no password");
+        }
+
+        if (values.currentPassword) {
+            const passwordsMatch = await bcrypt.compare(values.currentPassword, user.password);
+            if (!passwordsMatch) {
+                return { success: false, error: "Incorrect current password" };
+            }
+        }
+
+        const hashedPassword = await bcrypt.hash(values.newPassword, 10);
+
+        await db.user.update({
+            where: { id: session.user.id },
+            data: { password: hashedPassword }
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.log("[CHANGE_PASSWORD]", error);
+        return { success: false, error: "Failed to change password" };
     }
 };

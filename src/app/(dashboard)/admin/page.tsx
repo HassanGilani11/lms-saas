@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     Users, BookOpen, List, GraduationCap,
     MoreHorizontal, Globe, Monitor, Smartphone,
-    Tablet, MapPin
+    Tablet, MapPin, DollarSign
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { getAdminDashboardStats, getAdminPerformanceData } from "@/actions/analytics";
@@ -17,8 +17,8 @@ const AdminDashboardPage = async () => {
     const formatValue = (val: number) => val.toLocaleString();
 
     const kpiCards = [
+        { label: "Platform Revenue", value: `$${(stats.revenue || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, icon: DollarSign, color: "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400" },
         { label: "Courses", value: formatValue(stats.courses), icon: BookOpen, color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400" },
-        { label: "Categories", value: formatValue(stats.categories), icon: List, color: "bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400" },
         { label: "Instructors", value: formatValue(stats.instructors), icon: GraduationCap, color: "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400" },
         { label: "Students", value: formatValue(stats.students), icon: Users, color: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400" },
     ];

@@ -129,6 +129,23 @@ export const fulfillStripeCheckout = async (sessionId: string) => {
                         metadata: { purchaseId: session.id }
                     });
                 }
+
+                // Notify Instructor
+                const course = await db.course.findUnique({
+                    where: { id: courseId },
+                    select: { userId: true }
+                });
+
+                if (course) {
+                    await createNotification({
+                        userId: course.userId,
+                        title: "New Enrollment",
+                        message: `${email} enrolled in your course "${courseTitle}" via Stripe.`,
+                        type: NotificationType.ENROLLMENT,
+                        href: "/instructor/courses",
+                        metadata: { courseId }
+                    });
+                }
             } catch (notifError) {
                 console.error("[FULFILLMENT_NOTIF_ERROR]", notifError);
             }

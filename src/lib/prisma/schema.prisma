@@ -17,6 +17,9 @@ model User {
   image                   String?
   password                String?
   role                    UserRole                 @default(STUDENT)
+  title                   String?
+  bio                     String?                  @db.Text
+  socialLinks             Json?                    @default("{}")
   phone                   String?
   address                 String?
   createdAt               DateTime                 @default(now())
@@ -671,18 +674,19 @@ model AnalyticsAggregate {
 }
 
 model SystemSettings {
-  id             String    @id @default("default")
-  siteName       String    @default("LMS SaaS")
-  siteLogo       String?
-  contactEmail   String?
-  emailTemplates Json?     @default("{}")
-  stripeCurrency String    @default("USD")
-  baseCurrency   String    @default("USD")
-  exchangeRates  Json?     @default("{}")
-  ratesUpdatedAt DateTime?
-  stripeEnabled  Boolean   @default(true)
-  codEnabled     Boolean   @default(true)
-  updatedAt      DateTime  @updatedAt
+  id                   String    @id @default("default")
+  siteName             String    @default("LMS SaaS")
+  siteLogo             String?
+  contactEmail         String?
+  emailTemplates       Json?     @default("{}")
+  stripeCurrency       String    @default("USD")
+  baseCurrency         String    @default("USD")
+  exchangeRates        Json?     @default("{}")
+  ratesUpdatedAt       DateTime?
+  stripeEnabled        Boolean   @default(true)
+  codEnabled           Boolean   @default(true)
+  instructorCommission Float     @default(70.0)
+  updatedAt            DateTime  @updatedAt
 }
 
 model Coupon {
