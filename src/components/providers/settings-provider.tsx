@@ -1,6 +1,6 @@
 "use client";
 
-import { SystemSettings } from "@prisma/client";
+import { SystemSettings } from "@/lib/prisma";
 import { createContext, useContext, ReactNode } from "react";
 
 interface SettingsContextProps {

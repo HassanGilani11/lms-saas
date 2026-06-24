@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import { QuestionType } from "@prisma/client";
+import { QuestionType } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export const createQuestion = async (

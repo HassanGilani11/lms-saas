@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { CouponType } from "@prisma/client";
+import { CouponType } from "@/lib/prisma";
 
 export const getCoupons = async () => {
     try {

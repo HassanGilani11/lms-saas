@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getCoupons, createCoupon, updateCoupon, deleteCoupon } from "@/actions/coupon";
-import { CouponType } from "@prisma/client";
+import { CouponType } from "@/lib/prisma";
 import {
     Table,
     TableBody,

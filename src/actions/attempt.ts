@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { AttemptStatus } from "@prisma/client";
+import { AttemptStatus } from "@/lib/prisma";
 
 // Start a new attempt
 export const startAttempt = async (quizId: string) => {
